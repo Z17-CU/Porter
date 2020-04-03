@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:theme="@style/ThemeOverlay.AppCompat.Light">
+
+    <LinearLayout
+        android:id="@+id/_layoutProgress"
+        android:layout_width="@dimen/progressSize"
+        android:layout_height="@dimen/progressSize"
+        android:background="@drawable/round_white_bg"
+        android:padding="8dp">
+
+        <fr.castorflex.android.circularprogressbar.CircularProgressBar
+            android:id="@+id/loader"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indeterminate="true"
+            app:cpb_colors="@array/colorsArray"
+            app:cpb_max_sweep_angle="300"
+            app:cpb_min_sweep_angle="10"
+            app:cpb_rotation_speed="1.0"
+            app:cpb_stroke_width="4dp"
+            app:cpb_sweep_speed="1.0" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/_imageViewOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="60dp"
+        android:src="@drawable/ic_check"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/_imageViewFail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="60dp"
+        android:src="@drawable/ic_fail"
+        android:visibility="gone" />
+
+</LinearLayout>

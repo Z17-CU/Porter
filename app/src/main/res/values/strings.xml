@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Porter@</string>
+    <string name="permissions">Hay permisos obligatorios sin conceder</string>
+    <string name="lantern">lantern</string>
+    <string name="readError">Lectura incorrecta, inténtalo otravés.</string>
+    <string name="clientExist">El cliente fue regisitrado recientemente.</string>
+    <string name="error">Ha ocurrido un error.</string>
+    <string name="nombre">Nombre</string>
+    <string name="apellidos">Apellidos</string>
+    <string name="carn_identidad">Carné de identidad</string>
+    <string name="verificar">Verificar</string>
+    <string name="insertar">Insertar</string>
+    <string name="requerido">Requerido</string>
+</resources>

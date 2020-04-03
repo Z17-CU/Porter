@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll"
+    android:padding="8dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Light"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:layout_width="@dimen/progressSize"
+    android:layout_height="@dimen/progressSize">
+
+    <fr.castorflex.android.circularprogressbar.CircularProgressBar
+            android:indeterminate="true"
+            app:cpb_colors="@array/colorsArray"
+            app:cpb_rotation_speed="1.0"
+            app:cpb_sweep_speed="1.0"
+            app:cpb_stroke_width="4dp"
+            app:cpb_min_sweep_angle="10"
+            app:cpb_max_sweep_angle="300"
+            android:id="@+id/loader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="?android:attr/progressBarStyleLarge"/>
+
+</LinearLayout>
