@@ -49,7 +49,7 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
 
         holder.textViewName.text = queue.name
         holder.textViewDate.text = formatDateBig.format(queue.startDate)
-        holder.textViewID.text = ""
+        holder.textViewID.text = queue.clientsNumber.toString()
         holder.imageView.setImageDrawable(
             ContextCompat.getDrawable(
                 holder.imageView.context, R.drawable.ic_queue
@@ -61,5 +61,6 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
         }
 
         holder.layoutmarker.visibility = View.GONE
+        holder.textViewReIntents.visibility = View.GONE
     }
 }

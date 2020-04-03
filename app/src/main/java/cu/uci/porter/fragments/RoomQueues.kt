@@ -17,9 +17,7 @@ import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import cu.uci.porter.viewModels.ClientViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.qr_reader.*
 import kotlinx.android.synthetic.main.room_queues.*
-import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
 import me.yokeyword.fragmentation.SupportFragment
 
 class RoomQueues : SupportFragment() {

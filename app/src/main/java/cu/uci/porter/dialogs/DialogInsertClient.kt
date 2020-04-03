@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cu.uci.porter.R
+import cu.uci.porter.fragments.QrReaderFragment
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
@@ -22,7 +23,8 @@ import java.util.*
 class DialogInsertClient(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val queueId: Int
+    private val queueId: Int,
+    private val qrReaderFragment: QrReaderFragment
 ) {
 
     private lateinit var dao: Dao
@@ -52,6 +54,7 @@ class DialogInsertClient(
 
         view._okButton.setOnClickListener {
 
+            var done: Boolean? = null
             compositeDisposable.add(Completable.create {
 
                 val client = Client(
@@ -66,11 +69,7 @@ class DialogInsertClient(
                     queueId
                 )
 
-                if (dao.clientExist(client.id) > 0) {
-                    showError(context.getString(R.string.clientExist))
-                } else {
-                    dao.insertClient(client)
-                }
+                done = qrReaderFragment.saveClient(client)
 
                 it.onComplete()
             }
@@ -78,6 +77,7 @@ class DialogInsertClient(
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     dialog.dismiss()
+                    qrReaderFragment.showDone(done)
                 }, {
                     it.printStackTrace()
                     showError(context.getString(R.string.error))

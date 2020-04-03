@@ -12,4 +12,9 @@
     <string name="adicionar">Adicionar</string>
     <string name="insertar">Insertar</string>
     <string name="requerido">Requerido</string>
+    <string name="todos">Todos</string>
+    <string name="ni_os">Niños</string>
+    <string name="j_venes">Jóvenes</string>
+    <string name="adultos">Adultos</string>
+    <string name="_3ra_edad">3ra Edad</string>
 </resources>

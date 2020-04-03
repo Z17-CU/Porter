@@ -9,9 +9,9 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:background="?selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
         android:baselineAligned="false"
         android:orientation="horizontal">
 
@@ -25,15 +25,38 @@
             android:paddingBottom="8dp"
             tools:ignore="UselessParent">
 
-            <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/_circularImageView"
+            <RelativeLayout
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginLeft="12dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
-                tools:src="@drawable/ic_man_big" />
+                android:layout_marginRight="16dp">
+
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/_circularImageView"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    tools:src="@drawable/ic_girl_big" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="end|bottom">
+
+                    <TextView
+                        android:id="@+id/_textViewReIntents"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/round_white_bg"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:textColor="@color/google_red"
+                        android:textSize="12sp"
+                        tools:text="5" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

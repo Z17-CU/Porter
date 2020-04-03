@@ -2,6 +2,7 @@ package cu.uci.porter.adapters
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +49,16 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
         holder.textViewName.text = "${client.name} ${client.lastName}"
         holder.textViewID.text = client.ci
         holder.textViewDate.text = formatDateOnlyTime.format(client.lastRegistry)
+        holder.textViewReIntents.visibility = if (client.reIntent > 0) {
+            holder.textViewReIntents.text = if (client.reIntent > 9) {
+                "+9"
+            } else {
+                client.reIntent.toString()
+            }
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
         holder.layoutmarker.setBackgroundColor(
             when {
                 client.age < 12 -> {

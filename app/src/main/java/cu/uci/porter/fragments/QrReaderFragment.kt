@@ -2,6 +2,7 @@ package cu.uci.porter.fragments
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -9,13 +10,17 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.zxing.Result
+import cu.uci.porter.MainActivity
 import cu.uci.porter.R
 import cu.uci.porter.adapters.AdapterClient
-import cu.uci.porter.dialogs.DialogCreateQueue
 import cu.uci.porter.dialogs.DialogInsertClient
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
@@ -38,6 +43,13 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
     SupportFragment(),
     ZXingScannerView.ResultHandler {
 
+    companion object {
+        const val MODE_READ = 1
+        const val MODE_LIST = 2
+    }
+
+    private var currentMode = MutableLiveData<Int>().default(MODE_READ)
+    private lateinit var menu: Menu
     private lateinit var dao: Dao
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
@@ -80,28 +92,58 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
                 _imageViewEngranes.visibility = View.VISIBLE
             }
         })
+
+        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+
+            try {
+                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
+                    _recyclerViewClients.context, if (it == MODE_LIST) {
+                        pauseScanner()
+                        _qrReader.visibility = View.GONE
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
+                        R.drawable.ic_qr_reader
+                    } else {
+                        _qrReader.visibility = View.VISIBLE
+                        resumeReader()
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
+                        R.drawable.ic_filter_list
+                    }
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
         resumeReader()
+        progress.dismiss()
     }
 
     override fun onPause() {
         super.onPause()
-        _zXingScannerView.flash = false
-        _zXingScannerView.stopCamera()
-        progress.dismiss()
+        pauseScanner()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        this.menu = menu
         inflater.inflate(R.menu.main, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_insert_client -> {
-                DialogInsertClient(progress.context, compositeDisposable, queueId).create().show()
+                DialogInsertClient(progress.context, compositeDisposable, queueId, this).create()
+                    .show()
+                true
+            }
+            R.id.action_list -> {
+                changeMode()
+                true
+            }
+            R.id.action_show_filter_menu -> {
+                showPopupMenu(item)
                 true
             }
             else -> {
@@ -127,18 +169,7 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
 
             val client = stringToClient(rawResult)
 
-            if (client == null) {
-                showError(_flash.context.getString(R.string.readError))
-            } else {
-
-                if (dao.clientExist(client.id) > 0) {
-                    done = false
-                    showError(_flash.context.getString(R.string.clientExist))
-                } else {
-                    done = true
-                    dao.insertClient(client)
-                }
-            }
+            done = saveClient(client)
 
             it.onComplete()
         }
@@ -153,15 +184,89 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             }))
     }
 
-    private fun resumeReader() {
+    @SuppressLint("RestrictedApi")
+    private fun showPopupMenu(menuItem: MenuItem) {
+        val view: View = requireActivity().findViewById(menuItem.itemId)
+        val popupMenu = PopupMenu(requireContext(), view)
+        (context as MainActivity).menuInflater.inflate(R.menu.menu_filters, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_filter_todos -> {
+
+                }
+                R.id.action_filter_niños -> {
+
+                }
+                R.id.action_filter_jovenes -> {
+
+                }
+                R.id.action_filter_adultos -> {
+
+                }
+                R.id.action_filter_3raEdad -> {
+
+                }
+            }
+            false
+        }
+        val wrapper = ContextThemeWrapper(context, R.style.PopupWhite)
+        val menuPopupHelper = MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.show()
+    }
+
+    private fun changeMode() {
+        if (currentMode.value == MODE_READ) {
+            currentMode.postValue(MODE_LIST)
+        } else {
+            currentMode.postValue(MODE_READ)
+        }
+    }
+
+    private fun pauseScanner() {
+        _zXingScannerView.flash = false
         _zXingScannerView.stopCamera()
-        _zXingScannerView.setResultHandler(this)
-        _zXingScannerView.startCamera()
-        turnFlash()
         progress.dismiss()
     }
 
-    private fun showDone(done: Boolean?) {
+    fun saveClient(client: Client?): Boolean? {
+        var done: Boolean? = null
+        if (client == null) {
+            showError(_flash.context.getString(R.string.readError))
+        } else {
+
+            if (dao.clientExist(client.id, queueId) > 0) {
+                done = false
+                showError(_flash.context.getString(R.string.clientExist))
+
+                val mClient = dao.getClient(client.id)
+                mClient.reIntent++
+                mClient.lastRegistry = Calendar.getInstance().timeInMillis
+                dao.insertClient(mClient)
+            } else {
+                done = true
+                dao.insertClient(client)
+            }
+
+            val queue = dao.getQueue(queueId)
+            queue.clientsNumber = dao.clientsByQueue(queueId)
+
+            dao.insertQueue(queue)
+        }
+        return done
+    }
+
+    private fun resumeReader() {
+        if (currentMode.value == MODE_READ) {
+            _zXingScannerView.stopCamera()
+            _zXingScannerView.setResultHandler(this)
+            _zXingScannerView.startCamera()
+            turnFlash()
+        }
+        progress.dismiss()
+    }
+
+    fun showDone(done: Boolean?) {
 
         done?.let {
             _relativeDone.visibility = View.VISIBLE
@@ -258,4 +363,7 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             )
         )
     }
+
+    private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
+        apply { setValue(initialValue) }
 }
