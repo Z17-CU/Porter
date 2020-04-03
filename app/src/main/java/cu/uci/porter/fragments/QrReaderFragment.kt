@@ -161,8 +161,17 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_insert_client -> {
-                DialogInsertClient(progress.context, compositeDisposable, queue.id!!, this).create()
-                    .show()
+                pauseScanner()
+                val dialog = DialogInsertClient(
+                    progress.context,
+                    compositeDisposable,
+                    queue.id!!,
+                    this
+                ).create()
+                dialog.setOnDismissListener {
+                    resumeReader()
+                }
+                dialog.show()
                 true
             }
             R.id.action_list -> {
