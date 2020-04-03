@@ -1,7 +1,6 @@
 package cu.uci.porter.adapters
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
 import cu.uci.porter.fragments.QrReaderFragment
-import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Conts.Companion.formatDateBig
-import cu.uci.porter.utils.Conts.Companion.formatDateOnlyTime
 import cu.uci.porter.viewModels.ClientViewModel
-import me.yokeyword.fragmentation.Fragmentation
 import me.yokeyword.fragmentation.SupportFragment
 
 class AdapterQueue(private val context: SupportFragment, private val viewModel: ClientViewModel) :
@@ -52,12 +48,12 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
         holder.textViewID.text = queue.clientsNumber.toString()
         holder.imageView.setImageDrawable(
             ContextCompat.getDrawable(
-                holder.imageView.context, R.drawable.ic_queue
+                holder.imageView.context, R.drawable.ic_recurso_3
             )
         )
 
         holder.layoutBackground.setOnClickListener {
-            context.start(QrReaderFragment(queue.id!!, viewModel))
+            context.start(QrReaderFragment(queue, viewModel))
         }
 
         holder.layoutmarker.visibility = View.GONE

@@ -19,7 +19,8 @@ class MainActivity : SupportActivity() {
     companion object {
         private val REQUIRED_SDK_PERMISSIONS =
             arrayOf(
-                Manifest.permission.CAMERA
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         private const val REQUEST_CODE_ASK_PERMISSIONS = 1234
     }

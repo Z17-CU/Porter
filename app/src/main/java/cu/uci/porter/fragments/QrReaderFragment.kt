@@ -15,6 +15,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.zxing.Result
@@ -25,8 +26,10 @@ import cu.uci.porter.dialogs.DialogInsertClient
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
+import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
+import cu.uci.porter.utils.PDF
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -39,7 +42,7 @@ import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 
 
-class QrReaderFragment(private val queueId: Int, private val viewModel: ClientViewModel) :
+class QrReaderFragment(private val queue: Queue, private val viewModel: ClientViewModel) :
     SupportFragment(),
     ZXingScannerView.ResultHandler {
 
@@ -53,6 +56,8 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
     private lateinit var dao: Dao
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
+    private val adapter = AdapterClient()
+    private lateinit var observer: Observer<List<Client>>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +67,8 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
         val view = View.inflate(context, R.layout.qr_reader, null)
 
         setHasOptionsMenu(true)
+
+        requireActivity().title = queue.name
 
         progress = Progress(view.context)
 
@@ -78,11 +85,10 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             turnFlash()
         }
 
-        val adapter = AdapterClient()
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
 
-        viewModel.allClient(queueId).observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        observer = androidx.lifecycle.Observer {
             adapter.contentList = it
             adapter.notifyDataSetChanged()
             if (it.isNotEmpty()) {
@@ -91,7 +97,13 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             } else {
                 _imageViewEngranes.visibility = View.VISIBLE
             }
-        })
+        }
+
+        viewModel.allClients.removeObserver(observer)
+
+        viewModel.setAllClient(queue.id!!)
+
+        viewModel.allClients.observe(viewLifecycleOwner, observer)
 
         currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
 
@@ -101,11 +113,21 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
                         pauseScanner()
                         _qrReader.visibility = View.GONE
                         menu.findItem(R.id.action_show_filter_menu).isVisible = true
+                        menu.findItem(R.id.action_save).isVisible = true
+                        menu.findItem(R.id.action_insert_client).isVisible = false
                         R.drawable.ic_qr_reader
                     } else {
                         _qrReader.visibility = View.VISIBLE
                         resumeReader()
                         menu.findItem(R.id.action_show_filter_menu).isVisible = false
+                        menu.findItem(R.id.action_save).isVisible = false
+                        menu.findItem(R.id.action_insert_client).isVisible = true
+
+                        viewModel.allClients.removeObserver(observer)
+
+                        viewModel.setAllClient(queue.id!!)
+
+                        viewModel.allClients.observe(viewLifecycleOwner, observer)
                         R.drawable.ic_filter_list
                     }
                 )
@@ -126,6 +148,11 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
         pauseScanner()
     }
 
+    override fun onBackPressedSupport(): Boolean {
+        requireActivity().title = requireContext().getString(R.string.app_name)
+        return super.onBackPressedSupport()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         this.menu = menu
         inflater.inflate(R.menu.main, menu)
@@ -134,7 +161,7 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_insert_client -> {
-                DialogInsertClient(progress.context, compositeDisposable, queueId, this).create()
+                DialogInsertClient(progress.context, compositeDisposable, queue.id!!, this).create()
                     .show()
                 true
             }
@@ -144,6 +171,10 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             }
             R.id.action_show_filter_menu -> {
                 showPopupMenu(item)
+                true
+            }
+            R.id.action_save -> {
+                PDF(requireContext()).write(queue, adapter.contentList)
                 true
             }
             else -> {
@@ -184,6 +215,16 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
             }))
     }
 
+    private fun setRangue(min: Int, max: Int) {
+        Log.d("setRangue", "$min to $max")
+
+        viewModel.allClients.removeObserver(observer)
+
+        viewModel.setAllClientsInRangue(queue.id!!, min, max)
+
+        viewModel.allClients.observe(viewLifecycleOwner, observer)
+    }
+
     @SuppressLint("RestrictedApi")
     private fun showPopupMenu(menuItem: MenuItem) {
         val view: View = requireActivity().findViewById(menuItem.itemId)
@@ -192,19 +233,23 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_filter_todos -> {
+                    viewModel.allClients.removeObserver(observer)
 
+                    viewModel.setAllClient(queue.id!!)
+
+                    viewModel.allClients.observe(viewLifecycleOwner, observer)
                 }
                 R.id.action_filter_niños -> {
-
+                    setRangue(-1, 12)
                 }
                 R.id.action_filter_jovenes -> {
-
+                    setRangue(13, 30)
                 }
                 R.id.action_filter_adultos -> {
-
+                    setRangue(31, 55)
                 }
                 R.id.action_filter_3raEdad -> {
-
+                    setRangue(56, 200)
                 }
             }
             false
@@ -230,12 +275,13 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
     }
 
     fun saveClient(client: Client?): Boolean? {
+
         var done: Boolean? = null
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
         } else {
-
-            if (dao.clientExist(client.id, queueId) > 0) {
+            client.id += queue.id!!
+            if (dao.clientExist(client.id, queue.id!!) > 0) {
                 done = false
                 showError(_flash.context.getString(R.string.clientExist))
 
@@ -248,8 +294,8 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
                 dao.insertClient(client)
             }
 
-            val queue = dao.getQueue(queueId)
-            queue.clientsNumber = dao.clientsByQueue(queueId)
+            val queue = dao.getQueue(queue.id!!)
+            queue.clientsNumber = dao.clientsByQueue(queue.id!!)
 
             dao.insertQueue(queue)
         }
@@ -347,7 +393,7 @@ class QrReaderFragment(private val queueId: Int, private val viewModel: ClientVi
                         sex,
                         getAge(idString),
                         Calendar.getInstance().timeInMillis,
-                        queueId
+                        queue.id!!
                     )
             }
         }

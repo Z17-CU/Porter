@@ -17,4 +17,24 @@
     <string name="j_venes">Jóvenes</string>
     <string name="adultos">Adultos</string>
     <string name="_3ra_edad">3ra Edad</string>
+    <string name="hi">HOLA</string>
+    <string name="first_description"><b><i>Bienvenido a PORTER@</i></b>\n Una aplicación para regular el acceso de los puntos de venta</string>
+    <string name="id"><big>IDENTIFICACIÓN</big></string>
+    <string name="second_description">Para el acceso a un punto de venta cada cliente debe presentar necesariamente su identificación personal</string>
+    <string name="reg"><big>REGISTRO</big></string>
+    <string name="third_description">El cliente presentará su identificación y será registrado en la aplicación</string>
+    <string name="once"><big>SÓLO UNA VEZ</big></string>
+    <string name="fourth_description">Si el cliente vuelve a presentar la identificación antes que culmine el plazo establecido por la institución será denegado</string>
+    <string name="app_intro_skip_button">
+         Omitir
+    </string>
+    <string name="app_intro_next_button">
+         Siguiente
+    </string>
+    <string name="app_intro_back_button">
+         Atrás
+    </string>
+    <string name="app_intro_done_button">
+         Hecho
+    </string>
 </resources>

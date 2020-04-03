@@ -1,6 +1,7 @@
 package cu.uci.porter.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -25,6 +26,9 @@ interface Dao {
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id ORDER BY lastRegistry")
     fun getAllClients(id: Int): LiveData<List<Client>>
+
+    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id AND age BETWEEN :min AND :max ORDER BY lastRegistry")
+    fun getAllClientsInRangue(id: Int, min: Int, max: Int): LiveData<List<Client>>
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME}")
     fun getAllQueues(): LiveData<List<Queue>>

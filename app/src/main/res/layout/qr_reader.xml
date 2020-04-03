@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="100dp"
-                android:src="@drawable/ic_engranes"
+                android:src="@drawable/ic_recurso_2"
                 android:visibility="gone" />
 
         </RelativeLayout>
