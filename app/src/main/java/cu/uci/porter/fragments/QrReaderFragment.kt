@@ -10,13 +10,13 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.zxing.Result
 import cu.uci.porter.R
 import cu.uci.porter.adapters.AdapterClient
-import cu.uci.porter.dialogs.DialogTypeClient
+import cu.uci.porter.dialogs.DialogCreateQueue
+import cu.uci.porter.dialogs.DialogInsertClient
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
@@ -24,7 +24,6 @@ import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
-import cu.uci.porter.viewModels.ClientViewModelFactory
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -35,11 +34,9 @@ import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 
 
-class QrReaderFragment :
+class QrReaderFragment(private val queueId: Int, private val viewModel: ClientViewModel) :
     SupportFragment(),
     ZXingScannerView.ResultHandler {
-
-    private lateinit var viewModel: ClientViewModel
 
     private lateinit var dao: Dao
     private lateinit var progress: Progress
@@ -58,11 +55,6 @@ class QrReaderFragment :
 
         dao = AppDataBase.getInstance(view.context).dao()
 
-        val tempViewModel: ClientViewModel by viewModels(
-            factoryProducer = { ClientViewModelFactory(view.context) }
-        )
-        viewModel = tempViewModel
-
         return view
     }
 
@@ -78,11 +70,14 @@ class QrReaderFragment :
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
 
-        viewModel.allClient.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        viewModel.allClient(queueId).observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             adapter.contentList = it
             adapter.notifyDataSetChanged()
             if (it.isNotEmpty()) {
                 goTo(it.size - 1)
+                _imageViewEngranes.visibility = View.GONE
+            } else {
+                _imageViewEngranes.visibility = View.VISIBLE
             }
         })
     }
@@ -106,7 +101,7 @@ class QrReaderFragment :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_insert_client -> {
-                DialogTypeClient(progress.context, compositeDisposable).create().show()
+                DialogInsertClient(progress.context, compositeDisposable, queueId).create().show()
                 true
             }
             else -> {
@@ -210,7 +205,6 @@ class QrReaderFragment :
         }
         smoothScroller.targetPosition = pos
         _recyclerViewClients.layoutManager?.startSmoothScroll(smoothScroller)
-
     }
 
     private fun showError(error: String) {
@@ -247,7 +241,8 @@ class QrReaderFragment :
                         fv,
                         sex,
                         getAge(idString),
-                        Calendar.getInstance().timeInMillis
+                        Calendar.getInstance().timeInMillis,
+                        queueId
                     )
             }
         }

@@ -13,7 +13,8 @@ class Client(
     var fv: String?,
     var sex: Int?,
     var age: Int,
-    val lastRegistry: Long
+    val lastRegistry: Long,
+    val queueId: Int
 ) {
     companion object {
         const val TABLE_NAME = "Client"

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import cu.uci.porter.fragments.QrReaderFragment
+import cu.uci.porter.fragments.RoomQueues
 import me.yokeyword.fragmentation.BuildConfig
 import me.yokeyword.fragmentation.Fragmentation
 import me.yokeyword.fragmentation.SupportActivity
@@ -50,7 +51,7 @@ class MainActivity : SupportActivity() {
                 if (top == null) {
                     this@MainActivity.loadRootFragment(
                         R.id._mainLayout,
-                        QrReaderFragment()
+                        RoomQueues()
                     )  //load root Fragment
                 }
             }

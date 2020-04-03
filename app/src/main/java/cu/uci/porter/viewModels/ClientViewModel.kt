@@ -9,7 +9,8 @@ class ClientViewModel @Inject constructor(
     private val clientRepository: ClientRepository
 ) : ViewModel() {
 
-    var allClient = clientRepository.getAllClients()
+    fun allClient(id: Int) = clientRepository.getAllClients(id)
+    var allQueues = clientRepository.getAllQueues()
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }

@@ -19,9 +19,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
 import java.util.*
 
-class DialogTypeClient(
+class DialogInsertClient(
     private val context: Context,
-    private val compositeDisposable: CompositeDisposable
+    private val compositeDisposable: CompositeDisposable,
+    private val queueId: Int
 ) {
 
     private lateinit var dao: Dao
@@ -61,7 +62,8 @@ class DialogTypeClient(
                     null,
                     Common.getSex(view._editTextCI.text.toString().trim()),
                     Common.getAge(view._editTextCI.text.toString().trim()),
-                    Calendar.getInstance().timeInMillis
+                    Calendar.getInstance().timeInMillis,
+                    queueId
                 )
 
                 if (dao.clientExist(client.id) > 0) {

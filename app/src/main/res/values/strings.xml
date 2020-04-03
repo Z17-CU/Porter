@@ -9,6 +9,7 @@
     <string name="apellidos">Apellidos</string>
     <string name="carn_identidad">Carné de identidad</string>
     <string name="verificar">Verificar</string>
+    <string name="adicionar">Adicionar</string>
     <string name="insertar">Insertar</string>
     <string name="requerido">Requerido</string>
 </resources>
