@@ -44,7 +44,6 @@
         android:icon="@drawable/ic_save"
         android:orderInCategory="100"
         android:title="@string/insertar"
-        android:visible="false"
         app:showAsAction="ifRoom" />
 
 </menu>

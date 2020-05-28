@@ -124,14 +124,12 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         pauseScanner()
                         _qrReader.visibility = View.GONE
                         menu.findItem(R.id.action_show_filter_menu).isVisible = true
-                        menu.findItem(R.id.action_save).isVisible = true
                         menu.findItem(R.id.action_insert_client).isVisible = false
                         R.drawable.ic_qr_reader
                     } else {
                         _qrReader.visibility = View.VISIBLE
                         resumeReader()
                         menu.findItem(R.id.action_show_filter_menu).isVisible = false
-                        menu.findItem(R.id.action_save).isVisible = false
                         menu.findItem(R.id.action_insert_client).isVisible = true
 
                         viewModel.allClients.removeObserver(observer)
