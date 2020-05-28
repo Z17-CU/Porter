@@ -46,7 +46,7 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
             )
         )
 
-        holder.textViewName.text = "${client.name} ${client.lastName}"
+        holder.textViewName.text = "${client.name}"
         holder.textViewID.text = client.ci
         holder.textViewDate.text = formatDateOnlyTime.format(client.lastRegistry)
         holder.textViewReIntents.visibility = if (client.reIntent > 0) {

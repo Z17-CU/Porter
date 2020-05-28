@@ -12,7 +12,7 @@ class ClientRepository @Inject constructor(
     private val dao: Dao
 ) {
 
-    fun getAllClients(id: Int): LiveData<List<Client>> {
+    fun getAllClients(id: Long): LiveData<List<Client>> {
 
         return dao.getAllClients(id)
     }
@@ -22,7 +22,7 @@ class ClientRepository @Inject constructor(
         return dao.getAllQueues()
     }
 
-    fun getAllClientsInRangue(id: Int, min: Int, max: Int): LiveData<List<Client>> {
+    fun getAllClientsInRangue(id: Long, min: Int, max: Int): LiveData<List<Client>> {
         return dao.getAllClientsInRangue(id, min, max)
     }
 }

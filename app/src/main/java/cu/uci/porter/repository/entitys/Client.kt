@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 @Entity
 class Client(
     var name: String,
-    var lastName: String,
     @PrimaryKey
     var id: Long,
     var ci: String,
@@ -14,7 +13,7 @@ class Client(
     var sex: Int?,
     var age: Int,
     var lastRegistry: Long,
-    val queueId: Int,
+    val queueId: Long,
     var reIntent: Int = 0
 ) {
     companion object {

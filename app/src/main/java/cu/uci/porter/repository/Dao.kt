@@ -22,20 +22,20 @@ interface Dao {
     fun getClient(id: Long): Client
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id = :id")
-    fun getQueue(id: Int): Queue
+    fun getQueue(id: Long): Queue
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id ORDER BY lastRegistry")
-    fun getAllClients(id: Int): LiveData<List<Client>>
+    fun getAllClients(id: Long): LiveData<List<Client>>
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id AND age BETWEEN :min AND :max ORDER BY lastRegistry")
-    fun getAllClientsInRangue(id: Int, min: Int, max: Int): LiveData<List<Client>>
+    fun getAllClientsInRangue(id: Long, min: Int, max: Int): LiveData<List<Client>>
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME}")
     fun getAllQueues(): LiveData<List<Queue>>
 
     @Query("SELECT COUNT(*) from ${Client.TABLE_NAME} WHERE id = :id AND queueId = :queueId")
-    fun clientExist(id: Long, queueId: Int): Int
+    fun clientExist(id: Long, queueId: Long): Int
 
     @Query("SELECT COUNT(*) from ${Client.TABLE_NAME} WHERE queueId = :id")
-    fun clientsByQueue(id: Int): Int
+    fun clientsByQueue(id: Long): Int
 }

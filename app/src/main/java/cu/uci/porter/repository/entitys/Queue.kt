@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 class Queue(
     @PrimaryKey(autoGenerate = true)
-    var id: Int?,
+    var id: Long?,
     var name: String,
     var startDate: Long,
     var clientsNumber: Int = 0

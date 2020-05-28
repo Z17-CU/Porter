@@ -19,28 +19,28 @@ class Common {
             }
         }
 
-                fun getAge(idString: String): Int {
-                    val currentYearBig = Calendar.getInstance().get(Calendar.YEAR)
-                    val currentYear = currentYearBig.toString().substring(2, 4).toInt()
-                    var clientYear = idString.substring(0, 2).toInt()
+        fun getAge(idString: String): Int {
+            val currentYearBig = Calendar.getInstance().get(Calendar.YEAR)
+            val currentYear = currentYearBig.toString().substring(2, 4).toInt()
+            var clientYear = idString.substring(0, 2).toInt()
 
-                    clientYear = if (currentYear < clientYear) {
+            clientYear = if (currentYear < clientYear) {
 
-                        if (clientYear < 10) {
-                            "190$clientYear".toInt()
-                        } else {
-                            "19$clientYear".toInt()
-                        }
-                    } else {
-                        if (clientYear < 10) {
-                            "200$clientYear".toInt()
-                        } else {
-                            "20$clientYear".toInt()
-                        }
-                    }
-
-                    Log.d("Ages", "$currentYearBig $clientYear")
-                    return currentYearBig - clientYear
+                if (clientYear < 10) {
+                    "190$clientYear".toInt()
+                } else {
+                    "19$clientYear".toInt()
                 }
+            } else {
+                if (clientYear < 10) {
+                    "200$clientYear".toInt()
+                } else {
+                    "20$clientYear".toInt()
+                }
+            }
+
+            Log.d("Ages", "$currentYearBig $clientYear")
+            return currentYearBig - clientYear
+        }
     }
 }

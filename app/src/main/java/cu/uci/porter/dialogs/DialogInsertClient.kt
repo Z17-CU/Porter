@@ -23,7 +23,7 @@ import java.util.*
 class DialogInsertClient(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val queueId: Int,
+    private val queueId: Long,
     private val qrReaderFragment: QrReaderFragment
 ) {
 
@@ -42,10 +42,6 @@ class DialogInsertClient(
 
     private fun getView(): View {
 
-        var isNameOK = false
-        var isLastNameOK = false
-        var isCIOk = false
-
         val view = View.inflate(context, R.layout.layout_dialog_insert_client, null)
 
         view._cancelButton.setOnClickListener {
@@ -58,8 +54,7 @@ class DialogInsertClient(
             compositeDisposable.add(Completable.create {
 
                 val client = Client(
-                    view._editTextName.text.toString().trim(),
-                    view._editTextLastName.text.toString().trim(),
+                    view._editTextCI.text.toString().trim(),
                     view._editTextCI.text.trim().toString().toLong(),
                     view._editTextCI.text.toString().trim(),
                     null,
@@ -84,34 +79,6 @@ class DialogInsertClient(
                 }))
         }
 
-        view._editTextName.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                isNameOK = s.trim().isNotEmpty()
-
-                view._okButton.isEnabled = isCIOk && isLastNameOK && isNameOK
-            }
-        })
-
-        view._editTextLastName.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                isLastNameOK = s.trim().isNotEmpty()
-
-                view._okButton.isEnabled = isCIOk && isLastNameOK && isNameOK
-            }
-        })
-
         view._editTextCI.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             }
@@ -120,15 +87,29 @@ class DialogInsertClient(
             }
 
             override fun afterTextChanged(s: Editable) {
-                isCIOk = s.length == 11
 
-                view._okButton.isEnabled = isCIOk && isLastNameOK && isNameOK
+                view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim())
             }
         })
 
-        view._okButton.isEnabled = isCIOk && isLastNameOK && isNameOK
+        view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim())
 
         return view
+    }
+
+    private fun isValidCI(ci: String): Boolean {
+
+        if (ci.length == 11) {
+            val mount = ci.substring(2, 4).toInt()
+            val day = ci.substring(4, 6).toInt()
+            val isValid = mount < 13 && day < 32
+            if (!isValid) {
+                showError("Carné de identidad incorrecto")
+            }
+            return isValid
+        }
+
+        return false
     }
 
     private fun showError(error: String) {

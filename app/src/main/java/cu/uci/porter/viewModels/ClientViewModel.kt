@@ -13,11 +13,11 @@ class ClientViewModel @Inject constructor(
 
     var allClients = clientRepository.getAllClients(-1)
 
-    fun setAllClient(id: Int) {
+    fun setAllClient(id: Long) {
         allClients = clientRepository.getAllClients(id)
     }
 
-    fun setAllClientsInRangue(id: Int, min: Int, max: Int) {
+    fun setAllClientsInRangue(id: Long, min: Int, max: Int) {
         allClients = clientRepository.getAllClientsInRangue(id, min, max)
     }
 

@@ -62,27 +62,23 @@ class PDF(val context: Context) {
             document.add(paragraph)
 
 
-            val table = PdfPTable(5)
+            val table = PdfPTable(4)
             var cell1: PdfPCell? = PdfPCell(Phrase("Nombre"))
-            var cell2: PdfPCell? = PdfPCell(Phrase("Apellidos"))
             var cell3: PdfPCell? = PdfPCell(Phrase("CI"))
             var cell4: PdfPCell? = PdfPCell(Phrase("Reintentos"))
             var cell5: PdfPCell? = PdfPCell(Phrase("Última ves en cola"))
             table.addCell(cell1)
-            table.addCell(cell2)
             table.addCell(cell3)
             table.addCell(cell4)
             table.addCell(cell5)
 
             clients.map { client ->
                 cell1 = PdfPCell(Phrase(client.name))
-                cell2 = PdfPCell(Phrase(client.lastName))
                 cell3 = PdfPCell(Phrase(client.ci))
                 cell4 = PdfPCell(Phrase(client.reIntent.toString()))
                 cell5 = PdfPCell(Phrase(formatDateOnlyTime.format(client.lastRegistry)))
 
                 table.addCell(cell1)
-                table.addCell(cell2)
                 table.addCell(cell3)
                 table.addCell(cell4)
                 table.addCell(cell5)

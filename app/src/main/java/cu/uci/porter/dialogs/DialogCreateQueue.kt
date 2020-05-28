@@ -10,14 +10,14 @@ import android.widget.Toast
 import cu.uci.porter.R
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
-import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
-import cu.uci.porter.utils.Common
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
+import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view.*
 import java.util.*
 
 class DialogCreateQueue(

@@ -394,8 +394,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
 
                 client =
                     Client(
-                        name,
-                        lastName,
+                        "$name $lastName",
                         id,
                         idString,
                         fv,
