@@ -5,11 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import cu.uci.porter.R
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
@@ -93,6 +95,11 @@ class PDF(val context: Context) {
             .subscribeOn(Schedulers.io())
             .subscribe {
                 progress.dismiss()
+                Toast.makeText(
+                    context,
+                    R.string.export_OK,
+                    Toast.LENGTH_LONG
+                ).show()
                 sharePDF(file)
             })
     }

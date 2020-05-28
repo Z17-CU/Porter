@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 class Conts {
     companion object {
         val formatDateOnlyTime = SimpleDateFormat("h:mm:ss a")
-        val formatDateBig = SimpleDateFormat("d 'de' MMMM 'del' yyyy h:mm a")
+        val formatDateBig = SimpleDateFormat("d 'de' MMMM 'del' yyyy")
         val APP_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/Porter@"
     }
 }

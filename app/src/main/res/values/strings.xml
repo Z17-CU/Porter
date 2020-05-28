@@ -38,4 +38,8 @@
          Hecho
     </string>
     <string name="nombre_de_la_cola">Nombre de la cola</string>
+    <string name="guardar_como_pdf">Guardar como PDF</string>
+    <string name="guardar_como_csv">Guardar como CSV</string>
+    <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
+    <string name="export_OK">La cola ha sido exportada al almacenamiento del dispositivo</string>
 </resources>

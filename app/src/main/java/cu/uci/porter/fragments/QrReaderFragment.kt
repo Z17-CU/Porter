@@ -1,5 +1,6 @@
 package cu.uci.porter.fragments
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -18,7 +20,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.zxing.Result
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import cu.uci.porter.MainActivity
 import cu.uci.porter.R
 import cu.uci.porter.adapters.AdapterClient
@@ -27,10 +35,10 @@ import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
+import cu.uci.porter.utils.*
 import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
-import cu.uci.porter.utils.PDF
-import cu.uci.porter.utils.Progress
+import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -39,6 +47,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.qr_reader.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import me.yokeyword.fragmentation.SupportFragment
+import java.io.File
+import java.io.FileWriter
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -183,7 +194,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                 true
             }
             R.id.action_save -> {
-                PDF(requireContext()).write(queue, adapter.contentList)
+                showSaveOptions()
                 true
             }
             else -> {
@@ -416,6 +427,92 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                 if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
             )
         )
+    }
+
+    private fun showSaveOptions() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(R.layout.layout_buttom_sheet_dialog)
+        bottomSheetDialog.show()
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionSavePDF)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            PDF(requireContext()).write(queue, adapter.contentList)
+        }
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionSaveCSV)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            exportQueueCSV()
+        }
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionSaveJSON)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            exportQueueJson()
+        }
+    }
+
+    private fun exportQueueCSV() {
+        if (adapter.contentList.isNotEmpty()) {
+            val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
+            val dateFormat = SimpleDateFormat("d 'de' MMM 'del' yyyy", Locale("es", "CU"))
+
+            val name = queue.name + " " + Conts.formatDateBig.format(queue.startDate) + " " + Calendar.getInstance()
+                .timeInMillis + ".csv"
+
+            val exportDir = File(APP_DIRECTORY, "")
+            if (!exportDir.exists())
+                exportDir.mkdirs()
+
+            val file = File(exportDir, name)
+
+            try {
+                file.createNewFile()
+                val csvWriter = CSVWriter(FileWriter(file))
+                csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
+                adapter.contentList.forEachIndexed { index, client ->
+                    csvWriter.writeNext(
+                        arrayOf(
+                            "$index",
+                            client.name,
+                            client.ci,
+                            dateFormat.format(client.lastRegistry),
+                            timeFormat.format(client.lastRegistry)
+                        )
+                    )
+                }
+                csvWriter.close()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.export_OK,
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun exportQueueJson() {
+        Dexter.withActivity(requireActivity())
+            .withPermissions(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                    if (report.areAllPermissionsGranted()) {
+                        queue.let {
+                            queue.clientList = adapter.contentList
+                            viewModel.exportQueue(queue, requireContext())
+                        }
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: List<PermissionRequest>,
+                    token: PermissionToken
+                ) {
+                    token.continuePermissionRequest()
+                }
+            }).check()
     }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =

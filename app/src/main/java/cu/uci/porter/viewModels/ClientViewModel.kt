@@ -1,15 +1,32 @@
 package cu.uci.porter.viewModels
 
-import androidx.lifecycle.LiveData
+import android.content.Context
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import cu.uci.porter.R
 import cu.uci.porter.repository.ClientRepository
-import cu.uci.porter.repository.entitys.Client
+import cu.uci.porter.repository.entitys.Queue
+import cu.uci.porter.utils.Common
+import cu.uci.porter.utils.Conts
+import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
+import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
+import java.io.File
+import java.io.FileWriter
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class ClientViewModel @Inject constructor(
     private val clientRepository: ClientRepository
 ) : ViewModel() {
+
+    val compositeDisposable = CompositeDisposable()
 
     var allClients = clientRepository.getAllClients(-1)
 
@@ -22,6 +39,50 @@ class ClientViewModel @Inject constructor(
     }
 
     var allQueues = clientRepository.getAllQueues()
+
+    fun exportQueue(queue: Queue, context: Context) {
+        val file = File(APP_DIRECTORY)
+        if (!file.exists()) {
+            file.mkdir()
+        }
+
+        try {
+            val gpxfile = File(
+                file,
+                queue.name + " " + Conts.formatDateBig.format(queue.startDate) + " " + Calendar.getInstance()
+                    .timeInMillis + ".cola"
+            )
+            val data = Common.queueToString(queue)
+            val writer = FileWriter(gpxfile)
+            writer.append(data)
+            writer.flush()
+            writer.close()
+            Toast.makeText(
+                context,
+                R.string.export_OK,
+                Toast.LENGTH_LONG
+            ).show()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun importQueue(fragment: Fragment, code: Int) {
+        Common.selectQueueFromStorage(fragment, code)
+    }
+
+    fun saveImportQueue(queue: Queue) {
+
+        Completable.create {
+            clientRepository.saveCLients(queue.clientList ?: ArrayList())
+            queue.clientsNumber = (queue.clientList ?: ArrayList()).size
+            clientRepository.saveQueue(queue)
+            it.onComplete()
+        }.subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe().addTo(compositeDisposable)
+
+    }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }

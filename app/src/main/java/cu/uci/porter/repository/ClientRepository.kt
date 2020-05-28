@@ -25,4 +25,8 @@ class ClientRepository @Inject constructor(
     fun getAllClientsInRangue(id: Long, min: Int, max: Int): LiveData<List<Client>> {
         return dao.getAllClientsInRangue(id, min, max)
     }
+
+    fun saveCLients(clients: List<Client>) = dao.insertClient(clients)
+
+    fun saveQueue(queue: Queue) = dao.insertQueue(queue)
 }
