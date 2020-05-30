@@ -42,8 +42,14 @@ interface Dao {
     @Insert(onConflict = REPLACE)
     fun insertClientInQueue(clientInQueue: ClientInQueue)
 
+    @Insert(onConflict = REPLACE)
+    fun insertClientInQueue(clientInQueue: List<ClientInQueue>)
+
     @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME} WHERE queueId = :queueId")
-    fun getClientsInQueueList(queueId: Long): LiveData<List<ClientInQueue>>
+    fun getClientsInQueue(queueId: Long): LiveData<List<ClientInQueue>>
+
+    @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME} WHERE queueId = :queueId")
+    fun getClientsInQueueList(queueId: Long): List<ClientInQueue>
 
     @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME}")
     fun getClientsInQueue(): LiveData<List<ClientInQueue>>

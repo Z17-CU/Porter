@@ -28,7 +28,7 @@ class ClientViewModel @Inject constructor(
     var allClientsInQueue = clientRepository.getAllClientInQueue()
 
     fun setAllClientsIDQueue(id: Long) {
-        allClientsInQueue = clientRepository.getClientInQueueList(id)
+        allClientsInQueue = clientRepository.getClientInQueue(id)
     }
 
     private val compositeDisposable = CompositeDisposable()
@@ -71,6 +71,9 @@ class ClientViewModel @Inject constructor(
         Completable.create {
             clientRepository.saveCLients(queue.clientList ?: ArrayList())
             queue.clientsNumber = (queue.clientList ?: ArrayList()).size
+            queue.clientList = ArrayList()
+            clientRepository.saveCLientsInQueue(queue.clientInQueueList!!)
+            queue.clientInQueueList = ArrayList()
             clientRepository.saveQueue(queue)
             it.onComplete()
         }.subscribeOn(Schedulers.io())

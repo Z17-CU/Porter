@@ -14,6 +14,8 @@ class Queue(
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()
+    @Ignore
+    var clientInQueueList: List<ClientInQueue>? = ArrayList()
     companion object {
         const val TABLE_NAME = "Queue"
     }

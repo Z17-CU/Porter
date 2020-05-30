@@ -201,7 +201,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         mp.start()
         //vibrate
         val vibratorService = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        vibratorService.vibrate(80)
+        vibratorService.vibrate(120)
 
         var done: Boolean? = null
 
@@ -238,7 +238,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
             viewLifecycleOwner,
             Observer { clientsInQueue ->
 
-                Single.create<List<Client>> {
+                Single.create<List<Client>> { singleEmitter ->
 
                     var idList: List<Long> = ArrayList()
                     clientsInQueue.map {
@@ -259,7 +259,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
 
                     clientList = clientList.sortedBy { it.number }
 
-                    it.onSuccess(clientList)
+                    singleEmitter.onSuccess(clientList)
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { clients, _ ->
@@ -543,8 +543,23 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                 override fun onPermissionsChecked(report: MultiplePermissionsReport) {
                     if (report.areAllPermissionsGranted()) {
                         queue.let {
-                            queue.clientList = adapter.contentList
-                            viewModel.exportQueue(queue, requireContext())
+                            Single.create<Queue> {
+
+                                queue.clientInQueueList =
+                                    dao.getClientsInQueueList(queueId = queue.id!!)
+                                var clientsIds: List<Long> = ArrayList()
+                                queue.clientInQueueList!!.map { clientInQueue ->
+                                    clientsIds = clientsIds + clientInQueue.clientId
+                                }
+                                queue.clientList = dao.getClients(clientsIds)
+
+                                it.onSuccess(queue)
+                            }.subscribeOn(Schedulers.io())
+                                .observeOn(Schedulers.io())
+                                .subscribe { queue, _ ->
+                                    viewModel.exportQueue(queue, requireContext())
+                                }
+                                .addTo(compositeDisposable)
                         }
                     }
                 }
