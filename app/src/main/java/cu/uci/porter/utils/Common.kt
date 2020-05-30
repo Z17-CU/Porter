@@ -1,14 +1,22 @@
 package cu.uci.porter.utils
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.StrictMode
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
+import java.io.File
 import java.nio.charset.StandardCharsets
+import java.security.cert.Extension
 import java.util.*
 
 class Common {
@@ -79,6 +87,54 @@ class Common {
             }
 
             fragment.startActivityForResult(intent, requestCode)
+        }
+
+        private fun share(context: Context, file: File, extension: String) {
+            val builder = StrictMode.VmPolicy.Builder()
+            StrictMode.setVmPolicy(builder.build())
+            val share = Intent()
+            share.action = Intent.ACTION_SEND
+            share.type = "application/$extension"
+            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+            context.startActivity(share)
+        }
+
+        fun shareQueue(context: Context, file: File, extension: String) {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Compartir")
+            builder.setMessage("¿Desea compartir el archivo de la cola?")
+            builder.setNegativeButton("Cancelar", null)
+            builder.setPositiveButton(
+                "Compartir"
+            ) { _, _ ->
+                share(context, file, extension)
+            }
+            builder.setNeutralButton("Ver") { _, _ ->
+                openFile(context, file, extension)
+            }
+            builder.create().show()
+        }
+
+        private fun openFile(context: Context, file: File, extension: String) {
+            val path = FileProvider.getUriForFile(
+                context,
+                context.applicationContext.packageName + ".provider",
+                file
+            )
+            val pdfOpenintent = Intent(Intent.ACTION_VIEW)
+            pdfOpenintent.flags =
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            pdfOpenintent.setDataAndType(path, "application/$extension")
+            try {
+                context.startActivity(pdfOpenintent)
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    "No hay aplicaciones disponibles para abrir el fichero $extension.",
+                    Toast.LENGTH_LONG
+                ).show()
+                e.printStackTrace()
+            }
         }
     }
 }

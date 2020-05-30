@@ -37,15 +37,12 @@ import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.ClientInQueue
 import cu.uci.porter.repository.entitys.Queue
-import cu.uci.porter.utils.CSVWriter
+import cu.uci.porter.utils.*
 import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
-import cu.uci.porter.utils.Conts
 import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
 import cu.uci.porter.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.uci.porter.utils.Conts.Companion.QUEUE_TIME
-import cu.uci.porter.utils.PDF
-import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -193,8 +190,6 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
     }
 
     override fun handleResult(rawResult: Result) {
-
-        progress.show()
 
         //play sound
         val mp = MediaPlayer.create(context, R.raw.beep)
@@ -523,6 +518,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                     )
                 }
                 csvWriter.close()
+                Common.shareQueue(requireContext(), file, "csv")
                 Toast.makeText(
                     requireContext(),
                     R.string.export_OK,

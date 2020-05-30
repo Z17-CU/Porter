@@ -1,5 +1,6 @@
 package cu.uci.porter.viewModels
 
+import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -52,11 +53,14 @@ class ClientViewModel @Inject constructor(
             writer.append(data)
             writer.flush()
             writer.close()
-            Toast.makeText(
-                context,
-                R.string.export_OK,
-                Toast.LENGTH_LONG
-            ).show()
+            (context as Activity).runOnUiThread {
+                Toast.makeText(
+                    context,
+                    R.string.export_OK,
+                    Toast.LENGTH_LONG
+                ).show()
+                Common.shareQueue(context, gpxfile, "cola")
+            }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }

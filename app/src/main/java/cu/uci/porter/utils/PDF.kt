@@ -1,12 +1,7 @@
 package cu.uci.porter.utils
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -14,6 +9,7 @@ import com.itextpdf.text.pdf.PdfWriter
 import cu.uci.porter.R
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.repository.entitys.Queue
+import cu.uci.porter.utils.Common.Companion.shareQueue
 import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
 import cu.uci.porter.utils.Conts.Companion.formatDateBig
 import cu.uci.porter.utils.Conts.Companion.formatDateOnlyTime
@@ -37,7 +33,6 @@ class PDF(val context: Context) {
         val file = File(path)
 
         val progress = Progress(context)
-        progress.show()
 
         CompositeDisposable().add(Completable.create {
 
@@ -100,45 +95,7 @@ class PDF(val context: Context) {
                     R.string.export_OK,
                     Toast.LENGTH_LONG
                 ).show()
-                sharePDF(file)
+                shareQueue(context, file, "pdf")
             })
-    }
-
-    private fun sharePDF(file: File) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Compartir")
-        builder.setMessage("¿Desea compartir el pdf de la cola?")
-        builder.setNegativeButton("Cancelar", null)
-        builder.setPositiveButton(
-            "Compartir"
-        ) { _, _ ->
-            share(context, file)
-        }
-//        builder.setNeutralButton("Ver") { _, _ ->
-//            openFile(file)
-//        }
-        builder.create().show()
-    }
-
-//    private fun openFile(file: File) {
-//        val path = Uri.fromFile(file)
-//        val pdfOpenintent = Intent(Intent.ACTION_VIEW)
-//        pdfOpenintent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_CLEAR_TOP
-//        pdfOpenintent.setDataAndType(path, "application/pdf")
-//        try {
-//            context.startActivity(pdfOpenintent)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
-
-    private fun share(context: Context, file: File) {
-        val builder = VmPolicy.Builder()
-        StrictMode.setVmPolicy(builder.build())
-        val share = Intent()
-        share.action = Intent.ACTION_SEND
-        share.type = "application/pdf"
-        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
-        context.startActivity(share)
     }
 }
