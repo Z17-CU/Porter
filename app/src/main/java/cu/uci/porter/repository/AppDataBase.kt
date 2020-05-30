@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import cu.uci.porter.repository.entitys.Client
+import cu.uci.porter.repository.entitys.ClientInQueue
 import cu.uci.porter.repository.entitys.Queue
 
 @Database(
-    entities = [(Client::class),(Queue::class)],
+    entities = [(Client::class),(Queue::class),(ClientInQueue::class)],
     version = 1
 )
 //@TypeConverters(Converter::class)

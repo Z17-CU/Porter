@@ -1,44 +1,50 @@
 package cu.uci.porter.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
+import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import cu.uci.porter.repository.entitys.Client
+import cu.uci.porter.repository.entitys.ClientInQueue
 import cu.uci.porter.repository.entitys.Queue
 
 @Dao
 interface Dao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertClient(client: Client)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertClient(clients: List<Client>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = REPLACE)
     fun insertQueue(queue: Queue)
 
-    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id = :id")
-    fun getClient(id: Long): Client
+    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList)")
+    fun getClients(idList: List<Long>): List<Client>
+
+    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList) AND age BETWEEN :min AND :max")
+    fun getClientsInRange(idList: List<Long>, min: Int, max: Int): List<Client>
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id = :id")
     fun getQueue(id: Long): Queue
 
-    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id ORDER BY lastRegistry")
-    fun getAllClients(id: Long): LiveData<List<Client>>
-
-    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE queueId = :id AND age BETWEEN :min AND :max ORDER BY lastRegistry")
-    fun getAllClientsInRangue(id: Long, min: Int, max: Int): LiveData<List<Client>>
-
     @Query("SELECT * FROM ${Queue.TABLE_NAME}")
     fun getAllQueues(): LiveData<List<Queue>>
 
-    @Query("SELECT COUNT(*) from ${Client.TABLE_NAME} WHERE id = :id AND queueId = :queueId")
-    fun clientExist(id: Long, queueId: Long): Int
-
-    @Query("SELECT COUNT(*) from ${Client.TABLE_NAME} WHERE queueId = :id")
+    @Query("SELECT COUNT(*) from ${ClientInQueue.TABLE_NAME} WHERE queueId = :id")
     fun clientsByQueue(id: Long): Int
+
+    @Query("SELECT * from ${ClientInQueue.TABLE_NAME} WHERE clientId = :idClient AND queueId = :idQueue")
+    fun getClientFromQueue(idClient: Long, idQueue: Long): ClientInQueue?
+
+    @Insert(onConflict = REPLACE)
+    fun insertClientInQueue(clientInQueue: ClientInQueue)
+
+    @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME} WHERE queueId = :queueId")
+    fun getClientsInQueueList(queueId: Long): LiveData<List<ClientInQueue>>
+
+    @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME}")
+    fun getClientsInQueue(): LiveData<List<ClientInQueue>>
 }

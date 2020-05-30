@@ -59,9 +59,7 @@ class DialogInsertClient(
                     view._editTextCI.text.toString().trim(),
                     null,
                     Common.getSex(view._editTextCI.text.toString().trim()),
-                    Common.getAge(view._editTextCI.text.toString().trim()),
-                    Calendar.getInstance().timeInMillis,
-                    queueId
+                    Common.getAge(view._editTextCI.text.toString().trim())
                 )
 
                 done = qrReaderFragment.saveClient(client)

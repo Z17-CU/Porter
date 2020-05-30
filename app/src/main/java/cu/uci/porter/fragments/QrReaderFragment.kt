@@ -18,6 +18,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -34,15 +35,23 @@ import cu.uci.porter.dialogs.DialogInsertClient
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Client
+import cu.uci.porter.repository.entitys.ClientInQueue
 import cu.uci.porter.repository.entitys.Queue
-import cu.uci.porter.utils.*
+import cu.uci.porter.utils.CSVWriter
 import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
+import cu.uci.porter.utils.Conts
 import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
+import cu.uci.porter.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
+import cu.uci.porter.utils.Conts.Companion.QUEUE_TIME
+import cu.uci.porter.utils.PDF
+import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.qr_reader.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
@@ -51,6 +60,7 @@ import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class QrReaderFragment(private val queue: Queue, private val viewModel: ClientViewModel) :
@@ -68,7 +78,6 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
     private val adapter = AdapterClient()
-    private lateinit var observer: Observer<List<Client>>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,22 +108,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
 
-        observer = androidx.lifecycle.Observer {
-            adapter.contentList = it
-            adapter.notifyDataSetChanged()
-            if (it.isNotEmpty()) {
-                goTo(it.size - 1)
-                _imageViewEngranes.visibility = View.GONE
-            } else {
-                _imageViewEngranes.visibility = View.VISIBLE
-            }
-        }
-
-        viewModel.allClients.removeObserver(observer)
-
-        viewModel.setAllClient(queue.id!!)
-
-        viewModel.allClients.observe(viewLifecycleOwner, observer)
+        updateObserver(queue.id!!)
 
         currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
 
@@ -132,11 +126,8 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         menu.findItem(R.id.action_show_filter_menu).isVisible = false
                         menu.findItem(R.id.action_insert_client).isVisible = true
 
-                        viewModel.allClients.removeObserver(observer)
+                        updateObserver(queue.id!!)
 
-                        viewModel.setAllClient(queue.id!!)
-
-                        viewModel.allClients.observe(viewLifecycleOwner, observer)
                         R.drawable.ic_filter_list
                     }
                 )
@@ -233,14 +224,57 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
             }))
     }
 
-    private fun setRangue(min: Int, max: Int) {
-        Log.d("setRangue", "$min to $max")
+    @SuppressLint("LogNotTimber")
+    private fun updateObserver(
+        queueId: Long,
+        isInRange: Boolean = false,
+        min: Int = 0,
+        max: Int = 0
+    ) {
 
-        viewModel.allClients.removeObserver(observer)
+        viewModel.allClientsInQueue.removeObservers(viewLifecycleOwner)
+        viewModel.setAllClientsIDQueue(queueId)
+        viewModel.allClientsInQueue.observe(
+            viewLifecycleOwner,
+            Observer { clientsInQueue ->
 
-        viewModel.setAllClientsInRangue(queue.id!!, min, max)
+                Single.create<List<Client>> {
 
-        viewModel.allClients.observe(viewLifecycleOwner, observer)
+                    var idList: List<Long> = ArrayList()
+                    clientsInQueue.map {
+                        idList = idList + it.clientId
+                        Log.d("ClientId", it.clientId.toString())
+                    }
+                    var clientList = if (isInRange)
+                        dao.getClientsInRange(idList, min, max)
+                    else
+                        dao.getClients(idList)
+
+                    clientList.map { client ->
+                        val thisClientInQueue = clientsInQueue.find { it.clientId == client.id }!!
+                        client.lastRegistry = thisClientInQueue.lastRegistry
+                        client.reIntent = thisClientInQueue.reIntent
+                        client.number = thisClientInQueue.number
+                    }
+
+                    clientList = clientList.sortedBy { it.number }
+
+                    it.onSuccess(clientList)
+                }.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { clients, _ ->
+
+                        adapter.contentList = clients
+                        adapter.notifyDataSetChanged()
+                        if (clients.isNotEmpty()) {
+                            goTo(clients.size - 1)
+                            _imageViewEngranes.visibility = View.GONE
+                        } else {
+                            _imageViewEngranes.visibility = View.VISIBLE
+                        }
+
+                    }.addTo(compositeDisposable)
+            })
     }
 
     @SuppressLint("RestrictedApi")
@@ -251,23 +285,19 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_filter_todos -> {
-                    viewModel.allClients.removeObserver(observer)
-
-                    viewModel.setAllClient(queue.id!!)
-
-                    viewModel.allClients.observe(viewLifecycleOwner, observer)
+                    updateObserver(queueId = queue.id!!)
                 }
                 R.id.action_filter_niños -> {
-                    setRangue(-1, 12)
+                    updateObserver(queue.id!!, true, -1, 12)
                 }
                 R.id.action_filter_jovenes -> {
-                    setRangue(13, 30)
+                    updateObserver(queue.id!!, true, 13, 30)
                 }
                 R.id.action_filter_adultos -> {
-                    setRangue(31, 55)
+                    updateObserver(queue.id!!, true, 31, 55)
                 }
                 R.id.action_filter_3raEdad -> {
-                    setRangue(56, 200)
+                    updateObserver(queue.id!!, true, 56, 200)
                 }
             }
             false
@@ -298,22 +328,35 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
         } else {
-            client.id += queue.id!!
-            if (dao.clientExist(client.id, queue.id!!) > 0) {
-                done = false
-                showError(_flash.context.getString(R.string.clientExist))
+            dao.insertClient(client)
+            done = true
 
-                val mClient = dao.getClient(client.id)
-                mClient.reIntent++
-                mClient.lastRegistry = Calendar.getInstance().timeInMillis
-                dao.insertClient(mClient)
-            } else {
-                done = true
-                dao.insertClient(client)
-            }
+            var clientInQueue = dao.getClientFromQueue(client.id, queue.id!!)
 
-            val queue = dao.getQueue(queue.id!!)
             queue.clientsNumber = dao.clientsByQueue(queue.id!!)
+            queue.clientsNumber++
+
+            if (clientInQueue == null) {
+                clientInQueue =
+                    ClientInQueue(
+                        null,
+                        queue.id!!,
+                        client.id,
+                        Calendar.getInstance().timeInMillis,
+                        number = queue.clientsNumber
+                    )
+            } else {
+                if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) > (PreferenceManager.getDefaultSharedPreferences(
+                        context
+                    ).getInt(QUEUE_TIME, DEFAULT_QUEUE_TIME_HOURS)) * 60 * 60 * 1000
+                ) {
+                    clientInQueue.reIntent++
+                    queue.clientsNumber--
+                    done = false
+                }
+                clientInQueue.lastRegistry = Calendar.getInstance().timeInMillis
+            }
+            dao.insertClientInQueue(clientInQueue)
 
             dao.insertQueue(queue)
         }
@@ -382,6 +425,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         }
     }
 
+    @SuppressLint("LogNotTimber")
     private fun stringToClient(rawResult: Result): Client? {
 
         var client: Client? = null
@@ -408,9 +452,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         idString,
                         fv,
                         sex,
-                        getAge(idString),
-                        Calendar.getInstance().timeInMillis,
-                        queue.id!!
+                        getAge(idString)
                     )
             }
         }
@@ -453,8 +495,9 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
             val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
             val dateFormat = SimpleDateFormat("d 'de' MMM 'del' yyyy", Locale("es", "CU"))
 
-            val name = queue.name + " " + Conts.formatDateBig.format(queue.startDate) + " " + Calendar.getInstance()
-                .timeInMillis + ".csv"
+            val name =
+                queue.name + " " + Conts.formatDateBig.format(queue.startDate) + " " + Calendar.getInstance()
+                    .timeInMillis + ".csv"
 
             val exportDir = File(APP_DIRECTORY, "")
             if (!exportDir.exists())

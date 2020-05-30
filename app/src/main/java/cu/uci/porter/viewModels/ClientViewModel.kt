@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import cu.uci.porter.R
 import cu.uci.porter.repository.ClientRepository
 import cu.uci.porter.repository.entitys.Queue
@@ -26,17 +25,13 @@ class ClientViewModel @Inject constructor(
     private val clientRepository: ClientRepository
 ) : ViewModel() {
 
-    val compositeDisposable = CompositeDisposable()
+    var allClientsInQueue = clientRepository.getAllClientInQueue()
 
-    var allClients = clientRepository.getAllClients(-1)
-
-    fun setAllClient(id: Long) {
-        allClients = clientRepository.getAllClients(id)
+    fun setAllClientsIDQueue(id: Long) {
+        allClientsInQueue = clientRepository.getClientInQueueList(id)
     }
 
-    fun setAllClientsInRangue(id: Long, min: Int, max: Int) {
-        allClients = clientRepository.getAllClientsInRangue(id, min, max)
-    }
+    private val compositeDisposable = CompositeDisposable()
 
     var allQueues = clientRepository.getAllQueues()
 
