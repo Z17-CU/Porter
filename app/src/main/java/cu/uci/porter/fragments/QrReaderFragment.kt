@@ -346,7 +346,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         number = queue.clientsNumber
                     )
             } else {
-                if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) > (PreferenceManager.getDefaultSharedPreferences(
+                if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) < (PreferenceManager.getDefaultSharedPreferences(
                         context
                     ).getInt(QUEUE_TIME, DEFAULT_QUEUE_TIME_HOURS)) * 60 * 60 * 1000
                 ) {
@@ -378,8 +378,10 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         done?.let {
             _relativeDone.visibility = View.VISIBLE
             val view = if (done) {
+                MediaPlayer.create(context, R.raw.access_granted).start()
                 _imageViewCheck
             } else {
+                MediaPlayer.create(context, R.raw.access_denied).start()
                 _imageViewFail
             }
             view.alpha = 0f
@@ -387,7 +389,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
             view.animate()
                 .translationY(0f)
                 .alpha(1.0f)
-                .setDuration(200)
+                .setDuration(500)
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
@@ -395,7 +397,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         view.animate()
                             .translationY(0f)
                             .alpha(0.0f)
-                            .setDuration(200)
+                            .setDuration(500)
                             .setListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator?) {
                                     super.onAnimationEnd(animation)
