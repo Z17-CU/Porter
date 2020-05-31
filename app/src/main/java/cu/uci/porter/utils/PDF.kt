@@ -19,10 +19,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
 
 
 class PDF(val context: Context) {
+
     fun write(
         queue: Queue,
         clients: List<Client>
@@ -34,6 +36,8 @@ class PDF(val context: Context) {
 
         val progress = Progress(context)
 
+        var fail = false
+
         CompositeDisposable().add(Completable.create {
 
             val bfBold12 =
@@ -42,7 +46,14 @@ class PDF(val context: Context) {
             File(APP_DIRECTORY).mkdir()
 
             if (!file.exists()) {
-                file.createNewFile()
+                try {
+                    file.createNewFile()
+                } catch (e : IOException){
+                    e.printStackTrace()
+                    fail = true
+                    it.onComplete()
+                    return@create
+                }
             }
             val document = Document()
             PdfWriter.getInstance(
@@ -90,12 +101,20 @@ class PDF(val context: Context) {
             .subscribeOn(Schedulers.io())
             .subscribe {
                 progress.dismiss()
-                Toast.makeText(
-                    context,
-                    R.string.export_OK,
-                    Toast.LENGTH_LONG
-                ).show()
-                shareQueue(context, file, "pdf")
+                if(fail){
+                    Toast.makeText(
+                        context,
+                        "Compruebe si hay almacenamiento disponible.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        R.string.export_OK,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    shareQueue(context, file, "pdf")
+                }
             })
     }
 }
