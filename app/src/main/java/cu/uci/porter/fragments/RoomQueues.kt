@@ -1,12 +1,21 @@
 package cu.uci.porter.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import cu.control.queue.utils.MediaUtil
@@ -16,11 +25,14 @@ import cu.uci.porter.dialogs.DialogCreateQueue
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.utils.Common
+import cu.uci.porter.utils.Conts
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import cu.uci.porter.viewModels.ClientViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.settingst_layout.view.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
@@ -127,7 +139,10 @@ class RoomQueues : SupportFragment() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (menu is MenuBuilder)
+            menu.setOptionalIconsVisible(true)
         inflater.inflate(R.menu.import_menu, menu)
     }
 
@@ -135,6 +150,14 @@ class RoomQueues : SupportFragment() {
         return when (item.itemId) {
             R.id.action_import -> {
                 pickQueue()
+                true
+            }
+            R.id.action_settings -> {
+                openSettings()
+                true
+            }
+            R.id.action_abaut -> {
+                showAboutAs()
                 true
             }
             else -> {
@@ -156,5 +179,77 @@ class RoomQueues : SupportFragment() {
 
     private fun pickQueue() {
         viewModel.importQueue(this@RoomQueues, PICK_FILE_CODE)
+    }
+
+    private fun openSettings() {
+        val inflater =
+            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = inflater.inflate(R.layout.settingst_layout, null)
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setView(view)
+            .create()
+        view._cancelButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        view.editTextRotationTime.setText(
+            sharedPreferences.getInt(
+                Conts.QUEUE_TIME,
+                Conts.DEFAULT_QUEUE_TIME_HOURS
+            ).toString()
+        )
+
+        view._okButton.setOnClickListener {
+            if (view.editTextRotationTime.text.toString().isEmpty()) {
+                Toast.makeText(requireContext(), "Debe insertar un valor.", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                sharedPreferences.edit()
+                    .putInt(Conts.QUEUE_TIME, view.editTextRotationTime.text.toString().toInt())
+                    .apply()
+                alertDialog.dismiss()
+            }
+        }
+        alertDialog.show()
+    }
+
+    private fun showAboutAs() {
+
+        val inflater =
+            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = inflater.inflate(R.layout.about_as, null)
+        view.versionName.text = getVersion()
+        view._buttonSite.setOnClickListener {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(requireContext().resources.getString(R.string.https_github_com_richardanca_porter_by_richard))
+                )
+            )
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setView(view)
+            .create().show()
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun getVersion(): String {
+        var pInfo: PackageInfo? = null
+        var version: String? = ""
+        var revision = 0
+        try {
+            pInfo =
+                requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        if (pInfo != null) {
+            version = pInfo.versionName
+            revision = pInfo.versionCode
+        }
+
+        return "Versión: $version.$revision"
     }
 }

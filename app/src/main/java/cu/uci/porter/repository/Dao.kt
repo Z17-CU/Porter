@@ -21,6 +21,9 @@ interface Dao {
     @Insert(onConflict = REPLACE)
     fun insertQueue(queue: Queue)
 
+    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id = :id")
+    fun getClient(id: Long): Client
+
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList)")
     fun getClients(idList: List<Long>): List<Client>
 

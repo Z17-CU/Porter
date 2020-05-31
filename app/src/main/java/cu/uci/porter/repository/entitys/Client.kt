@@ -16,7 +16,8 @@ class Client(
     var age: Int,
     var lastRegistry: Long = 0,
     var reIntent: Int = 0,
-    var number: Int = 0
+    var number: Int = 0,
+    var isChecked: Boolean = false
 ) {
     companion object {
         const val TABLE_NAME = "Client"

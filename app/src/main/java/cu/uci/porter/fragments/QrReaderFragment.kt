@@ -60,7 +60,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class QrReaderFragment(private val queue: Queue, private val viewModel: ClientViewModel) :
+class QrReaderFragment(private val queue: Queue, private val viewModel: ClientViewModel, private val checkList: Boolean) :
     SupportFragment(),
     ZXingScannerView.ResultHandler {
 
@@ -68,7 +68,6 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         const val MODE_READ = 1
         const val MODE_LIST = 2
     }
-
     private var currentMode = MutableLiveData<Int>().default(MODE_READ)
     private lateinit var menu: Menu
     private lateinit var dao: Dao
@@ -90,6 +89,8 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         progress = Progress(view.context)
 
         dao = AppDataBase.getInstance(view.context).dao()
+
+        adapter.checkMode = checkList
 
         return view
     }
@@ -250,6 +251,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
                         client.lastRegistry = thisClientInQueue.lastRegistry
                         client.reIntent = thisClientInQueue.reIntent
                         client.number = thisClientInQueue.number
+                        client.isChecked = thisClientInQueue.isChecked
                     }
 
                     clientList = clientList.sortedBy { it.number }
@@ -318,10 +320,25 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
     }
 
     fun saveClient(client: Client?): Boolean? {
-
-        var done: Boolean? = null
+        var done: Boolean?
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
+            return null
+        }
+        if (checkList) {
+            val tempClient = dao.getClientFromQueue(client.id, queue.id!!)
+            if (tempClient == null) {
+                showError("El cliente no está en la cola.")
+                return false
+            }
+
+            done = if (tempClient.isChecked) {
+                false
+            } else {
+                tempClient.isChecked = true
+                dao.insertClientInQueue(tempClient)
+                true
+            }
         } else {
             dao.insertClient(client)
             done = true

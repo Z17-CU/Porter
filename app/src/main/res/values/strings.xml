@@ -42,4 +42,15 @@
     <string name="guardar_como_csv">Guardar como CSV</string>
     <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
     <string name="export_OK">La cola ha sido exportada al almacenamiento del dispositivo</string>
+    <string name="modo_de_registro">Modo de registro.</string>
+    <string name="modo_de_chequeo">Modo de chequeo.</string>
+    <string name="acerca_de">Acerca de</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="uci_2020">UCI 2020</string>
+    <string name="c_digo_fuente">Código fuente</string>
+    <string name="https_github_com_richardanca_porter_by_richard">https://github.com/richardanca/Porter_By_Richard</string>
+    <string name="https_github_com">https://github.com</string>
+    <string name="app_icon">App icon</string>
+    <string name="define_el_tiempo_de_rotaci_n_de_los_clientes_aqu">Define el tiempo (Horas) de rotación de los clientes aquí.</string>
+    <string name="horas">Horas</string>
 </resources>

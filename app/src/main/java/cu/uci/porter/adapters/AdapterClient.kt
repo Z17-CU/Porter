@@ -14,6 +14,7 @@ import cu.uci.porter.utils.Conts.Companion.formatDateOnlyTime
 class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
 
     var contentList: List<Client> = ArrayList()
+    var checkMode = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
         return ViewHolderClient(
@@ -36,17 +37,55 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
         holder.layoutBackground.background =
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
-                if (position % 2 != 0) R.drawable.item_white_bg else R.drawable.bg_item_dark
+                when {
+                    checkMode && position % 2 != 0 -> R.drawable.item_blue_bg
+                    checkMode && position % 2 == 0 -> R.drawable.bg_item_dark_blue
+                    position % 2 != 0 -> R.drawable.item_white_bg
+                    else -> R.drawable.bg_item_dark
+                }
             )
 
-        holder.imageView.setImageDrawable(
-            ContextCompat.getDrawable(
-                holder.imageView.context,
-                if (client.sex == Client.SEX_WOMAN) R.drawable.ic_girl_big else R.drawable.ic_man_big
-            )
-        )
+        when {
+            checkMode && !client.isChecked -> {
+                holder.clientNumber.visibility = View.VISIBLE
+                holder.imageViewCheck.visibility = View.GONE
+                holder.imageView.visibility = View.VISIBLE
+                holder.imageView.background = ContextCompat.getDrawable(
+                    holder.imageView.context,
+                    R.drawable.round_accent_bg
+                )
+                holder.imageView.setImageDrawable(null)
 
-        holder.textViewName.text = "${client.name}"
+                holder.clientNumber.text = client.number.toString()
+            }
+            checkMode && client.isChecked -> {
+                holder.clientNumber.visibility = View.GONE
+                holder.imageView.visibility = View.GONE
+                holder.imageViewCheck.visibility = View.VISIBLE
+            }
+            else -> {
+                holder.clientNumber.visibility = View.GONE
+                holder.imageViewCheck.visibility = View.GONE
+                holder.imageView.visibility = View.VISIBLE
+                holder.imageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        holder.imageView.context,
+                        when (client.sex) {
+                            Client.SEX_WOMAN -> {
+                                holder.imageView.background = null
+                                R.drawable.ic_girl_big
+                            }
+                            else -> {
+                                holder.imageView.background = null
+                                R.drawable.ic_man_big
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+        holder.textViewName.text = client.name
         holder.textViewID.text = client.ci
         holder.textViewDate.text = formatDateOnlyTime.format(client.lastRegistry)
         holder.textViewReIntents.visibility = if (client.reIntent > 0) {

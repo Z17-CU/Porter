@@ -37,7 +37,27 @@
                     android:id="@+id/_circularImageView"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
+                    android:padding="2dp"
                     tools:src="@drawable/ic_girl_big" />
+
+                <ImageView
+                    android:id="@+id/_imageViewCheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/round_green_bg"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_check_list"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/clientNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

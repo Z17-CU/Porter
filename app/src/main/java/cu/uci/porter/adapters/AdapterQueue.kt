@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
 import cu.uci.porter.fragments.QrReaderFragment
@@ -53,10 +55,26 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
         )
 
         holder.layoutBackground.setOnClickListener {
-            context.start(QrReaderFragment(queue, viewModel))
+            showReaderOptions(queue)
         }
 
         holder.layoutmarker.visibility = View.GONE
         holder.textViewReIntents.visibility = View.GONE
+    }
+
+    private fun showReaderOptions(queue: Queue) {
+        val bottomSheetDialog = BottomSheetDialog(context.requireContext())
+        bottomSheetDialog.setContentView(R.layout.layout_buttom_sheet_dialog_open_reader)
+        bottomSheetDialog.show()
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionAsChecker)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            context.start(QrReaderFragment(queue, viewModel, true))
+        }
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionAsReader)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            context.start(QrReaderFragment(queue, viewModel, false))
+        }
     }
 }

@@ -1,6 +1,7 @@
 package cu.uci.porter.adapters.viewHolders
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -15,4 +16,6 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val layoutmarker: LinearLayout = itemView._markerLayout
     val layoutBackground: LinearLayout = itemView._layoutItemPersona
     val textViewReIntents: TextView = itemView._textViewReIntents
+    val clientNumber: TextView = itemView.clientNumber
+    val imageViewCheck: ImageView = itemView._imageViewCheck
 }
