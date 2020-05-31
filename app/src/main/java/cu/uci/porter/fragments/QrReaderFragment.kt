@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
@@ -60,7 +61,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class QrReaderFragment(private val queue: Queue, private val viewModel: ClientViewModel, private val checkList: Boolean) :
+class QrReaderFragment(
+    private val queue: Queue,
+    private val viewModel: ClientViewModel,
+    private val checkList: Boolean
+) :
     SupportFragment(),
     ZXingScannerView.ResultHandler {
 
@@ -68,6 +73,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         const val MODE_READ = 1
         const val MODE_LIST = 2
     }
+
     private var currentMode = MutableLiveData<Int>().default(MODE_READ)
     private lateinit var menu: Menu
     private lateinit var dao: Dao
@@ -83,6 +89,8 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
         val view = View.inflate(context, R.layout.qr_reader, null)
 
         setHasOptionsMenu(true)
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         requireActivity().title = queue.name
 
@@ -148,6 +156,7 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
 
     override fun onBackPressedSupport(): Boolean {
         requireActivity().title = requireContext().getString(R.string.app_name)
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         return super.onBackPressedSupport()
     }
 
@@ -182,6 +191,14 @@ class QrReaderFragment(private val queue: Queue, private val viewModel: ClientVi
             }
             R.id.action_save -> {
                 showSaveOptions()
+                true
+            }
+            android.R.id.home -> {
+                requireActivity().title = requireContext().getString(R.string.app_name)
+                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
+                    false
+                )
+                pop()
                 true
             }
             else -> {
