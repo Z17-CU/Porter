@@ -4,9 +4,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import cu.uci.porter.fragments.QrReaderFragment
 import cu.uci.porter.fragments.RoomQueues
 import me.yokeyword.fragmentation.BuildConfig
 import me.yokeyword.fragmentation.Fragmentation
@@ -28,6 +28,7 @@ class MainActivity : SupportActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         init()
     }
 

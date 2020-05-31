@@ -24,7 +24,7 @@ android {
 
         defaultConfig {
             applicationId = "cu.control.queue"
-            minSdkVersion(21)
+            minSdkVersion(16)
             targetSdkVersion(28)
             versionCode = code
             versionName = "$name.$build"

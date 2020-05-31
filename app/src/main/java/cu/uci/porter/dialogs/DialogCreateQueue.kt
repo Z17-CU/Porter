@@ -52,7 +52,7 @@ class DialogCreateQueue(
 
                 dao.insertQueue(
                     Queue(
-                        null,
+                        Calendar.getInstance().timeInMillis,
                         view._editTextName.text.toString().trim(),
                         Calendar.getInstance().timeInMillis
                     )
