@@ -23,7 +23,7 @@ android {
         val build = versionProps.getProperty("VERSION_BUILD").toInt() + 1
 
         defaultConfig {
-            applicationId = "cu.uci.porter"
+            applicationId = "cu.control.queue"
             minSdkVersion(21)
             targetSdkVersion(28)
             versionCode = code
@@ -38,10 +38,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("porter-key.jks")
-            storePassword = "porterkey"
-            keyAlias = "porter"
-            keyPassword = "porterkey"
+            storeFile = file("queue-key.jks")
+            storePassword = "queuekey"
+            keyAlias = "queue"
+            keyPassword = "queuekey"
         }
     }
 
@@ -54,7 +54,7 @@ android {
             proguardFile("proguard-rules.pro")
 
             signingConfig = signingConfigs.getByName("release")
-            resValue("string", "content_provider", "cu.uci.porter.android.provider")
+            resValue("string", "content_provider", "cu.control.queue.android.provider")
         }
     }
 
