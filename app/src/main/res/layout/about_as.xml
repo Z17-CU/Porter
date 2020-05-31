@@ -119,7 +119,16 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:padding="5dp"
-                    android:text="@string/uci_2020"
+                    android:textStyle="bold"
+                    android:text="@string/universidad_de_las_ciencias_inform_ticas"
+                    android:textColor="#8a8a8a" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:paddingBottom="5dp"
+                    android:text="@string/todos_los_derechos_reservados_n2018"
                     android:textColor="#8a8a8a" />
 
             </LinearLayout>
