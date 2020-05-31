@@ -507,17 +507,32 @@ class QrReaderFragment(
 
         bottomSheetDialog.findViewById<TextView>(R.id._optionSavePDF)?.setOnClickListener {
             bottomSheetDialog.dismiss()
-            PDF(requireContext()).write(queue, adapter.contentList)
+            try {
+                PDF(requireContext()).write(queue, adapter.contentList)
+            } catch (e: NoSuchFileException) {
+                e.printStackTrace()
+                showError("La función de exportar no es compatible con su dispositivo.")
+            }
         }
 
         bottomSheetDialog.findViewById<TextView>(R.id._optionSaveCSV)?.setOnClickListener {
             bottomSheetDialog.dismiss()
-            exportQueueCSV()
+            try {
+                exportQueueCSV()
+            } catch (e: NoSuchFileException) {
+                e.printStackTrace()
+                showError("La función de exportar no es compatible con su dispositivo.")
+            }
         }
 
         bottomSheetDialog.findViewById<TextView>(R.id._optionSaveJSON)?.setOnClickListener {
             bottomSheetDialog.dismiss()
-            exportQueueJson()
+            try {
+                exportQueueJson()
+            } catch (e: NoSuchFileException) {
+                e.printStackTrace()
+                showError("La función de exportar no es compatible con su dispositivo.")
+            }
         }
     }
 
