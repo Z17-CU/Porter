@@ -3,6 +3,11 @@
 buildscript {
     val kotlinVersion = "1.3.71"
     repositories {
+
+        mavenCentral()
+        google()
+        jcenter()
+
         maven { url = uri("https://maven.aliyun.com/repository/central") }
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
@@ -10,7 +15,7 @@ buildscript {
 
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.6.1")
+        classpath("com.android.tools.build:gradle:4.0.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -20,6 +25,10 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
+        google()
+        jcenter()
+
         maven { url = uri("https://maven.aliyun.com/repository/central") }
         maven { url = uri("https://maven.aliyun.com/repository/google") }
         maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
