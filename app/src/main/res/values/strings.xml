@@ -59,4 +59,5 @@
     <string name="lista">Lista</string>
     <string name="filtros">Filtros</string>
     <string name="exportar">Exportar</string>
+    <string name="eliminar">Eliminar</string>
 </resources>

@@ -2,6 +2,7 @@ package cu.uci.porter.repository
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
@@ -32,6 +33,9 @@ interface Dao {
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id = :id")
     fun getQueue(id: Long): Queue
+
+    @Delete
+    fun deleteQueue(queue: Queue)
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME}")
     fun getAllQueues(): LiveData<List<Queue>>
