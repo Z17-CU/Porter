@@ -82,6 +82,12 @@ class DialogCreateQueue(
             override fun afterTextChanged(s: Editable) {
 
                 view._okButton.isEnabled = s.toString().trim().isNotEmpty()
+
+                view.textViewRequerido.visibility = if (view._okButton.isEnabled) {
+                    View.INVISIBLE
+                } else {
+                    View.VISIBLE
+                }
             }
         })
 
