@@ -38,10 +38,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("queue-key.jks")
-            storePassword = "queuekey"
-            keyAlias = "queue"
-            keyPassword = "queuekey"
+            storeFile = file(project.properties["KEYSTORE_PORTERO"] ?: "")
+            storePassword = project.properties["KEYSTORE_PASSWORD_PORTERO"]?.toString() ?: ""
+            keyAlias =  project.properties["KEY_ALIAS_PORTERO"]?.toString() ?: ""
+            keyPassword = project.properties["KEY_PASSWORD_PORTERO"]?.toString() ?: ""
         }
     }
 
