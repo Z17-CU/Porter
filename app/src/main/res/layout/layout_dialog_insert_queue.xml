@@ -18,10 +18,12 @@
 
         <EditText
             android:id="@+id/_editTextName"
+            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapCharacters"
-            tools:text="Cola del Pollo" />
+            android:inputType="textCapSentences"
+            tools:text="Cola del Pollo"
+            android:importantForAutofill="no" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

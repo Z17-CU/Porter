@@ -1,10 +1,13 @@
 package cu.uci.porter.dialogs
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import cu.uci.porter.R
@@ -38,6 +41,7 @@ class DialogCreateQueue(
         return dialog
     }
 
+    @SuppressLint("LogNotTimber")
     private fun getView(): View {
 
         val view = View.inflate(context, R.layout.layout_dialog_insert_queue, null)
@@ -79,7 +83,7 @@ class DialogCreateQueue(
 
             override fun afterTextChanged(s: Editable) {
 
-                view._okButton.isEnabled = s.isNotEmpty()
+                view._okButton.isEnabled = s.toString().trim().isNotEmpty()
             }
         })
 
