@@ -48,6 +48,7 @@ class DialogInsertClient(
 
         view._okButton.setOnClickListener {
 
+            var done: Boolean? = null
             compositeDisposable.add(Completable.create {
 
                 val client = Client(
@@ -59,7 +60,7 @@ class DialogInsertClient(
                     Common.getAge(view._editTextCI.text.toString().trim())
                 )
 
-                qrReaderFragment.saveClient(client)
+                done = qrReaderFragment.saveClient(client)
 
                 it.onComplete()
             }
@@ -67,6 +68,7 @@ class DialogInsertClient(
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     dialog.dismiss()
+                    qrReaderFragment.showDone(done)
                 }, {
                     it.printStackTrace()
                     showError(context.getString(R.string.error))

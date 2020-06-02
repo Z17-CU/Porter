@@ -213,11 +213,13 @@ class QrReaderFragment(
         val vibratorService = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
+        var done: Boolean? = null
+
         compositeDisposable.add(Completable.create {
 
             val client = stringToClient(rawResult)
 
-            saveClient(client)
+            done = saveClient(client)
 
             it.onComplete()
         }
@@ -225,6 +227,7 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.io())
             .subscribe({
                 resumeReader()
+                showDone(done)
             }, {
                 it.printStackTrace()
                 resumeReader()
@@ -394,6 +397,17 @@ class QrReaderFragment(
             turnFlash()
         }
         progress.dismiss()
+    }
+
+    fun showDone(done: Boolean?) {
+
+        done?.let {
+            if (done) {
+                MediaPlayer.create(context, R.raw.access_granted).start()
+            } else {
+                MediaPlayer.create(context, R.raw.access_denied).start()
+            }
+        }
     }
 
     private fun goTo(pos: Int) {
