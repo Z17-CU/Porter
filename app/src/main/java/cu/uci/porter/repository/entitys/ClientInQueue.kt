@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 class ClientInQueue(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int?,
+    @PrimaryKey
+    val id: Long,
     val queueId: Long,
     val clientId: Long,
     var lastRegistry: Long,

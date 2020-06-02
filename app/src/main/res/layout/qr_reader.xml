@@ -60,29 +60,4 @@
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/_relativeDone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/_imageViewCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="70dp"
-            app:srcCompat="@drawable/ic_check"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/_imageViewFail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="80dp"
-            app:srcCompat="@drawable/ic_fail"
-            android:visibility="gone" />
-
-    </RelativeLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

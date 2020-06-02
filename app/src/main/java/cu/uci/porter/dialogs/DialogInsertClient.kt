@@ -18,12 +18,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
-import java.util.*
 
 class DialogInsertClient(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val queueId: Long,
     private val qrReaderFragment: QrReaderFragment
 ) {
 
@@ -50,7 +48,6 @@ class DialogInsertClient(
 
         view._okButton.setOnClickListener {
 
-            var done: Boolean? = null
             compositeDisposable.add(Completable.create {
 
                 val client = Client(
@@ -62,7 +59,7 @@ class DialogInsertClient(
                     Common.getAge(view._editTextCI.text.toString().trim())
                 )
 
-                done = qrReaderFragment.saveClient(client)
+                qrReaderFragment.saveClient(client)
 
                 it.onComplete()
             }
@@ -70,7 +67,6 @@ class DialogInsertClient(
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     dialog.dismiss()
-                    qrReaderFragment.showDone(done)
                 }, {
                     it.printStackTrace()
                     showError(context.getString(R.string.error))

@@ -1,8 +1,6 @@
 package cu.uci.porter.fragments
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
@@ -172,7 +170,6 @@ class QrReaderFragment(
                 val dialog = DialogInsertClient(
                     progress.context,
                     compositeDisposable,
-                    queue.id!!,
                     this
                 ).create()
                 dialog.setOnDismissListener {
@@ -216,13 +213,11 @@ class QrReaderFragment(
         val vibratorService = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        var done: Boolean? = null
-
         compositeDisposable.add(Completable.create {
 
             val client = stringToClient(rawResult)
 
-            done = saveClient(client)
+            saveClient(client)
 
             it.onComplete()
         }
@@ -230,7 +225,6 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.io())
             .subscribe({
                 resumeReader()
-                showDone(done)
             }, {
                 it.printStackTrace()
                 resumeReader()
@@ -368,7 +362,7 @@ class QrReaderFragment(
             if (clientInQueue == null) {
                 clientInQueue =
                     ClientInQueue(
-                        null,
+                        Calendar.getInstance().timeInMillis,
                         queue.id!!,
                         client.id,
                         Calendar.getInstance().timeInMillis,
@@ -400,43 +394,6 @@ class QrReaderFragment(
             turnFlash()
         }
         progress.dismiss()
-    }
-
-    fun showDone(done: Boolean?) {
-
-        done?.let {
-            _relativeDone.visibility = View.VISIBLE
-            val view = if (done) {
-                MediaPlayer.create(context, R.raw.access_granted).start()
-                _imageViewCheck
-            } else {
-                MediaPlayer.create(context, R.raw.access_denied).start()
-                _imageViewFail
-            }
-            view.alpha = 0f
-            view.visibility = View.VISIBLE
-            view.animate()
-                .translationY(0f)
-                .alpha(1.0f)
-                .setDuration(500)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-
-                        view.animate()
-                            .translationY(0f)
-                            .alpha(0.0f)
-                            .setDuration(500)
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator?) {
-                                    super.onAnimationEnd(animation)
-                                    view.visibility = View.GONE
-                                    _relativeDone.visibility = View.GONE
-                                }
-                            })
-                    }
-                })
-        }
     }
 
     private fun goTo(pos: Int) {
