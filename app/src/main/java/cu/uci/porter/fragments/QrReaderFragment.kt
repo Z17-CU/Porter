@@ -255,10 +255,44 @@ class QrReaderFragment(
                         idList = idList + it.clientId
                         Log.d("ClientId", it.clientId.toString())
                     }
-                    var clientList = if (isInRange)
-                        dao.getClientsInRange(idList, min, max)
-                    else
-                        dao.getClients(idList)
+                    var clientList: List<Client> = ArrayList()
+                    if (isInRange) {
+                        if (idList.size < 1000) {
+                            clientList = clientList + dao.getClientsInRange(idList, min, max)
+                        } else {
+                            var a = 0
+                            var b = 999
+
+                            while (a < idList.size - 1) {
+                                if (b > idList.size - 1) {
+                                    b = idList.size - 1
+                                }
+                                clientList = clientList + dao.getClientsInRange(
+                                    idList.subList(a, b),
+                                    min,
+                                    max
+                                )
+                                a = b + 1
+                                b += 999
+                            }
+                        }
+                    } else {
+                        if (idList.size < 1000) {
+                            clientList = clientList + dao.getClients(idList)
+                        } else {
+                            var a = 0
+                            var b = 999
+
+                            while (a < idList.size - 1) {
+                                if (b > idList.size - 1) {
+                                    b = idList.size - 1
+                                }
+                                clientList = clientList + dao.getClients(idList.subList(a, b))
+                                a = b + 1
+                                b += 999
+                            }
+                        }
+                    }
 
                     clientList.map { client ->
                         val thisClientInQueue = clientsInQueue.find { it.clientId == client.id }!!
@@ -351,10 +385,12 @@ class QrReaderFragment(
             } else {
                 tempClient.isChecked = true
                 dao.insertClientInQueue(tempClient)
+
                 true
             }
         } else {
             dao.insertClient(client)
+
             done = true
 
             var clientInQueue = dao.getClientFromQueue(client.id, queue.id!!)
