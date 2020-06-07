@@ -2,7 +2,7 @@
     <string name="app_name">Porter@</string>
     <string name="permissions">Hay permisos obligatorios sin conceder</string>
     <string name="lantern">lantern</string>
-    <string name="readError">Lectura incorrecta, inténtalo otravés.</string>
+    <string name="readError">Lectura incorrecta, inténtalo otra vez.</string>
     <string name="clientExist">El cliente fue regisitrado recientemente.</string>
     <string name="error">Ha ocurrido un error.</string>
     <string name="nombre">Nombre</string>
