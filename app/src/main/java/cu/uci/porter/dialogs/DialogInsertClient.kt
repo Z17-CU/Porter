@@ -68,7 +68,6 @@ class DialogInsertClient(
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     dialog.dismiss()
-                    qrReaderFragment.showDone(done)
                 }, {
                     it.printStackTrace()
                     showError(context.getString(R.string.error))

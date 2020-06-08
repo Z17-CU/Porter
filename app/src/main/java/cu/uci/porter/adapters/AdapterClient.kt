@@ -1,6 +1,7 @@
 package cu.uci.porter.adapters
 
 import android.annotation.SuppressLint
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,17 @@ import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.utils.Conts.Companion.formatDateOnlyTime
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import java.util.concurrent.TimeUnit
 
 class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
+    var done: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
         return ViewHolderClient(
@@ -38,12 +45,19 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
+                    client.selected && done -> {
+                        R.drawable.item_green_bg
+                    }
+                    client.selected && !done -> {
+                        R.drawable.item_red_bg
+                    }
                     checkMode && position % 2 != 0 -> R.drawable.item_blue_bg
                     checkMode && position % 2 == 0 -> R.drawable.bg_item_dark_blue
                     position % 2 != 0 -> R.drawable.item_white_bg
                     else -> R.drawable.bg_item_dark
                 }
             )
+
 
         when {
             checkMode && !client.isChecked -> {

@@ -19,6 +19,8 @@ class Client(
     var number: Int = 0,
     var isChecked: Boolean = false
 ) {
+    @Ignore
+    var selected: Boolean = false
     companion object {
         const val TABLE_NAME = "Client"
         const val SEX_WOMAN = 1

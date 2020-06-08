@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
 import android.os.Vibrator
 import android.util.Log
 import android.view.*
@@ -78,6 +79,9 @@ class QrReaderFragment(
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
     private val adapter = AdapterClient()
+
+    private var client: Client? = null
+    private var done: Boolean? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -213,13 +217,11 @@ class QrReaderFragment(
         val vibratorService = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        var done: Boolean? = null
-
         compositeDisposable.add(Completable.create {
 
             val client = stringToClient(rawResult)
 
-            done = saveClient(client)
+            saveClient(client)
 
             it.onComplete()
         }
@@ -227,7 +229,6 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.io())
             .subscribe({
                 resumeReader()
-                showDone(done)
             }, {
                 it.printStackTrace()
                 resumeReader()
@@ -312,7 +313,7 @@ class QrReaderFragment(
                         adapter.contentList = clients
                         adapter.notifyDataSetChanged()
                         if (clients.isNotEmpty()) {
-                            goTo(clients.size - 1)
+                            goTo()
                             _imageViewEngranes.visibility = View.GONE
                         } else {
                             _imageViewEngranes.visibility = View.VISIBLE
@@ -368,7 +369,7 @@ class QrReaderFragment(
     }
 
     fun saveClient(client: Client?): Boolean? {
-        var done: Boolean?
+        this.client = client
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
             return null
@@ -377,15 +378,20 @@ class QrReaderFragment(
             val tempClient = dao.getClientFromQueue(client.id, queue.id!!)
             if (tempClient == null) {
                 showError("El cliente no está en la cola.")
+                showDone(false)
                 return false
             }
 
             done = if (tempClient.isChecked) {
+                dao.getClientFromQueue(client.id, queue.id!!)?.let {
+                    it.reIntent++
+                    it.lastRegistry = Calendar.getInstance().timeInMillis
+                    dao.insertClientInQueue(it)
+                }
                 false
             } else {
                 tempClient.isChecked = true
                 dao.insertClientInQueue(tempClient)
-
                 true
             }
         } else {
@@ -422,6 +428,7 @@ class QrReaderFragment(
 
             dao.insertQueue(queue)
         }
+        showDone(done)
         return done
     }
 
@@ -437,24 +444,48 @@ class QrReaderFragment(
 
     fun showDone(done: Boolean?) {
 
-        done?.let {
-            if (done) {
-                MediaPlayer.create(context, R.raw.access_granted).start()
-            } else {
-                MediaPlayer.create(context, R.raw.access_denied).start()
+        Completable.create {
+            done?.let {
+                if (done) {
+                    MediaPlayer.create(context, R.raw.access_granted).start()
+                } else {
+                    MediaPlayer.create(context, R.raw.access_denied).start()
+                }
             }
-        }
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .observeOn(Schedulers.computation())
+            .subscribe().addTo(compositeDisposable)
     }
 
-    private fun goTo(pos: Int) {
-
-        val smoothScroller = object : LinearSmoothScroller(context) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_END
+    private fun goTo() {
+        var pos = -1
+        Handler().postDelayed({
+            val smoothScroller = object : LinearSmoothScroller(context) {
+                override fun getVerticalSnapPreference(): Int {
+                    return SNAP_TO_END
+                }
             }
-        }
-        smoothScroller.targetPosition = pos
-        _recyclerViewClients.layoutManager?.startSmoothScroll(smoothScroller)
+            pos = if (client != null && done != null) {
+                adapter.contentList.indexOfFirst { it.id == client!!.id }
+            } else {
+                adapter.contentList.size - 1
+            }
+            if (pos == -1) {
+                pos = adapter.contentList.size - 1
+            }
+            smoothScroller.targetPosition = pos
+            _recyclerViewClients.layoutManager?.startSmoothScroll(smoothScroller)
+        }, 100)
+
+        Handler().postDelayed({
+            _recyclerViewClients.layoutManager?.scrollToPosition(pos)
+            if (done != null) {
+                adapter.done = done!!
+                adapter.contentList[pos].selected = true
+                adapter.notifyDataSetChanged()
+            }
+        }, 1000)
     }
 
     private fun showError(error: String) {
