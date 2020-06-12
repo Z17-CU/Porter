@@ -17,8 +17,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MyTextAppearance" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">#ffffff</item>
+    <style name="PopupMenuStyle" parent="Theme.AppCompat.Light">
+        <item name="android:background">@android:color/white</item>
     </style>
 
     <style name="AddClientButtons" parent="Widget.AppCompat.Button.Borderless">
