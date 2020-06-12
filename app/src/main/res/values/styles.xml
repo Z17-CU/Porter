@@ -47,7 +47,7 @@
     <style name="MaterialSearchViewStyle">
         <item name="searchBackground">@color/search_field_bg</item>
         <item name="searchCloseIcon">@drawable/ic_clear</item>
-        <item name="searchBackIcon">@drawable/ic_arrow_back_red</item>
+        <item name="searchBackIcon">@drawable/ic_arrow_back_accent</item>
         <item name="searchSuggestionBackground">@color/search_layover_bg</item>
         <item name="android:textColor">#000</item>
         <item name="android:textColorHint">#999999</item>
