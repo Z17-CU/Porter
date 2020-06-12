@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -13,6 +15,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MyTextAppearance" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">#ffffff</item>
     </style>
 
     <style name="AddClientButtons" parent="Widget.AppCompat.Button.Borderless">
@@ -36,6 +42,30 @@
     <style name="PopupWhite" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:textColor">#636363</item>
+    </style>
+
+    <style name="MaterialSearchViewStyle">
+        <item name="searchBackground">@color/search_field_bg</item>
+        <item name="searchCloseIcon">@drawable/ic_clear</item>
+        <item name="searchBackIcon">@drawable/ic_arrow_back_red</item>
+        <item name="searchSuggestionBackground">@color/search_layover_bg</item>
+        <item name="android:textColor">#000</item>
+        <item name="android:textColorHint">#999999</item>
+        <item name="android:hint">@string/buscar</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">11</item>
+        <item name="android:digits">1234567890</item>
+    </style>
+
+    <style name="ActionBarTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="android:textColorPrimary">#FFF</item>
+        <item name="android:textColorSecondary">#FFF</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnSurface">#FFF</item>
+
+        <item name="android:textColor">#EB000000</item>
+        <item name="android:actionMenuTextColor">#EB000000</item>
     </style>
 
 </resources>

@@ -40,7 +40,7 @@ android {
         create("release") {
             storeFile = file(project.properties["KEYSTORE_PORTERO"] ?: "")
             storePassword = project.properties["KEYSTORE_PASSWORD_PORTERO"]?.toString() ?: ""
-            keyAlias =  project.properties["KEY_ALIAS_PORTERO"]?.toString() ?: ""
+            keyAlias = project.properties["KEY_ALIAS_PORTERO"]?.toString() ?: ""
             keyPassword = project.properties["KEY_PASSWORD_PORTERO"]?.toString() ?: ""
         }
     }
@@ -175,6 +175,9 @@ dependencies {
     /** Fragmentation */
     implementation("me.yokeyword:fragmentationx:1.0.1")
     implementation("me.yokeyword:fragmentationx-swipeback:1.0.1")
+
+    /**SearchView*/
+    implementation("com.miguelcatalan:materialsearchview:1.4.0")
 }
 
 fun updateVersionCode() {

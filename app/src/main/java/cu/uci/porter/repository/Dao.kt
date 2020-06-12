@@ -60,4 +60,10 @@ interface Dao {
 
     @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME}")
     fun getClientsInQueue(): LiveData<List<ClientInQueue>>
+
+    @Query("SELECT queueId FROM ${ClientInQueue.TABLE_NAME} WHERE clientId = :clientId GROUP BY queueId")
+    fun getQueuesIdsByClient(clientId: Long): List<Long>?
+
+    @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id IN (:ids)")
+    fun getQueuesByIds(ids: List<Long>): List<Queue>?
 }
