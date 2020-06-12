@@ -56,7 +56,8 @@
     <string name="universidad_de_las_ciencias_inform_ticas">Universidad de las Ciencias Informáticas</string>
     <string name="todos_los_derechos_reservados_n2018">Todos los derechos reservados\n2020</string>
     <string name="teclado">Teclado</string>
-    <string name="lista">Lista</string>
+    <string name="lista">Listar</string>
+    <string name="readQR">Lector Qr</string>
     <string name="filtros">Filtros</string>
     <string name="exportar">Exportar</string>
     <string name="eliminar">Eliminar</string>

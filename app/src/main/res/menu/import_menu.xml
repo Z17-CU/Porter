@@ -18,18 +18,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_import"
-        android:icon="@drawable/ic_download"
-        android:orderInCategory="100"
-        android:title="@string/insertar"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_action_action_search"
         android:orderInCategory="100"
         android:title="@string/buscar"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_import"
+        android:icon="@drawable/ic_download"
+        android:orderInCategory="100"
+        android:title="@string/insertar"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"

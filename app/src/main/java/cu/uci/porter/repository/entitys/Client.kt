@@ -17,10 +17,10 @@ class Client(
     var lastRegistry: Long = 0,
     var reIntent: Int = 0,
     var number: Int = 0,
-    var isChecked: Boolean = false
+    var isChecked: Boolean = false,
+    var selected: Boolean = false,
+    var searched: Boolean = false
 ) {
-    @Ignore
-    var selected: Boolean = false
     companion object {
         const val TABLE_NAME = "Client"
         const val SEX_WOMAN = 1

@@ -7,8 +7,11 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
+import android.text.InputFilter
+import android.text.InputType
 import android.util.Log
 import android.view.*
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +21,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -28,6 +32,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.miguelcatalan.materialsearchview.MaterialSearchView
 import cu.uci.porter.MainActivity
 import cu.uci.porter.R
 import cu.uci.porter.adapters.AdapterClient
@@ -80,6 +85,8 @@ class QrReaderFragment(
     private val compositeDisposable = CompositeDisposable()
     private val adapter = AdapterClient()
 
+    private var searchQuery = MutableLiveData<String>().default("")
+
     private var client: Client? = null
     private var done: Boolean? = null
 
@@ -92,9 +99,7 @@ class QrReaderFragment(
 
         setHasOptionsMenu(true)
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        requireActivity().title = queue.name
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
         progress = Progress(view.context)
 
@@ -107,6 +112,8 @@ class QrReaderFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initToolBar()
 
         _flash.setOnClickListener {
             _zXingScannerView.flash = !_zXingScannerView.flash
@@ -127,13 +134,16 @@ class QrReaderFragment(
                         _qrReader.visibility = View.GONE
                         menu.findItem(R.id.action_show_filter_menu).isVisible = true
                         menu.findItem(R.id.action_insert_client).isVisible = false
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.readQR)
                         R.drawable.ic_qr_reader
                     } else {
                         _qrReader.visibility = View.VISIBLE
                         resumeReader()
                         menu.findItem(R.id.action_show_filter_menu).isVisible = false
                         menu.findItem(R.id.action_insert_client).isVisible = true
-
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.lista)
                         updateObserver(queue.id!!)
 
                         R.drawable.ic_filter_list
@@ -141,6 +151,23 @@ class QrReaderFragment(
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        })
+
+        searchQuery.observe(viewLifecycleOwner, Observer {
+            if (!it.isNullOrEmpty()) {
+                val id = it.toLong()
+                val index = adapter.contentList.indexOfLast { client -> client.id == id }
+                adapter.contentList.map { client ->
+                    client.searched = false
+                }
+                if (index != -1) {
+                    adapter.contentList[index].searched = true
+                    goTo(index)
+                } else {
+                    showError("El cliente no está en la cola.")
+                }
+                adapter.notifyDataSetChanged()
             }
         })
     }
@@ -157,54 +184,15 @@ class QrReaderFragment(
     }
 
     override fun onBackPressedSupport(): Boolean {
-        requireActivity().title = requireContext().getString(R.string.app_name)
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        return super.onBackPressedSupport()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        inflater.inflate(R.menu.main, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_insert_client -> {
-                pauseScanner()
-                val dialog = DialogInsertClient(
-                    progress.context,
-                    compositeDisposable,
-                    this
-                ).create()
-                dialog.setOnDismissListener {
-                    resumeReader()
-                }
-                dialog.show()
-                true
-            }
-            R.id.action_list -> {
-                changeMode()
-                true
-            }
-            R.id.action_show_filter_menu -> {
-                showPopupMenu(item)
-                true
-            }
-            R.id.action_save -> {
-                showSaveOptions()
-                true
-            }
-            android.R.id.home -> {
-                requireActivity().title = requireContext().getString(R.string.app_name)
-                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
-                    false
-                )
-                pop()
-                true
-            }
-            else -> {
+        return if (searchView.isSearchOpen) {
+            searchView.closeSearch()
+            true
+        } else {
+            requireActivity().title = requireContext().getString(R.string.app_name)
+            (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
                 false
-            }
+            )
+            return super.onBackPressedSupport()
         }
     }
 
@@ -233,6 +221,96 @@ class QrReaderFragment(
                 it.printStackTrace()
                 resumeReader()
             }))
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun initToolBar() {
+        with(toolbar as androidx.appcompat.widget.Toolbar) {
+
+            inflateMenu(R.menu.main)
+
+            val item = this.menu.findItem(R.id.action_search)
+            searchView.setMenuItem(item)
+
+            if (this.menu is MenuBuilder)
+                (this.menu as MenuBuilder).setOptionalIconsVisible(true)
+
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.action_insert_client -> {
+                        pauseScanner()
+                        val dialog = DialogInsertClient(
+                            progress.context,
+                            compositeDisposable,
+                            this@QrReaderFragment
+                        ).create()
+                        dialog.setOnDismissListener {
+                            resumeReader()
+                        }
+                        dialog.show()
+                        true
+                    }
+                    R.id.action_list -> {
+                        changeMode()
+                        true
+                    }
+                    R.id.action_show_filter_menu -> {
+                        showPopupMenu(item)
+                        true
+                    }
+                    R.id.action_save -> {
+                        showSaveOptions()
+                        true
+                    }
+                    else -> {
+                        false
+                    }
+                }
+            }
+
+            setNavigationIcon(R.drawable.ic_arrow_back)
+
+            title = queue.name
+
+            setNavigationOnClickListener {
+                requireActivity().title = requireContext().getString(R.string.app_name)
+                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
+                    false
+                )
+                pop()
+            }
+
+            searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    //Do some magic
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    when (newText?.length) {
+                        11 -> searchQuery.postValue(newText)
+                        else -> searchQuery.postValue("")
+                    }
+                    return false
+                }
+            })
+
+            searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
+                override fun onSearchViewShown() {
+                    searchView.findViewById<EditText>(R.id.searchTextView).inputType =
+                        InputType.TYPE_CLASS_NUMBER
+                    searchView.findViewById<EditText>(R.id.searchTextView).filters = arrayOf(
+                        InputFilter.LengthFilter(11)
+                    )
+                }
+
+                override fun onSearchViewClosed() {
+                    searchQuery.postValue("")
+                }
+            })
+
+            this@QrReaderFragment.menu = this.menu
+        }
     }
 
     @SuppressLint("LogNotTimber")
@@ -458,7 +536,7 @@ class QrReaderFragment(
             .subscribe().addTo(compositeDisposable)
     }
 
-    private fun goTo() {
+    private fun goTo(goTo: Int = -1) {
         var pos = -1
         Handler().postDelayed({
             val smoothScroller = object : LinearSmoothScroller(context) {
@@ -466,7 +544,9 @@ class QrReaderFragment(
                     return SNAP_TO_END
                 }
             }
-            pos = if (client != null && done != null) {
+            pos = if (goTo != -1) {
+                goTo
+            } else if (client != null && done != null) {
                 adapter.contentList.indexOfFirst { it.id == client!!.id }
             } else {
                 adapter.contentList.size - 1
