@@ -18,13 +18,14 @@
 
         <EditText
             android:id="@+id/_editTextName"
-            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789"
+            android:importantForAutofill="no"
             android:inputType="textCapSentences"
             android:maxLength="30"
-            tools:text="Cola del Pollo"
-            android:importantForAutofill="no" />
+            android:maxLines="1"
+            tools:text="Cola del Pollo" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -37,6 +38,25 @@
         android:text="@string/requerido"
         android:textColor="@color/google_red"
         android:textSize="12sp" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/descripci_n_de_la_cola"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp"
+        android:paddingEnd="16dp"
+        android:paddingRight="16dp">
+
+        <EditText
+            android:id="@+id/_editTextDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

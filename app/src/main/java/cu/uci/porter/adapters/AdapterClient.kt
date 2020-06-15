@@ -55,7 +55,7 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
 
 
         when {
-            checkMode && !client.isChecked -> {
+            !client.isChecked -> {
                 holder.clientNumber.visibility = View.VISIBLE
                 holder.imageViewCheck.visibility = View.GONE
                 holder.imageView.visibility = View.VISIBLE
@@ -67,30 +67,10 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
 
                 holder.clientNumber.text = client.number.toString()
             }
-            checkMode && client.isChecked -> {
+            client.isChecked -> {
                 holder.clientNumber.visibility = View.GONE
                 holder.imageView.visibility = View.GONE
                 holder.imageViewCheck.visibility = View.VISIBLE
-            }
-            else -> {
-                holder.clientNumber.visibility = View.GONE
-                holder.imageViewCheck.visibility = View.GONE
-                holder.imageView.visibility = View.VISIBLE
-                holder.imageView.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        holder.imageView.context,
-                        when (client.sex) {
-                            Client.SEX_WOMAN -> {
-                                holder.imageView.background = null
-                                R.drawable.ic_girl_big
-                            }
-                            else -> {
-                                holder.imageView.background = null
-                                R.drawable.ic_man_big
-                            }
-                        }
-                    )
-                )
             }
         }
 

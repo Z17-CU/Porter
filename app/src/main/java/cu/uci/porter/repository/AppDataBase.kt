@@ -13,7 +13,7 @@ import cu.uci.porter.repository.entitys.Queue
 
 @Database(
     entities = [(Client::class), (Queue::class), (ClientInQueue::class)],
-    version = 2
+    version = 3
 )
 //@TypeConverters(Converter::class)
 abstract class AppDataBase : RoomDatabase() {
@@ -29,6 +29,9 @@ abstract class AppDataBase : RoomDatabase() {
                     )
                     database.execSQL(
                         "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN searched INTEGER NOT NULL DEFAULT 0"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ${Queue.TABLE_NAME} ADD COLUMN description TEXT NOT NULL DEFAULT ''"
                     )
                 }
             })

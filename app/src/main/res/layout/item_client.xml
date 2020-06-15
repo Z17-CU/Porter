@@ -47,8 +47,8 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/round_green_bg"
                     android:padding="4dp"
-                    app:srcCompat="@drawable/ic_check_list"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_check_list" />
 
                 <TextView
                     android:id="@+id/clientNumber"
@@ -85,14 +85,34 @@
                 android:orientation="vertical"
                 tools:ignore="RtlSymmetry">
 
-                <TextView
-                    android:id="@+id/_textViewNombre"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textColor="#494949"
-                    android:textSize="18sp"
-                    tools:text="Richard Anca Perurena" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/_textViewNombre"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:maxLines="1"
+                        android:textColor="#494949"
+                        android:textSize="18sp"
+                        tools:text="Richard Anca Perurena" />
+
+                    <ImageView
+                        android:id="@+id/imageViewDetails"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/details"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_help_outline" />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

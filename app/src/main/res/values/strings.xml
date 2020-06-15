@@ -62,4 +62,8 @@
     <string name="exportar">Exportar</string>
     <string name="eliminar">Eliminar</string>
     <string name="buscar">Buscar por CI</string>
+    <string name="editar">Editar</string>
+    <string name="descripci_n_de_la_cola">Descripción de la cola.</string>
+    <string name="details">Details</string>
+    <string name="notDescroption">La cola no tiene descripción.</string>
 </resources>

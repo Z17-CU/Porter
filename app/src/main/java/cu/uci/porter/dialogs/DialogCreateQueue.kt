@@ -13,8 +13,10 @@ import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Queue
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
@@ -23,11 +25,13 @@ import java.util.*
 
 class DialogCreateQueue(
     private val context: Context,
-    private val compositeDisposable: CompositeDisposable
+    private val compositeDisposable: CompositeDisposable,
+    private val id: Long = -1L
 ) {
 
     private lateinit var dao: Dao
     private lateinit var dialog: AlertDialog
+    private var queue: Queue? = null
 
     fun create(): AlertDialog {
         dao = AppDataBase.getInstance(context).dao()
@@ -53,11 +57,18 @@ class DialogCreateQueue(
             compositeDisposable.add(Completable.create {
 
                 dao.insertQueue(
-                    Queue(
-                        Calendar.getInstance().timeInMillis,
-                        view._editTextName.text.toString().trim(),
-                        Calendar.getInstance().timeInMillis
-                    )
+                    if (queue == null)
+                        Queue(
+                            Calendar.getInstance().timeInMillis,
+                            view._editTextName.text.toString().trim(),
+                            Calendar.getInstance().timeInMillis,
+                            description = view._editTextDescription.text.toString().trim()
+                        )
+                    else {
+                        queue!!.name = view._editTextName.text.toString().trim()
+                        queue!!.description = view._editTextDescription.text.toString().trim()
+                        queue!!
+                    }
                 )
 
                 it.onComplete()
@@ -92,6 +103,19 @@ class DialogCreateQueue(
         })
 
         view._okButton.isEnabled = view._editTextName.text.toString().trim().isNotEmpty()
+
+        if (id != -1L) {
+            Single.create<Queue> {
+                queue = dao.getQueue(id)
+                it.onSuccess(queue!!)
+            }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { queue ->
+                    view._editTextName.setText(queue.name)
+                    view._editTextDescription.setText(queue.description)
+                    view._okButton.setText(context.getString(R.string.editar))
+                }.addTo(compositeDisposable)
+        }
 
         return view
     }

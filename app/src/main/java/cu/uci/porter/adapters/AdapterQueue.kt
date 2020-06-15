@@ -3,10 +3,12 @@ package cu.uci.porter.adapters
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -16,12 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
+import cu.uci.porter.dialogs.DialogCreateQueue
 import cu.uci.porter.fragments.QrReaderFragment
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Conts.Companion.formatDateBig
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import me.yokeyword.fragmentation.SupportFragment
 
@@ -74,6 +78,16 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
 
         holder.layoutmarker.visibility = View.GONE
         holder.textViewReIntents.visibility = View.GONE
+
+        holder.imageDetails.visibility = View.VISIBLE
+        holder.imageDetails.setOnClickListener {
+            Toast.makeText(
+                it.context, if (queue.description.isBlank())
+                    it.context.getText(R.string.notDescroption)
+                else
+                    queue.description, Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -102,6 +116,13 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
                         }
                         .create()
                         .show()
+                }
+                R.id.action_edit -> {
+                    DialogCreateQueue(
+                        context,
+                        CompositeDisposable(),
+                        contentList[position].id!!
+                    ).create().show()
                 }
             }
             false

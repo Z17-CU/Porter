@@ -18,4 +18,5 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val textViewReIntents: TextView = itemView._textViewReIntents
     val clientNumber: TextView = itemView.clientNumber
     val imageViewCheck: ImageView = itemView._imageViewCheck
+    val imageDetails: ImageView = itemView.imageViewDetails
 }

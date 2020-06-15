@@ -396,6 +396,7 @@ class QrReaderFragment(
                         } else {
                             _imageViewEngranes.visibility = View.VISIBLE
                         }
+                        toolbar.title = queue.name + " - " + adapter.contentList.size
 
                     }.addTo(compositeDisposable)
             })
