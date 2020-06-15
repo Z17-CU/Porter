@@ -389,6 +389,7 @@ class QrReaderFragment(
                     .subscribe { clients, _ ->
 
                         adapter.contentList = clients
+                        adapter.queueId = queueId
                         adapter.notifyDataSetChanged()
                         if (clients.isNotEmpty()) {
                             goTo()

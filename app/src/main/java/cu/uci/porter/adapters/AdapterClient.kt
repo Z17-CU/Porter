@@ -1,6 +1,7 @@
 package cu.uci.porter.adapters
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,14 +9,18 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
+import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.entitys.Client
 import cu.uci.porter.utils.Conts.Companion.formatDateOnlyTime
+import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 
 class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
     var done: Boolean = false
+    var queueId: Long = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
         return ViewHolderClient(
@@ -103,5 +108,25 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
                 }
             }
         )
+
+        holder.layoutBackground.setOnLongClickListener {
+            val message =
+                "Desea actualizar a ${client.name} como ${if (client.isChecked) "no chequeado" else "chequeado"}?"
+            AlertDialog.Builder(it.context)
+                .setMessage(message)
+                .setPositiveButton("Actualizar") { _, _ ->
+                    Completable.create { emitter ->
+                        val dao = AppDataBase.getInstance(it.context).dao()
+                        val clientInQueue = dao.getClientFromQueue(client.id, queueId)
+                        clientInQueue?.isChecked = !client.isChecked
+                        dao.insertClientInQueue(clientInQueue!!)
+                        emitter.onComplete()
+                    }.observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
+                }
+                .create().show()
+            return@setOnLongClickListener true
+        }
     }
 }
