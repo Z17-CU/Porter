@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import cu.control.queue.utils.MediaUtil
 import cu.uci.porter.R
+import cu.uci.porter.SettingsActivity
 import cu.uci.porter.adapters.AdapterQueue
 import cu.uci.porter.dialogs.DialogCreateQueue
 import cu.uci.porter.repository.AppDataBase
@@ -280,35 +281,37 @@ class RoomQueues : SupportFragment() {
     }
 
     private fun openSettings() {
-        val inflater =
-            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflater.inflate(R.layout.settingst_layout, null)
-        val alertDialog = AlertDialog.Builder(requireContext())
-            .setView(view)
-            .create()
-        view._cancelButton.setOnClickListener {
-            alertDialog.dismiss()
-        }
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        view.editTextRotationTime.setText(
-            sharedPreferences.getInt(
-                Conts.QUEUE_TIME,
-                Conts.DEFAULT_QUEUE_TIME_HOURS
-            ).toString()
-        )
 
-        view._okButton.setOnClickListener {
-            if (view.editTextRotationTime.text.toString().isEmpty()) {
-                Toast.makeText(requireContext(), "Debe insertar un valor.", Toast.LENGTH_LONG)
-                    .show()
-            } else {
-                sharedPreferences.edit()
-                    .putInt(Conts.QUEUE_TIME, view.editTextRotationTime.text.toString().toInt())
-                    .apply()
-                alertDialog.dismiss()
-            }
-        }
-        alertDialog.show()
+        startActivity(Intent(requireContext(), SettingsActivity::class.java))
+//        val inflater =
+//            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//        val view = inflater.inflate(R.layout.settingst_layout, null)
+//        val alertDialog = AlertDialog.Builder(requireContext())
+//            .setView(view)
+//            .create()
+//        view._cancelButton.setOnClickListener {
+//            alertDialog.dismiss()
+//        }
+//        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+//        view.editTextRotationTime.setText(
+//            sharedPreferences.getInt(
+//                Conts.QUEUE_TIME,
+//                Conts.DEFAULT_QUEUE_TIME_HOURS
+//            ).toString()
+//        )
+//
+//        view._okButton.setOnClickListener {
+//            if (view.editTextRotationTime.text.toString().isEmpty()) {
+//                Toast.makeText(requireContext(), "Debe insertar un valor.", Toast.LENGTH_LONG)
+//                    .show()
+//            } else {
+//                sharedPreferences.edit()
+//                    .putInt(Conts.QUEUE_TIME, view.editTextRotationTime.text.toString().toInt())
+//                    .apply()
+//                alertDialog.dismiss()
+//            }
+//        }
+//        alertDialog.show()
     }
 
     private fun showAboutAs() {

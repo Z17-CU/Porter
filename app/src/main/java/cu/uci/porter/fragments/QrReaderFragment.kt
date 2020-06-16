@@ -14,6 +14,7 @@ import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -45,8 +46,11 @@ import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.*
 import cu.uci.porter.utils.Common.Companion.getAge
 import cu.uci.porter.utils.Common.Companion.getSex
+import cu.uci.porter.utils.Conts.Companion.ALERTS
 import cu.uci.porter.utils.Conts.Companion.APP_DIRECTORY
 import cu.uci.porter.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
+import cu.uci.porter.utils.Conts.Companion.QUEUE_CANT
+import cu.uci.porter.utils.Conts.Companion.QUEUE_DAYS
 import cu.uci.porter.utils.Conts.Companion.QUEUE_TIME
 import cu.uci.porter.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -62,6 +66,7 @@ import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 
@@ -448,12 +453,55 @@ class QrReaderFragment(
         progress.dismiss()
     }
 
-    fun saveClient(client: Client?): Boolean? {
+    fun saveClient(client: Client?) {
         this.client = client
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
-            return null
+            return
         }
+
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ALERTS, false)) {
+
+            val queueCant = PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS)
+            val queueDays = PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(QUEUE_DAYS, DEFAULT_QUEUE_TIME_HOURS)
+
+            val count = dao.countToAlert(
+                client.id,
+                Calendar.getInstance().timeInMillis - (TimeUnit.MILLISECONDS.convert(
+                    queueDays.toLong(),
+                    TimeUnit.DAYS
+                ))
+            )
+            if (count >= queueCant) {
+
+                requireActivity().runOnUiThread {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Alerta")
+                        .setMessage(client.name + " a lanzado una alerta porque en los últimos $queueDays días a estado en $count colas.")
+                        .setPositiveButton("Continuar") { _, _ ->
+                            Completable.create {
+                                proccesClient(client)
+                                it.onComplete()
+                            }.subscribeOn(Schedulers.io())
+                                .observeOn(Schedulers.io())
+                                .subscribe()
+                                .addTo(compositeDisposable)
+                        }
+                        .setNegativeButton("Cancelar", null)
+                        .create().show()
+                }
+            } else {
+                proccesClient(client)
+            }
+
+        } else {
+            proccesClient(client)
+        }
+    }
+
+    private fun proccesClient(client: Client): Boolean {
         if (checkList) {
             val tempClient = dao.getClientFromQueue(client.id, queue.id!!)
             if (tempClient == null) {
@@ -509,7 +557,7 @@ class QrReaderFragment(
             dao.insertQueue(queue)
         }
         showDone(done)
-        return done
+        return done!!
     }
 
     private fun resumeReader() {

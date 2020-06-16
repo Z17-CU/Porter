@@ -66,4 +66,7 @@ interface Dao {
 
     @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id IN (:ids)")
     fun getQueuesByIds(ids: List<Long>): List<Queue>?
+
+    @Query("SELECT COUNT(*) FROM ${ClientInQueue.TABLE_NAME} WHERE clientId = :id AND lastRegistry > :beginDate")
+    fun countToAlert(id: Long, beginDate: Long): Int
 }

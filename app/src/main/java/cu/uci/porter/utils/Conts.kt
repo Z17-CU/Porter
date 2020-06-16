@@ -14,5 +14,8 @@ class Conts {
         //Preferences
         val QUEUE_TIME = "QUEUE_TIME"
         val DEFAULT_QUEUE_TIME_HOURS = 4
+        val QUEUE_CANT = "QUEUE_CANT"
+        val QUEUE_DAYS = "QUEUE_DAYS"
+        val ALERTS = "alerts"
     }
 }

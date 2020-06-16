@@ -7,6 +7,7 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
+    id("kotlin-android")
 }
 
 android {
@@ -178,6 +179,9 @@ dependencies {
 
     /**SearchView*/
     implementation("com.miguelcatalan:materialsearchview:1.4.0")
+
+    /**Preferences*/
+    implementation("com.takisoft.preferencex:preferencex:1.1.0")
 }
 
 fun updateVersionCode() {
