@@ -13,7 +13,7 @@ import cu.uci.porter.repository.entitys.Queue
 
 @Database(
     entities = [(Client::class), (Queue::class), (ClientInQueue::class)],
-    version = 3
+    version = 2
 )
 //@TypeConverters(Converter::class)
 abstract class AppDataBase : RoomDatabase() {
