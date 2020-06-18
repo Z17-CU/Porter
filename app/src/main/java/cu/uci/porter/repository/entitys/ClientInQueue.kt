@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 class ClientInQueue(
     @PrimaryKey
     var id: Long,
-    val queueId: Long,
+    var queueId: Long,
     var clientId: Long,
     var lastRegistry: Long,
     var reIntent: Int = 0,

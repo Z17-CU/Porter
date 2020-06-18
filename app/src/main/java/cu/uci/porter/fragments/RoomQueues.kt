@@ -208,11 +208,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                     .setMessage("¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}?. Ésta acción no se puede deshacer. Se establecerá la fecha de la cola más antigua y los usuarios comunes solo aparecerán una vez.")
                     .setPositiveButton(requireContext().getText(R.string.merge)) { _, _ ->
                         mergeQueues(queueToMerge!!, queue)
+                        queueToMerge = null
+                        toMerge = false
                     }
-                    .setNegativeButton(requireContext().getString(android.R.string.cancel), null)
+                    .setNegativeButton(requireContext().getString(android.R.string.cancel)) { _, _ ->
+                        queueToMerge = null
+                        toMerge = false
+                    }
+                    .setCancelable(false)
                     .create().show()
-                queueToMerge = null
-                toMerge = false
             }
         } else {
             showReaderOptions(queue)
@@ -252,7 +256,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     DialogCreateQueue(
                         requireContext(),
                         CompositeDisposable(),
-                        queue.id!!
+                        queue.id
                     ).create().show()
                 }
                 R.id.action_merge -> {
@@ -453,13 +457,24 @@ class RoomQueues : SupportFragment(), onClickListener {
                     queue1.description.isNotEmpty() && queue2.description.isEmpty() -> queue1.description
                     queue1.description.isEmpty() && queue2.description.isNotEmpty() -> queue2.description
                     else -> "${queue1.description} y ${queue2.description}"
-                })
+                }
+            )
 
             val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id, queue2.id)
 
+            var number = 1
             allClientsInQueue.map {
-
+                it.number = number
+                it.queueId = newQueue.id
+                number++
             }
+
+            newQueue.clientsNumber = allClientsInQueue.size
+
+            dao.deleteQueue(queue1)
+            dao.deleteQueue(queue2)
+            dao.insertQueue(newQueue)
+            dao.insertClientInQueue(allClientsInQueue)
 
             it.onComplete()
         }.observeOn(AndroidSchedulers.mainThread())
