@@ -27,13 +27,11 @@
                     android:theme="@style/ActionBarTheme"
                     app:popupTheme="@style/PopupMenuStyle" />
 
-                <com.miguelcatalan.materialsearchview.MaterialSearchView
+                <cu.uci.porter.utils.MaterialSearchView
                     android:id="@+id/searchView"
                     style="@style/MaterialSearchViewStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLength="11" />
+                    android:layout_height="wrap_content" />
 
             </RelativeLayout>
 

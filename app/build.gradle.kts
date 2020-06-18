@@ -177,9 +177,6 @@ dependencies {
     implementation("me.yokeyword:fragmentationx:1.0.1")
     implementation("me.yokeyword:fragmentationx-swipeback:1.0.1")
 
-    /**SearchView*/
-    implementation("com.miguelcatalan:materialsearchview:1.4.0")
-
     /**Preferences*/
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 }

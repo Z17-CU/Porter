@@ -7,11 +7,8 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
-import android.text.InputFilter
-import android.text.InputType
 import android.util.Log
 import android.view.*
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -22,7 +19,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -33,7 +29,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.miguelcatalan.materialsearchview.MaterialSearchView
 import cu.uci.porter.MainActivity
 import cu.uci.porter.R
 import cu.uci.porter.adapters.AdapterClient
@@ -128,7 +123,7 @@ class QrReaderFragment(
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
 
-        updateObserver(queue.id!!)
+        updateObserver(queue.id)
 
         currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
 
@@ -149,7 +144,7 @@ class QrReaderFragment(
                         menu.findItem(R.id.action_insert_client).isVisible = true
                         menu.findItem(R.id.action_list).title =
                             requireContext().getString(R.string.lista)
-                        updateObserver(queue.id!!)
+                        updateObserver(queue.id)
 
                         R.drawable.ic_filter_list
                     }
@@ -189,7 +184,7 @@ class QrReaderFragment(
     }
 
     override fun onBackPressedSupport(): Boolean {
-        return if (searchView.isSearchOpen) {
+        return if (searchView.isOpen) {
             searchView.closeSearch()
             true
         } else {
@@ -235,7 +230,6 @@ class QrReaderFragment(
             inflateMenu(R.menu.main)
 
             val item = this.menu.findItem(R.id.action_search)
-            searchView.setMenuItem(item)
 
             if (this.menu is MenuBuilder)
                 (this.menu as MenuBuilder).setOptionalIconsVisible(true)
@@ -265,6 +259,10 @@ class QrReaderFragment(
                     }
                     R.id.action_save -> {
                         showSaveOptions()
+                        true
+                    }
+                    R.id.action_search -> {
+                        searchView.openSearch()
                         true
                     }
                     else -> {
@@ -300,13 +298,9 @@ class QrReaderFragment(
                 }
             })
 
-            searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
-                override fun onSearchViewShown() {
-                    searchView.findViewById<EditText>(R.id.searchTextView).inputType =
-                        InputType.TYPE_CLASS_NUMBER
-                    searchView.findViewById<EditText>(R.id.searchTextView).filters = arrayOf(
-                        InputFilter.LengthFilter(11)
-                    )
+            searchView.setSearchViewListener(object : MaterialSearchView.SearchViewListener {
+                override fun onSearchViewOpened() {
+
                 }
 
                 override fun onSearchViewClosed() {
@@ -416,19 +410,19 @@ class QrReaderFragment(
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_filter_todos -> {
-                    updateObserver(queueId = queue.id!!)
+                    updateObserver(queueId = queue.id)
                 }
                 R.id.action_filter_niños -> {
-                    updateObserver(queue.id!!, true, -1, 12)
+                    updateObserver(queue.id, true, -1, 12)
                 }
                 R.id.action_filter_jovenes -> {
-                    updateObserver(queue.id!!, true, 13, 30)
+                    updateObserver(queue.id, true, 13, 30)
                 }
                 R.id.action_filter_adultos -> {
-                    updateObserver(queue.id!!, true, 31, 55)
+                    updateObserver(queue.id, true, 31, 55)
                 }
                 R.id.action_filter_3raEdad -> {
-                    updateObserver(queue.id!!, true, 56, 200)
+                    updateObserver(queue.id, true, 56, 200)
                 }
             }
             false
@@ -503,7 +497,7 @@ class QrReaderFragment(
 
     private fun proccesClient(client: Client): Boolean {
         if (checkList) {
-            val tempClient = dao.getClientFromQueue(client.id, queue.id!!)
+            val tempClient = dao.getClientFromQueue(client.id, queue.id)
             if (tempClient == null) {
                 showError("El cliente no está en la cola.")
                 showDone(false)
@@ -511,7 +505,7 @@ class QrReaderFragment(
             }
 
             done = if (tempClient.isChecked) {
-                dao.getClientFromQueue(client.id, queue.id!!)?.let {
+                dao.getClientFromQueue(client.id, queue.id)?.let {
                     it.reIntent++
                     it.lastRegistry = Calendar.getInstance().timeInMillis
                     dao.insertClientInQueue(it)
@@ -527,16 +521,16 @@ class QrReaderFragment(
 
             done = true
 
-            var clientInQueue = dao.getClientFromQueue(client.id, queue.id!!)
+            var clientInQueue = dao.getClientFromQueue(client.id, queue.id)
 
-            queue.clientsNumber = dao.clientsByQueue(queue.id!!)
+            queue.clientsNumber = dao.clientsByQueue(queue.id)
             queue.clientsNumber++
 
             if (clientInQueue == null) {
                 clientInQueue =
                     ClientInQueue(
                         Calendar.getInstance().timeInMillis,
-                        queue.id!!,
+                        queue.id,
                         client.id,
                         Calendar.getInstance().timeInMillis,
                         number = queue.clientsNumber
@@ -570,7 +564,7 @@ class QrReaderFragment(
         progress.dismiss()
     }
 
-    fun showDone(done: Boolean?) {
+    private fun showDone(done: Boolean?) {
 
         Completable.create {
             done?.let {
@@ -759,7 +753,7 @@ class QrReaderFragment(
                             Single.create<Queue> {
 
                                 queue.clientInQueueList =
-                                    dao.getClientsInQueueList(queueId = queue.id!!)
+                                    dao.getClientsInQueueList(queueId = queue.id)
                                 var clientsIds: List<Long> = ArrayList()
                                 queue.clientInQueueList!!.map { clientInQueue ->
                                     clientsIds = clientsIds + clientInQueue.clientId

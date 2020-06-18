@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/search_field_bg"
+            android:gravity="start"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/action_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/atras"
+                android:paddingLeft="@dimen/search_icon_padding"
+                android:paddingRight="@dimen/search_icon_padding"
+                android:tint="?attr/colorAccent"
+                app:srcCompat="@drawable/ic_arrow_back_accent" />
+
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/buscar"
+                android:imeOptions="actionSearch|flagNoExtractUi"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="11"
+                android:maxLines="1"
+                android:paddingLeft="@dimen/search_view_text_padding"
+                android:paddingRight="@dimen/search_view_text_padding"
+                android:textAlignment="viewStart"
+                android:textColor="#000"
+                android:textColorHint="@color/colorTextGrayScale50"
+                android:textCursorDrawable="@null" />
+
+            <ImageButton
+                android:id="@+id/action_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/borrar_busqueda"
+                android:paddingLeft="@dimen/search_icon_padding"
+                android:paddingRight="@dimen/search_icon_padding"
+                android:tint="?attr/colorAccent"
+                android:visibility="visible"
+                app:srcCompat="@drawable/ic_clear" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

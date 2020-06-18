@@ -9,12 +9,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +26,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.miguelcatalan.materialsearchview.MaterialSearchView
 import cu.control.queue.utils.MediaUtil
 import cu.uci.porter.R
 import cu.uci.porter.SettingsActivity
@@ -41,6 +37,7 @@ import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Common
 import cu.uci.porter.utils.Conts
+import cu.uci.porter.utils.MaterialSearchView
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import cu.uci.porter.viewModels.ClientViewModelFactory
@@ -138,7 +135,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     override fun onBackPressedSupport(): Boolean {
-        return if (searchView.isSearchOpen) {
+        return if (searchView.isOpen) {
             searchView.closeSearch()
             true
         } else {
@@ -297,9 +294,6 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             inflateMenu(R.menu.import_menu)
 
-            val item = this.menu.findItem(R.id.action_search)
-            searchView.setMenuItem(item)
-
             if (this.menu is MenuBuilder)
                 (this.menu as MenuBuilder).setOptionalIconsVisible(true)
 
@@ -315,6 +309,10 @@ class RoomQueues : SupportFragment(), onClickListener {
                     }
                     R.id.action_abaut -> {
                         showAboutAs()
+                        true
+                    }
+                    R.id.action_search -> {
+                        searchView.openSearch()
                         true
                     }
                     else -> {
@@ -346,13 +344,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                 }
             })
 
-            searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
-                override fun onSearchViewShown() {
-                    searchView.findViewById<EditText>(R.id.searchTextView).inputType =
-                        InputType.TYPE_CLASS_NUMBER
-                    searchView.findViewById<EditText>(R.id.searchTextView).filters = arrayOf(
-                        InputFilter.LengthFilter(11)
-                    )
+            searchView.setSearchViewListener(object : MaterialSearchView.SearchViewListener {
+                override fun onSearchViewOpened() {
+
                 }
 
                 override fun onSearchViewClosed() {

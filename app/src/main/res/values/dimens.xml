@@ -3,4 +3,7 @@
     <dimen name="progressSize">60dp</dimen>
     <dimen name="textSize">20sp</dimen>
 
+    <dimen name="search_icon_padding">12dp</dimen>
+    <dimen name="search_view_text_padding">8dp</dimen>
+
 </resources>

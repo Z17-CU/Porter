@@ -17,6 +17,12 @@
 
     <color name="search_field_bg">#EFEBE9</color>
 
+    <color name="colorTextGrayScale50">#ff999999</color>
+
+    <color name="colorIconGrayScale">#D8D8D8</color>
+
+    <color name="colorDarkGrayScale">#000000</color>
+
     <color name="colorIntroBG">#D1D1D1</color>
 
     <color name="gray">#38000000</color>
