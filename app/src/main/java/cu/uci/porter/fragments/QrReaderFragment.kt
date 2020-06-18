@@ -123,7 +123,7 @@ class QrReaderFragment(
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
 
-        updateObserver(queue.id)
+        updateObserver(queue.id!!)
 
         currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
 
@@ -144,7 +144,7 @@ class QrReaderFragment(
                         menu.findItem(R.id.action_insert_client).isVisible = true
                         menu.findItem(R.id.action_list).title =
                             requireContext().getString(R.string.lista)
-                        updateObserver(queue.id)
+                        updateObserver(queue.id!!)
 
                         R.drawable.ic_filter_list
                     }
@@ -410,19 +410,19 @@ class QrReaderFragment(
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_filter_todos -> {
-                    updateObserver(queueId = queue.id)
+                    updateObserver(queueId = queue.id!!)
                 }
                 R.id.action_filter_niños -> {
-                    updateObserver(queue.id, true, -1, 12)
+                    updateObserver(queue.id!!, true, -1, 12)
                 }
                 R.id.action_filter_jovenes -> {
-                    updateObserver(queue.id, true, 13, 30)
+                    updateObserver(queue.id!!, true, 13, 30)
                 }
                 R.id.action_filter_adultos -> {
-                    updateObserver(queue.id, true, 31, 55)
+                    updateObserver(queue.id!!, true, 31, 55)
                 }
                 R.id.action_filter_3raEdad -> {
-                    updateObserver(queue.id, true, 56, 200)
+                    updateObserver(queue.id!!, true, 56, 200)
                 }
             }
             false
@@ -497,7 +497,7 @@ class QrReaderFragment(
 
     private fun proccesClient(client: Client): Boolean {
         if (checkList) {
-            val tempClient = dao.getClientFromQueue(client.id, queue.id)
+            val tempClient = dao.getClientFromQueue(client.id, queue.id!!)
             if (tempClient == null) {
                 showError("El cliente no está en la cola.")
                 showDone(false)
@@ -505,7 +505,7 @@ class QrReaderFragment(
             }
 
             done = if (tempClient.isChecked) {
-                dao.getClientFromQueue(client.id, queue.id)?.let {
+                dao.getClientFromQueue(client.id, queue.id!!)?.let {
                     it.reIntent++
                     it.lastRegistry = Calendar.getInstance().timeInMillis
                     dao.insertClientInQueue(it)
@@ -521,16 +521,16 @@ class QrReaderFragment(
 
             done = true
 
-            var clientInQueue = dao.getClientFromQueue(client.id, queue.id)
+            var clientInQueue = dao.getClientFromQueue(client.id, queue.id!!)
 
-            queue.clientsNumber = dao.clientsByQueue(queue.id)
+            queue.clientsNumber = dao.clientsByQueue(queue.id!!)
             queue.clientsNumber++
 
             if (clientInQueue == null) {
                 clientInQueue =
                     ClientInQueue(
                         Calendar.getInstance().timeInMillis,
-                        queue.id,
+                        queue.id!!,
                         client.id,
                         Calendar.getInstance().timeInMillis,
                         number = queue.clientsNumber
@@ -753,7 +753,7 @@ class QrReaderFragment(
                             Single.create<Queue> {
 
                                 queue.clientInQueueList =
-                                    dao.getClientsInQueueList(queueId = queue.id)
+                                    dao.getClientsInQueueList(queueId = queue.id!!)
                                 var clientsIds: List<Long> = ArrayList()
                                 queue.clientInQueueList!!.map { clientInQueue ->
                                     clientsIds = clientsIds + clientInQueue.clientId

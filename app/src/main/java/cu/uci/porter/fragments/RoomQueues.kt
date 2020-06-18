@@ -263,7 +263,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     DialogCreateQueue(
                         requireContext(),
                         CompositeDisposable(),
-                        queue.id
+                        queue.id!!
                     ).create().show()
                 }
                 R.id.action_merge -> {
@@ -458,12 +458,12 @@ class RoomQueues : SupportFragment(), onClickListener {
                 }
             )
 
-            val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id, queue2.id)
+            val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id!!, queue2.id!!)
 
             var number = 1
             allClientsInQueue.map { clientInQueue ->
                 clientInQueue.number = number
-                clientInQueue.queueId = newQueue.id
+                clientInQueue.queueId = newQueue.id!!
                 number++
             }
 

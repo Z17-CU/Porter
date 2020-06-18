@@ -7,11 +7,11 @@ import androidx.room.PrimaryKey
 @Entity
 class Queue(
     @PrimaryKey(autoGenerate = true)
-    var id: Long,
+    var id: Long?,
     var name: String,
     var startDate: Long,
     var clientsNumber: Int = 0,
-    var description: String? = ""
+    var description: String = ""
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()
