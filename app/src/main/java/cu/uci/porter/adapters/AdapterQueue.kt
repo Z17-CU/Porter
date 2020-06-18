@@ -1,35 +1,21 @@
 package cu.uci.porter.adapters
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Dialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import cu.uci.porter.R
 import cu.uci.porter.adapters.viewHolders.ViewHolderClient
-import cu.uci.porter.dialogs.DialogCreateQueue
-import cu.uci.porter.fragments.QrReaderFragment
-import cu.uci.porter.repository.AppDataBase
+import cu.uci.porter.interfaces.onClickListener
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Conts.Companion.formatDateBig
-import cu.uci.porter.viewModels.ClientViewModel
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import me.yokeyword.fragmentation.SupportFragment
 
-class AdapterQueue(private val context: SupportFragment, private val viewModel: ClientViewModel) :
+class AdapterQueue(
+    private val onClickListener: onClickListener
+) :
     RecyclerView.Adapter<ViewHolderClient>() {
 
     var contentList: List<Queue> = ArrayList()
@@ -68,11 +54,11 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
         )
 
         holder.layoutBackground.setOnClickListener {
-            showReaderOptions(queue)
+            onClickListener.onClick(queue)
         }
 
         holder.layoutBackground.setOnLongClickListener {
-            showPopup(it, position)
+            onClickListener.onLongClick(it, queue)
             return@setOnLongClickListener true
         }
 
@@ -87,66 +73,6 @@ class AdapterQueue(private val context: SupportFragment, private val viewModel: 
                 else
                     queue.description, Toast.LENGTH_LONG
             ).show()
-        }
-    }
-
-    @SuppressLint("RestrictedApi")
-    private fun showPopup(view: View, position: Int) {
-        val context = view.context
-
-        val popupMenu = PopupMenu(context!!, view)
-        (context as Activity).menuInflater.inflate(R.menu.menu_delete, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_delete -> {
-                    AlertDialog.Builder(context)
-                        .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar " + contentList[position].name + " de la lista?")
-                        .setNegativeButton("Cancelar", null)
-                        .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                AppDataBase.getInstance(context).dao()
-                                    .deleteQueue(contentList[position])
-                                it.onComplete()
-                            }
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe()
-
-                        }
-                        .create()
-                        .show()
-                }
-                R.id.action_edit -> {
-                    DialogCreateQueue(
-                        context,
-                        CompositeDisposable(),
-                        contentList[position].id!!
-                    ).create().show()
-                }
-            }
-            false
-        }
-        val wrapper = ContextThemeWrapper(context, R.style.PopupWhite)
-        val menuPopupHelper =
-            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
-        menuPopupHelper.setForceShowIcon(true)
-        menuPopupHelper.show()
-    }
-
-    private fun showReaderOptions(queue: Queue) {
-        val bottomSheetDialog = BottomSheetDialog(context.requireContext())
-        bottomSheetDialog.setContentView(R.layout.layout_buttom_sheet_dialog_open_reader)
-        bottomSheetDialog.show()
-
-        bottomSheetDialog.findViewById<TextView>(R.id._optionAsChecker)?.setOnClickListener {
-            bottomSheetDialog.dismiss()
-            context.start(QrReaderFragment(queue, viewModel, true))
-        }
-
-        bottomSheetDialog.findViewById<TextView>(R.id._optionAsReader)?.setOnClickListener {
-            bottomSheetDialog.dismiss()
-            context.start(QrReaderFragment(queue, viewModel, false))
         }
     }
 }

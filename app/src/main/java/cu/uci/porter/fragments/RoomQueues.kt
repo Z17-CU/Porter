@@ -15,30 +15,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import cu.control.queue.utils.MediaUtil
 import cu.uci.porter.R
 import cu.uci.porter.SettingsActivity
 import cu.uci.porter.adapters.AdapterQueue
 import cu.uci.porter.dialogs.DialogCreateQueue
+import cu.uci.porter.interfaces.onClickListener
 import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Common
-import cu.uci.porter.utils.Conts
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import cu.uci.porter.viewModels.ClientViewModelFactory
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -46,13 +51,14 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.room_queues.*
-import kotlinx.android.synthetic.main.settingst_layout.view.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.util.*
+import kotlin.collections.ArrayList
 
-class RoomQueues : SupportFragment() {
+class RoomQueues : SupportFragment(), onClickListener {
 
     private lateinit var viewModel: ClientViewModel
 
@@ -61,6 +67,9 @@ class RoomQueues : SupportFragment() {
     private lateinit var dao: Dao
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
+
+    private var toMerge = false
+    private var queueToMerge: Queue? = null
 
     private lateinit var adapter: AdapterQueue
 
@@ -99,7 +108,7 @@ class RoomQueues : SupportFragment() {
         }
 
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
-        adapter = AdapterQueue(this, viewModel)
+        adapter = AdapterQueue(this)
         _recyclerViewQueues.adapter = adapter
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
@@ -181,6 +190,91 @@ class RoomQueues : SupportFragment() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    override fun onClick(queue: Queue) {
+        if (toMerge && queueToMerge != null) {
+            if (queue.id == queueToMerge!!.id) {
+                Toast.makeText(
+                    requireContext(),
+                    "No puede mezclar una cola con ella misma.",
+                    Toast.LENGTH_LONG
+                ).show()
+                queueToMerge = null
+                toMerge = false
+            } else {
+                AlertDialog.Builder(requireContext())
+                    .setTitle(requireContext().getString(R.string.merge))
+                    .setMessage("¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}?. Ésta acción no se puede deshacer. Se establecerá la fecha de la cola más antigua y los usuarios comunes solo aparecerán una vez.")
+                    .setPositiveButton(requireContext().getText(R.string.merge)) { _, _ ->
+                        mergeQueues(queueToMerge!!, queue)
+                    }
+                    .setNegativeButton(requireContext().getString(android.R.string.cancel), null)
+                    .create().show()
+                queueToMerge = null
+                toMerge = false
+            }
+        } else {
+            showReaderOptions(queue)
+        }
+    }
+
+    override fun onLongClick(view: View, queue: Queue) {
+        showPopup(view, queue)
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun showPopup(view: View, queue: Queue) {
+
+        val popupMenu = PopupMenu(requireContext(), view)
+        (context as Activity).menuInflater.inflate(R.menu.menu_delete, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_delete -> {
+                    AlertDialog.Builder(context)
+                        .setTitle("Eliminar")
+                        .setMessage("¿Desea eliminar " + queue.name + " de la lista?")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Eliminar") { _, _ ->
+                            Completable.create {
+                                dao.deleteQueue(queue)
+                                it.onComplete()
+                            }
+                                .observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+
+                        }
+                        .create()
+                        .show()
+                }
+                R.id.action_edit -> {
+                    DialogCreateQueue(
+                        requireContext(),
+                        CompositeDisposable(),
+                        queue.id!!
+                    ).create().show()
+                }
+                R.id.action_merge -> {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(requireContext().getString(R.string.merge))
+                        .setMessage("Seleccione otra cola para mezclar con ${queue.name}.")
+                        .setPositiveButton("Seleccionar") { _, _ ->
+                            queueToMerge = queue
+                            toMerge = true
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            queueToMerge = null
+                        }.create().show()
+                }
+            }
+            false
+        }
+        val wrapper = ContextThemeWrapper(requireContext(), R.style.PopupWhite)
+        val menuPopupHelper =
+            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.show()
     }
 
     @SuppressLint("RestrictedApi")
@@ -281,37 +375,23 @@ class RoomQueues : SupportFragment() {
     }
 
     private fun openSettings() {
-
         startActivity(Intent(requireContext(), SettingsActivity::class.java))
-//        val inflater =
-//            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//        val view = inflater.inflate(R.layout.settingst_layout, null)
-//        val alertDialog = AlertDialog.Builder(requireContext())
-//            .setView(view)
-//            .create()
-//        view._cancelButton.setOnClickListener {
-//            alertDialog.dismiss()
-//        }
-//        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-//        view.editTextRotationTime.setText(
-//            sharedPreferences.getInt(
-//                Conts.QUEUE_TIME,
-//                Conts.DEFAULT_QUEUE_TIME_HOURS
-//            ).toString()
-//        )
-//
-//        view._okButton.setOnClickListener {
-//            if (view.editTextRotationTime.text.toString().isEmpty()) {
-//                Toast.makeText(requireContext(), "Debe insertar un valor.", Toast.LENGTH_LONG)
-//                    .show()
-//            } else {
-//                sharedPreferences.edit()
-//                    .putInt(Conts.QUEUE_TIME, view.editTextRotationTime.text.toString().toInt())
-//                    .apply()
-//                alertDialog.dismiss()
-//            }
-//        }
-//        alertDialog.show()
+    }
+
+    private fun showReaderOptions(queue: Queue) {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(R.layout.layout_buttom_sheet_dialog_open_reader)
+        bottomSheetDialog.show()
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionAsChecker)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            start(QrReaderFragment(queue, viewModel, true))
+        }
+
+        bottomSheetDialog.findViewById<TextView>(R.id._optionAsReader)?.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            start(QrReaderFragment(queue, viewModel, false))
+        }
     }
 
     private fun showAboutAs() {
@@ -352,6 +432,42 @@ class RoomQueues : SupportFragment() {
         }
 
         return "Versión: $version.$revision"
+    }
+
+    private fun mergeQueues(queue1: Queue, queue2: Queue) {
+        progress.show()
+        Completable.create {
+
+            val startDate = if (queue1.startDate < queue2.startDate) {
+                queue1.startDate
+            } else {
+                queue2.startDate
+            }
+
+            val newQueue = Queue(
+                Calendar.getInstance().timeInMillis,
+                "${queue1.name} y ${queue2.name}",
+                startDate,
+                description = when {
+                    queue1.description.isEmpty() && queue2.description.isEmpty() -> ""
+                    queue1.description.isNotEmpty() && queue2.description.isEmpty() -> queue1.description
+                    queue1.description.isEmpty() && queue2.description.isNotEmpty() -> queue2.description
+                    else -> "${queue1.description} y ${queue2.description}"
+                })
+
+            val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id, queue2.id)
+
+            allClientsInQueue.map {
+
+            }
+
+            it.onComplete()
+        }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe {
+                progress.dismiss()
+            }
+            .addTo(compositeDisposable)
     }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
