@@ -457,9 +457,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                 "${queue1.name} y ${queue2.name}",
                 startDate,
                 description = when {
-                    queue1.description.isEmpty() && queue2.description.isEmpty() -> ""
-                    queue1.description.isNotEmpty() && queue2.description.isEmpty() -> queue1.description
-                    queue1.description.isEmpty() && queue2.description.isNotEmpty() -> queue2.description
+                    queue1.description!!.isEmpty() && queue2.description!!.isEmpty() -> ""
+                    queue1.description!!.isNotEmpty() && queue2.description!!.isEmpty() -> queue1.description
+                    queue1.description!!.isEmpty() && queue2.description!!.isNotEmpty() -> queue2.description
                     else -> "${queue1.description} y ${queue2.description}"
                 }
             )

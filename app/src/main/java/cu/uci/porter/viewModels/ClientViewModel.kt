@@ -73,6 +73,17 @@ class ClientViewModel @Inject constructor(
     fun saveImportQueue(queue: Queue) {
 
         Completable.create {
+
+            if (queue.description == null) {
+                queue.description = ""
+            }
+            queue.clientList?.map { client ->
+                if (client.selected == null)
+                    client.selected = false
+                if (client.searched == null)
+                    client.searched = false
+            }
+
             clientRepository.saveCLients(queue.clientList ?: ArrayList())
             queue.clientsNumber = (queue.clientList ?: ArrayList()).size
             queue.clientList = ArrayList()

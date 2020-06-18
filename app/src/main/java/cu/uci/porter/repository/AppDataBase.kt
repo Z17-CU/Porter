@@ -25,13 +25,13 @@ abstract class AppDataBase : RoomDatabase() {
             .addMigrations(object : Migration(1, 2) {
                 override fun migrate(database: SupportSQLiteDatabase) {
                     database.execSQL(
-                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN selected INTEGER NOT NULL DEFAULT 0"
+                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN selected INTEGER DEFAULT 0"
                     )
                     database.execSQL(
-                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN searched INTEGER NOT NULL DEFAULT 0"
+                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN searched INTEGER DEFAULT 0"
                     )
                     database.execSQL(
-                        "ALTER TABLE ${Queue.TABLE_NAME} ADD COLUMN description TEXT NOT NULL DEFAULT ''"
+                        "ALTER TABLE ${Queue.TABLE_NAME} ADD COLUMN description TEXT DEFAULT ''"
                     )
                 }
             })

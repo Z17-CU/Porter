@@ -342,21 +342,21 @@ class QrReaderFragment(
                     var clientList: List<Client> = ArrayList()
                     if (isInRange) {
                         if (idList.size < 1000) {
-                            clientList = clientList + dao.getClientsInRange(idList, min, max)
+                            clientList = dao.getClientsInRange(idList, min, max)
                         } else {
                             var a = 0
                             var b = 999
 
-                            while (a < idList.size - 1) {
-                                if (b > idList.size - 1) {
-                                    b = idList.size - 1
+                            while (a < idList.size) {
+                                if (b > idList.size) {
+                                    b = idList.size
                                 }
                                 clientList = clientList + dao.getClientsInRange(
                                     idList.subList(a, b),
                                     min,
                                     max
                                 )
-                                a = b + 1
+                                a = b
                                 b += 999
                             }
                         }
@@ -367,12 +367,12 @@ class QrReaderFragment(
                             var a = 0
                             var b = 999
 
-                            while (a < idList.size - 1) {
-                                if (b > idList.size - 1) {
-                                    b = idList.size - 1
+                            while (a < idList.size) {
+                                if (b > idList.size) {
+                                    b = idList.size
                                 }
                                 clientList = clientList + dao.getClients(idList.subList(a, b))
-                                a = b + 1
+                                a = b
                                 b += 999
                             }
                         }

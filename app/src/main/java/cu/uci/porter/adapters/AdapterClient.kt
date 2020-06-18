@@ -44,11 +44,11 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
-                    client.searched -> R.drawable.item_accent_bg
-                    client.selected && done -> {
+                    client.searched!! -> R.drawable.item_accent_bg
+                    client.selected!! && done -> {
                         R.drawable.item_green_bg
                     }
-                    client.selected && !done -> {
+                    client.selected!! && !done -> {
                         R.drawable.item_red_bg
                     }
                     checkMode && position % 2 != 0 -> R.drawable.item_blue_bg

@@ -68,7 +68,7 @@ class AdapterQueue(
         holder.imageDetails.visibility = View.VISIBLE
         holder.imageDetails.setOnClickListener {
             Toast.makeText(
-                it.context, if (queue.description.isBlank())
+                it.context, if (queue.description.isNullOrBlank())
                     it.context.getText(R.string.notDescroption)
                 else
                     queue.description, Toast.LENGTH_LONG

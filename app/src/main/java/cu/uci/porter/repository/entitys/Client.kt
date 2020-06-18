@@ -18,8 +18,8 @@ class Client(
     var reIntent: Int = 0,
     var number: Int = 0,
     var isChecked: Boolean = false,
-    var selected: Boolean = false,
-    var searched: Boolean = false
+    var selected: Boolean? = false,
+    var searched: Boolean? = false
 ) {
     companion object {
         const val TABLE_NAME = "Client"
