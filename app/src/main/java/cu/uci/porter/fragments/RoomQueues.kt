@@ -40,6 +40,7 @@ import cu.uci.porter.repository.AppDataBase
 import cu.uci.porter.repository.Dao
 import cu.uci.porter.repository.entitys.Queue
 import cu.uci.porter.utils.Common
+import cu.uci.porter.utils.Conts
 import cu.uci.porter.utils.Progress
 import cu.uci.porter.viewModels.ClientViewModel
 import cu.uci.porter.viewModels.ClientViewModelFactory
@@ -203,11 +204,20 @@ class RoomQueues : SupportFragment(), onClickListener {
                 queueToMerge = null
                 toMerge = false
             } else {
+                val startDate = if (queueToMerge!!.startDate < queue.startDate) {
+                    queueToMerge!!.startDate
+                } else {
+                    queue.startDate
+                }
                 AlertDialog.Builder(requireContext())
                     .setTitle(requireContext().getString(R.string.merge))
-                    .setMessage("¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}?. Ésta acción no se puede deshacer. Se establecerá la fecha de la cola más antigua y los usuarios comunes solo aparecerán una vez.")
+                    .setMessage(
+                        "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${Conts.formatDateBig.format(
+                            startDate
+                        )} y los usuarios comunes solo aparecerán una vez. \nÉsta acción no se puede deshacer."
+                    )
                     .setPositiveButton(requireContext().getText(R.string.merge)) { _, _ ->
-                        mergeQueues(queueToMerge!!, queue)
+                        mergeQueues(queueToMerge!!, queue, startDate)
                         queueToMerge = null
                         toMerge = false
                     }
@@ -438,15 +448,9 @@ class RoomQueues : SupportFragment(), onClickListener {
         return "Versión: $version.$revision"
     }
 
-    private fun mergeQueues(queue1: Queue, queue2: Queue) {
+    private fun mergeQueues(queue1: Queue, queue2: Queue, startDate: Long) {
         progress.show()
         Completable.create {
-
-            val startDate = if (queue1.startDate < queue2.startDate) {
-                queue1.startDate
-            } else {
-                queue2.startDate
-            }
 
             val newQueue = Queue(
                 Calendar.getInstance().timeInMillis,
@@ -463,9 +467,9 @@ class RoomQueues : SupportFragment(), onClickListener {
             val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id, queue2.id)
 
             var number = 1
-            allClientsInQueue.map {
-                it.number = number
-                it.queueId = newQueue.id
+            allClientsInQueue.map { clientInQueue ->
+                clientInQueue.number = number
+                clientInQueue.queueId = newQueue.id
                 number++
             }
 
