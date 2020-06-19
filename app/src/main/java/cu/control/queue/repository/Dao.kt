@@ -26,7 +26,28 @@ interface Dao {
     fun getClient(id: Long): Client
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList)")
-    fun getClients(idList: List<Long>): List<Client>
+    fun getClientsInternal(idList: List<Long>): List<Client>
+
+    fun getClients(idList: List<Long>): List<Client> {
+        var clientList: List<Client> = ArrayList()
+
+        if (idList.size < 1000) {
+            clientList = getClientsInternal(idList)
+        } else {
+            var a = 0
+            var b = 999
+
+            while (a < idList.size) {
+                if (b > idList.size) {
+                    b = idList.size
+                }
+                clientList = clientList + getClientsInternal(idList.subList(a, b))
+                a = b
+                b += 999
+            }
+        }
+        return clientList
+    }
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList) AND age BETWEEN :min AND :max")
     fun getClientsInRange(idList: List<Long>, min: Int, max: Int): List<Client>

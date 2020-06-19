@@ -355,21 +355,7 @@ class QrReaderFragment(
                             }
                         }
                     } else {
-                        if (idList.size < 1000) {
-                            clientList = clientList + dao.getClients(idList)
-                        } else {
-                            var a = 0
-                            var b = 999
-
-                            while (a < idList.size) {
-                                if (b > idList.size) {
-                                    b = idList.size
-                                }
-                                clientList = clientList + dao.getClients(idList.subList(a, b))
-                                a = b
-                                b += 999
-                            }
-                        }
+                        clientList = dao.getClients(idList)
                     }
 
                     clientList.map { client ->
@@ -759,25 +745,7 @@ class QrReaderFragment(
                                     clientsIds = clientsIds + clientInQueue.clientId
                                 }
 
-                                var clientList: List<Client> = ArrayList()
-
-                                if (clientsIds.size < 1000) {
-                                    clientList = clientList + dao.getClients(clientsIds)
-                                } else {
-                                    var a = 0
-                                    var b = 999
-
-                                    while (a < clientsIds.size) {
-                                        if (b > clientsIds.size) {
-                                            b = clientsIds.size
-                                        }
-                                        clientList = clientList + dao.getClients(clientsIds.subList(a, b))
-                                        a = b
-                                        b += 999
-                                    }
-                                }
-
-                                queue.clientList = clientList
+                                queue.clientList = dao.getClients(clientsIds)
 
                                 it.onSuccess(queue)
                             }.subscribeOn(Schedulers.io())
