@@ -3,7 +3,7 @@
 
     <PreferenceCategory app:title="Ajustes de restricción">
 
-        <cu.uci.porter.utils.IntEditTextPreference
+        <cu.control.queue.utils.IntEditTextPreference
             android:inputType="number"
             app:key="QUEUE_TIME"
             app:title="Tiempo de rotación en horas."
@@ -17,13 +17,13 @@
             app:key="alerts"
             app:title="Alertas" />
 
-        <cu.uci.porter.utils.IntEditTextPreference
+        <cu.control.queue.utils.IntEditTextPreference
             android:inputType="number"
             app:key="QUEUE_CANT"
             app:title="Cantidad de colas a alertar."
             app:useSimpleSummaryProvider="true" />
 
-        <cu.uci.porter.utils.IntEditTextPreference
+        <cu.control.queue.utils.IntEditTextPreference
             android:inputType="number"
             app:key="QUEUE_DAYS"
             app:title="Cantidad de días a alertar."

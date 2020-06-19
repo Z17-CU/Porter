@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.konan.properties.Properties
 plugins {
 
     id("com.android.application")
+    id("io.fabric")
+    id("com.google.gms.google-services")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
@@ -89,16 +91,16 @@ kapt {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.71")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72")
     implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core-ktx:1.2.0")
+    implementation("androidx.core:core-ktx:1.3.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.preference:preference:1.1.0")
+    implementation("androidx.preference:preference:1.1.1")
     testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test.ext:junit:1.1.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 
-    implementation("com.google.android.material:material:1.2.0-alpha05")
+    implementation("com.google.android.material:material:1.3.0-alpha01")
 
     implementation("com.karumi:dexter:6.0.2")
 
@@ -117,13 +119,13 @@ dependencies {
     kapt("com.google.dagger:dagger-android-processor:2.27")
     kapt("com.google.dagger:dagger-compiler:2.27")
 
-    implementation("androidx.fragment:fragment-ktx:1.2.4")
-    implementation("androidx.fragment:fragment-ktx:1.2.4")
-    implementation("androidx.navigation:navigation-runtime-ktx:2.3.0-alpha04")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.0-alpha04")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.0-alpha04")
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.3.0-rc01")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.3.0-rc01")
+    implementation("androidx.navigation:navigation-ui-ktx:2.3.0-rc01")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.71")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
 
     implementation("com.jakewharton.timber:timber:4.7.1")
 
@@ -153,7 +155,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     /** Glide */
-    implementation("com.github.bumptech.glide:glide:4.9.0")
+    implementation("com.github.bumptech.glide:glide:4.11.0")
 
     /** Qr Reader */
     implementation("me.dm7.barcodescanner:zxing:1.9.8")
@@ -179,6 +181,10 @@ dependencies {
 
     /**Preferences*/
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
+
+    /** Firebase */
+    implementation("com.google.firebase:firebase-analytics:17.4.3")
+    implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
 }
 
 fun updateVersionCode() {

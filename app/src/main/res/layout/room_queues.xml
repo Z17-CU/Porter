@@ -27,7 +27,7 @@
                     android:theme="@style/ActionBarTheme"
                     app:popupTheme="@style/PopupMenuStyle" />
 
-                <cu.uci.porter.utils.MaterialSearchView
+                <cu.control.queue.utils.MaterialSearchView
                     android:id="@+id/searchView"
                     style="@style/MaterialSearchViewStyle"
                     android:layout_width="match_parent"
