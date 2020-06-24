@@ -1,10 +1,15 @@
 package cu.control.queue.adapters
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
@@ -13,6 +18,8 @@ import cu.control.queue.repository.AppDataBase
 import cu.control.queue.repository.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
 import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
 class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
@@ -110,23 +117,63 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
         )
 
         holder.layoutBackground.setOnLongClickListener {
-            val message =
-                "Desea actualizar a ${client.name} como ${if (client.isChecked) "no chequeado" else "chequeado"}?"
-            AlertDialog.Builder(it.context)
-                .setMessage(message)
-                .setPositiveButton("Actualizar") { _, _ ->
-                    Completable.create { emitter ->
-                        val dao = AppDataBase.getInstance(it.context).dao()
-                        val clientInQueue = dao.getClientFromQueue(client.id, queueId)
-                        clientInQueue?.isChecked = !client.isChecked
-                        dao.insertClientInQueue(clientInQueue!!)
-                        emitter.onComplete()
-                    }.observeOn(Schedulers.io())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
-                }
-                .create().show()
+            showPopup(it, client)
             return@setOnLongClickListener true
         }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun showPopup(view: View, client: Client) {
+
+        val context = view.context
+        val dao = AppDataBase.getInstance(context).dao()
+        val popupMenu = PopupMenu(context, view)
+        (context as Activity).menuInflater.inflate(R.menu.menu_client, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_delete -> {
+                    AlertDialog.Builder(context)
+                        .setTitle("Eliminar")
+                        .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Eliminar") { _, _ ->
+                            Completable.create {
+                                val size = contentList.size - 1
+                                dao.deleteClientFromQueue(client.id, queueId)
+                                dao.updateQueueSize(queueId, size)
+                                it.onComplete()
+                            }
+                                .observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe().addTo(CompositeDisposable())
+                        }
+                        .create()
+                        .show()
+                }
+                R.id.action_check -> {
+                    val message =
+                        "Desea actualizar a ${client.name} como ${if (client.isChecked) "no chequeado" else "chequeado"}?"
+                    AlertDialog.Builder(context)
+                        .setMessage(message)
+                        .setPositiveButton("Actualizar") { _, _ ->
+                            Completable.create { emitter ->
+                                val clientInQueue = dao.getClientFromQueue(client.id, queueId)
+                                clientInQueue?.isChecked = !client.isChecked
+                                dao.insertClientInQueue(clientInQueue!!)
+                                emitter.onComplete()
+                            }.observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+                        }
+                        .create().show()
+                }
+            }
+            false
+        }
+        val wrapper = ContextThemeWrapper(context, R.style.PopupWhite)
+        val menuPopupHelper =
+            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.show()
     }
 }

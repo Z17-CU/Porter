@@ -8,14 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:932862037436:android:d39077029a2969d43d6fb9",
+        "mobilesdk_app_id": "1:932862037436:android:633a794163807fe73d6fb9",
         "android_client_info": {
           "package_name": "cu.control.queue"
         }
       },
       "oauth_client": [
         {
-          "client_id": "932862037436-obgdkteh78kpcho5e6idah99h4bbgggj.apps.googleusercontent.com",
+          "client_id": "932862037436-sfo5rpmbotqo3i8ao1cidl4v4a9l105e.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "cu.control.queue",

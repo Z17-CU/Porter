@@ -58,6 +58,12 @@ interface Dao {
     @Delete
     fun deleteQueue(queue: Queue)
 
+    @Query("DELETE FROM ${ClientInQueue.TABLE_NAME} WHERE clientId = :clientId AND queueId = :queueId")
+    fun deleteClientFromQueue(clientId: Long, queueId: Long)
+
+    @Query("UPDATE ${Queue.TABLE_NAME} SET clientsNumber = :size WHERE id = :queueId")
+    fun updateQueueSize(queueId: Long, size: Int)
+
     @Query("SELECT * FROM ${Queue.TABLE_NAME}")
     fun getAllQueues(): LiveData<List<Queue>>
 

@@ -459,7 +459,7 @@ class QrReaderFragment(
                 requireActivity().runOnUiThread {
                     AlertDialog.Builder(requireContext())
                         .setTitle("Alerta")
-                        .setMessage(client.name + " a lanzado una alerta porque en los últimos $queueDays días a estado en $count colas.")
+                        .setMessage(client.name + " ha lanzado una alerta porque en los últimos $queueDays días ha estado en $count colas.")
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {
                                 proccesClient(client)

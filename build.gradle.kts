@@ -14,7 +14,10 @@ buildscript {
         maven { url = uri("https://jitpack.io") }
 
         //firebase
-        maven { url = uri("https://s3.amazonaws.com/fabric-artifacts/public") }
+        maven {
+            url = uri("https://s3.amazonaws.com/fabric-artifacts/public")
+        }
+        //maven { url = uri("https://maven.fabric.io/public") }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.0")
