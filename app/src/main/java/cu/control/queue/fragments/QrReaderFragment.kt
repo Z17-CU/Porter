@@ -519,7 +519,7 @@ class QrReaderFragment(
                         queue.id!!,
                         client.id,
                         Calendar.getInstance().timeInMillis,
-                        number = queue.clientsNumber
+                        number = dao.getLastNumberInQueue(queue.id!!) + 1
                     )
             } else {
                 if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) < (PreferenceManager.getDefaultSharedPreferences(

@@ -61,6 +61,9 @@ interface Dao {
     @Query("DELETE FROM ${ClientInQueue.TABLE_NAME} WHERE clientId = :clientId AND queueId = :queueId")
     fun deleteClientFromQueue(clientId: Long, queueId: Long)
 
+    @Query("SELECT MAX(number) FROM ${ClientInQueue.TABLE_NAME} WHERE queueId = :queueId")
+    fun getLastNumberInQueue(queueId: Long): Int
+
     @Query("UPDATE ${Queue.TABLE_NAME} SET clientsNumber = :size WHERE id = :queueId")
     fun updateQueueSize(queueId: Long, size: Int)
 
