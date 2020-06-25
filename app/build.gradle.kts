@@ -185,6 +185,9 @@ dependencies {
     /** Firebase */
     implementation("com.google.firebase:firebase-analytics:17.4.3")
     implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
+
+    /** ScrollView */
+    implementation("com.github.turing-tech:MaterialScrollBar:13.3.2")
 }
 
 fun updateVersionCode() {

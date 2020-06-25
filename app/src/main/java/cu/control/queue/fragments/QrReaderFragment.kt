@@ -29,6 +29,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.turingtechnologies.materialscrollbar.CustomIndicator
 import cu.control.queue.MainActivity
 import cu.control.queue.R
 import cu.control.queue.adapters.AdapterClient
@@ -90,6 +91,8 @@ class QrReaderFragment(
     private var client: Client? = null
     private var done: Boolean? = null
 
+    private var isAddClient = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -110,6 +113,7 @@ class QrReaderFragment(
         return view
     }
 
+    @SuppressLint("LogNotTimber")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -122,6 +126,8 @@ class QrReaderFragment(
 
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
+
+        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
 
         updateObserver(queue.id!!)
 
@@ -435,6 +441,7 @@ class QrReaderFragment(
 
     fun saveClient(client: Client?) {
         this.client = client
+        isAddClient = true
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
             return
@@ -568,6 +575,12 @@ class QrReaderFragment(
 
     private fun goTo(goTo: Int = -1) {
         var pos = -1
+
+        if (goTo == -1 && !isAddClient)
+            return
+
+        isAddClient = false
+
         Handler().postDelayed({
             val smoothScroller = object : LinearSmoothScroller(context) {
                 override fun getVerticalSnapPreference(): Int {

@@ -148,13 +148,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/_markerLayout"
-            android:layout_width="6dp"
-            android:layout_height="match_parent"
-            android:background="@color/colorAccent"
-            android:orientation="horizontal" />
-
     </LinearLayout>
 
     <LinearLayout

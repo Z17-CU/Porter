@@ -13,7 +13,6 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val textViewName: TextView = itemView._textViewNombre
     val textViewID: TextView = itemView._textViewCI
     val textViewDate: TextView = itemView._textViewDate
-    val layoutmarker: LinearLayout = itemView._markerLayout
     val layoutBackground: LinearLayout = itemView._layoutItemPersona
     val textViewReIntents: TextView = itemView._textViewReIntents
     val clientNumber: TextView = itemView.clientNumber

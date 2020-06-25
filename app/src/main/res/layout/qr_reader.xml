@@ -67,7 +67,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="center">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/_recyclerViewClients"
@@ -80,8 +81,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="100dp"
-                app:srcCompat="@drawable/ic_recurso_2"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_recurso_2" />
+
+            <com.turingtechnologies.materialscrollbar.DragScrollBar
+                android:id="@+id/dragScrollBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignEnd="@id/_recyclerViewClients"
+                android:layout_alignRight="@id/_recyclerViewClients"
+                app:msb_barColor="@color/gray"
+                app:msb_handleOffColor="@color/colorAccent"
+                app:msb_lightOnTouch="true"
+                app:msb_recyclerView="@id/_recyclerViewClients" />
 
         </RelativeLayout>
 

@@ -62,7 +62,6 @@ class AdapterQueue(
             return@setOnLongClickListener true
         }
 
-        holder.layoutmarker.visibility = View.GONE
         holder.textViewReIntents.visibility = View.GONE
 
         holder.imageDetails.visibility = View.VISIBLE

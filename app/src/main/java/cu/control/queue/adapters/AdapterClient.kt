@@ -3,6 +3,7 @@ package cu.control.queue.adapters
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.repository.AppDataBase
@@ -22,14 +24,16 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
-class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
+class AdapterClient : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
     var done: Boolean = false
     var queueId: Long = 0
+    private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
+        context = parent.context
         return ViewHolderClient(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_client,
@@ -99,22 +103,6 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
         } else {
             View.GONE
         }
-        holder.layoutmarker.setBackgroundColor(
-            when {
-                client.age < 12 -> {
-                    ContextCompat.getColor(holder.layoutmarker.context, R.color.google_blue)
-                }
-                client.age in 12..30 -> {
-                    ContextCompat.getColor(holder.layoutmarker.context, R.color.google_green)
-                }
-                client.age in 31..55 -> {
-                    ContextCompat.getColor(holder.layoutmarker.context, R.color.google_yellow)
-                }
-                else -> {
-                    ContextCompat.getColor(holder.layoutmarker.context, R.color.google_red)
-                }
-            }
-        )
 
         holder.layoutBackground.setOnLongClickListener {
             showPopup(it, client)
@@ -175,5 +163,12 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>() {
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    override fun getCustomStringForElement(element: Int): String {
+        return if (contentList.isEmpty())
+            ""
+        else
+            contentList[element].number.toString()
     }
 }
