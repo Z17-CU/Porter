@@ -249,6 +249,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         .setPositiveButton("Eliminar") { _, _ ->
                             Completable.create {
                                 dao.deleteQueue(queue)
+                                dao.deleteAllClientsFromQueue(queue.id!!)
                                 it.onComplete()
                             }
                                 .observeOn(Schedulers.io())
