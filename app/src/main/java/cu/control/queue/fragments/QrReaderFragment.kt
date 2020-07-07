@@ -466,13 +466,16 @@ class QrReaderFragment(
             )
             if (count >= queueCant) {
 
+                MediaPlayer.create(context, R.raw.error_buzz).start()
+
                 requireActivity().runOnUiThread {
+
                     AlertDialog.Builder(requireContext())
                         .setTitle("Alerta")
                         .setMessage(
                             client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
                                 startDate
-                            )} al ${Conts.formatDateMid.format(endDate)} el cliente ha estado en $count colas."
+                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count colas."
                         )
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {

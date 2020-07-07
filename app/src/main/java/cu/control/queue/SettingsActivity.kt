@@ -82,7 +82,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun showDatePicker(preferenceKey: String) {
-            val calendar = Calendar.getInstance()
+            var calendar = Calendar.getInstance()
             calendar.timeInMillis = preferenceManager.sharedPreferences.getLong(
                 preferenceKey,
                 Calendar.getInstance().timeInMillis
@@ -95,6 +95,13 @@ class SettingsActivity : AppCompatActivity() {
                     calendar.set(Calendar.YEAR, year)
                     calendar.set(Calendar.MONTH, month)
                     calendar.set(Calendar.DAY_OF_MONTH, day)
+
+                    calendar = if (preferenceKey == QUERY_START_DATE) {
+                        initDay(calendar)
+                    } else {
+                        endDay(calendar)
+                    }
+
                     preferenceManager.sharedPreferences.edit()
                         .putLong(preferenceKey, calendar.timeInMillis).apply()
                     preferenceManager.findPreference<Preference>(preferenceKey)?.summary =
@@ -106,7 +113,26 @@ class SettingsActivity : AppCompatActivity() {
                 calendar.get(Calendar.DAY_OF_MONTH)
             )
             dpd.show()
+        }
 
+        private fun initDay(date: Calendar): Calendar {
+
+            date.set(Calendar.HOUR_OF_DAY, 0)
+            date.set(Calendar.MINUTE, 0)
+            date.set(Calendar.SECOND, 0)
+            date.set(Calendar.MILLISECOND, 0)
+
+            return date
+        }
+
+        private fun endDay(date: Calendar): Calendar {
+
+            date.set(Calendar.HOUR_OF_DAY, 23)
+            date.set(Calendar.MINUTE, 59)
+            date.set(Calendar.SECOND, 59)
+            date.set(Calendar.MILLISECOND, 999)
+
+            return date
         }
     }
 
