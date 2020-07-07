@@ -9,6 +9,7 @@ class Conts {
     companion object {
         val formatDateOnlyTime = SimpleDateFormat("h:mm:ss a")
         val formatDateBig = SimpleDateFormat("d 'de' MMMM 'del' yyyy")
+        val formatDateMid = SimpleDateFormat("d 'de' MMMM")
         val APP_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/Porter@"
 
         //Preferences

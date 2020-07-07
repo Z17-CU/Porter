@@ -32,6 +32,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.turingtechnologies.materialscrollbar.CustomIndicator
 import cu.control.queue.MainActivity
 import cu.control.queue.R
+import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterClient
 import cu.control.queue.dialogs.DialogInsertClient
 import cu.control.queue.repository.AppDataBase
@@ -46,7 +47,6 @@ import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.control.queue.utils.Conts.Companion.QUEUE_CANT
-import cu.control.queue.utils.Conts.Companion.QUEUE_DAYS
 import cu.control.queue.utils.Conts.Companion.QUEUE_TIME
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -62,7 +62,6 @@ import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 
@@ -453,22 +452,28 @@ class QrReaderFragment(
 
             val queueCant = PreferenceManager.getDefaultSharedPreferences(context)
                 .getInt(QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS)
-            val queueDays = PreferenceManager.getDefaultSharedPreferences(context)
-                .getInt(QUEUE_DAYS, DEFAULT_QUEUE_TIME_HOURS)
+
+            val currentTime = Calendar.getInstance().timeInMillis
+            val startDate = PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong(SettingsActivity.QUERY_START_DATE, currentTime)
+            val endDate = PreferenceManager.getDefaultSharedPreferences(context)
+                .getLong(SettingsActivity.QUERY_END_DATE, currentTime)
 
             val count = dao.countToAlert(
                 client.id,
-                Calendar.getInstance().timeInMillis - (TimeUnit.MILLISECONDS.convert(
-                    queueDays.toLong(),
-                    TimeUnit.DAYS
-                ))
+                startDate,
+                endDate
             )
             if (count >= queueCant) {
 
                 requireActivity().runOnUiThread {
                     AlertDialog.Builder(requireContext())
                         .setTitle("Alerta")
-                        .setMessage(client.name + " ha lanzado una alerta porque en los últimos $queueDays días ha estado en $count colas.")
+                        .setMessage(
+                            client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
+                                startDate
+                            )} al ${Conts.formatDateMid.format(endDate)} el cliente ha estado en $count colas."
+                        )
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {
                                 proccesClient(client)
