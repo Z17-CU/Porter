@@ -447,7 +447,9 @@ class QrReaderFragment(
             return
         }
 
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ALERTS, false)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(ALERTS, false) && !checkList
+        ) {
 
             val queueCant = PreferenceManager.getDefaultSharedPreferences(context)
                 .getInt(QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS)
