@@ -23,11 +23,13 @@
             app:title="Cantidad de colas a alertar."
             app:useSimpleSummaryProvider="true" />
 
-        <cu.control.queue.utils.IntEditTextPreference
-            android:inputType="number"
-            app:key="QUEUE_DAYS"
-            app:title="Cantidad de días a alertar."
-            app:useSimpleSummaryProvider="true" />
+        <Preference
+            app:title="Fecha de inicio."
+            app:key="QUERY_START_DATE"/>
+
+        <Preference
+            app:title="Fecha de fin."
+            app:key="QUERY_END_DATE"/>
 
     </PreferenceCategory>
 
