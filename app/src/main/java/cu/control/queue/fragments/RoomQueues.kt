@@ -308,6 +308,10 @@ class RoomQueues : SupportFragment(), onClickListener {
                         openSettings()
                         true
                     }
+                    R.id.action_black_list -> {
+                        start(BlackListFragment())
+                        true
+                    }
                     R.id.action_abaut -> {
                         showAboutAs()
                         true

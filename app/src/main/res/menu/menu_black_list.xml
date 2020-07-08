@@ -18,24 +18,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_check"
-        android:icon="@drawable/ic_check_list_24"
-        android:orderInCategory="100"
-        android:title="@string/chequear_deschequiar"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
         android:orderInCategory="100"
         android:title="@string/eliminar"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_black_list"
-        android:icon="@drawable/ic_baseline_view_list"
-        android:orderInCategory="100"
-        android:title="@string/lista_negra"
         app:showAsAction="never" />
 
 </menu>

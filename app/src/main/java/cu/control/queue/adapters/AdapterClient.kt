@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
+import cu.control.queue.interfaces.OnClientClickListener
+import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.AppDataBase
 import cu.control.queue.repository.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
@@ -24,7 +26,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
-class AdapterClient : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
+class AdapterClient(val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
@@ -113,56 +115,7 @@ class AdapterClient : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
     @SuppressLint("RestrictedApi")
     private fun showPopup(view: View, client: Client) {
 
-        val context = view.context
-        val dao = AppDataBase.getInstance(context).dao()
-        val popupMenu = PopupMenu(context, view)
-        (context as Activity).menuInflater.inflate(R.menu.menu_client, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_delete -> {
-                    AlertDialog.Builder(context)
-                        .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
-                        .setNegativeButton("Cancelar", null)
-                        .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                val size = contentList.size - 1
-                                dao.deleteClientFromQueue(client.id, queueId)
-                                dao.updateQueueSize(queueId, size)
-                                it.onComplete()
-                            }
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe().addTo(CompositeDisposable())
-                        }
-                        .create()
-                        .show()
-                }
-                R.id.action_check -> {
-                    val message =
-                        "Desea actualizar a ${client.name} como ${if (client.isChecked) "no chequeado" else "chequeado"}?"
-                    AlertDialog.Builder(context)
-                        .setMessage(message)
-                        .setPositiveButton("Actualizar") { _, _ ->
-                            Completable.create { emitter ->
-                                val clientInQueue = dao.getClientFromQueue(client.id, queueId)
-                                clientInQueue?.isChecked = !client.isChecked
-                                dao.insertClientInQueue(clientInQueue!!)
-                                emitter.onComplete()
-                            }.observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe()
-                        }
-                        .create().show()
-                }
-            }
-            false
-        }
-        val wrapper = ContextThemeWrapper(context, R.style.PopupWhite)
-        val menuPopupHelper =
-            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
-        menuPopupHelper.setForceShowIcon(true)
-        menuPopupHelper.show()
+        onClientClickListener.onLongClick(view, client)
     }
 
     override fun getCustomStringForElement(element: Int): String {

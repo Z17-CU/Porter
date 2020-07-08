@@ -85,4 +85,5 @@
     <string name="atras">Atras</string>
     <string name="borrar_busqueda">Borrar busqueda</string>
     <string name="chequear_deschequiar">Chequear / Deschequiar</string>
+    <string name="lista_negra">Lista Negra</string>
 </resources>

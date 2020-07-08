@@ -8,7 +8,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cu.control.queue.R
-import cu.control.queue.fragments.QrReaderFragment
+import cu.control.queue.interfaces.onSave
 import cu.control.queue.repository.AppDataBase
 import cu.control.queue.repository.Dao
 import cu.control.queue.repository.entitys.Client
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
 class DialogInsertClient(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val qrReaderFragment: QrReaderFragment
+    private val onSave: onSave
 ) {
 
     private lateinit var dao: Dao
@@ -59,7 +59,7 @@ class DialogInsertClient(
                     Common.getAge(view._editTextCI.text.toString().trim())
                 )
 
-                qrReaderFragment.saveClient(client)
+                onSave.save(client)
 
                 it.onComplete()
             }

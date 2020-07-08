@@ -2,6 +2,7 @@ package cu.control.queue.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -35,6 +36,8 @@ import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterClient
 import cu.control.queue.dialogs.DialogInsertClient
+import cu.control.queue.interfaces.OnClientClickListener
+import cu.control.queue.interfaces.onSave
 import cu.control.queue.repository.AppDataBase
 import cu.control.queue.repository.Dao
 import cu.control.queue.repository.entitys.Client
@@ -71,7 +74,9 @@ class QrReaderFragment(
     private val checkList: Boolean
 ) :
     SupportFragment(),
-    ZXingScannerView.ResultHandler {
+    ZXingScannerView.ResultHandler,
+    OnClientClickListener,
+    onSave {
 
     companion object {
         const val MODE_READ = 1
@@ -83,7 +88,7 @@ class QrReaderFragment(
     private lateinit var dao: Dao
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
-    private val adapter = AdapterClient()
+    private val adapter = AdapterClient(this)
 
     private var searchQuery = MutableLiveData<String>().default("")
 
@@ -438,11 +443,25 @@ class QrReaderFragment(
         progress.dismiss()
     }
 
-    fun saveClient(client: Client?) {
+    private fun saveClient(client: Client?) {
         this.client = client
         isAddClient = true
         if (client == null) {
             showError(_flash.context.getString(R.string.readError))
+            return
+        }
+
+        if (dao.getClient(client.id)?.onBlackList == true) {
+
+            MediaPlayer.create(context, R.raw.error_buzz).start()
+
+            requireActivity().runOnUiThread {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Lista negra")
+                    .setMessage("${client.name} está en lista negra.")
+                    .setPositiveButton(requireContext().getString(android.R.string.ok), null)
+                    .create().show()
+            }
             return
         }
 
@@ -792,4 +811,84 @@ class QrReaderFragment(
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }
+
+    override fun save(client: Client) {
+        Completable.create {
+            saveClient(client)
+            it.onComplete()
+        }.observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .subscribe().addTo(compositeDisposable)
+    }
+
+    override fun onClick(client: Client) {
+
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun onLongClick(view: View, client: Client) {
+        val context = view.context
+        val dao = AppDataBase.getInstance(context).dao()
+        val popupMenu = PopupMenu(context, view)
+        (context as Activity).menuInflater.inflate(R.menu.menu_client, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_delete -> {
+                    android.app.AlertDialog.Builder(context)
+                        .setTitle("Eliminar")
+                        .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Eliminar") { _, _ ->
+                            Completable.create {
+                                val size = adapter.contentList.size - 1
+                                dao.deleteClientFromQueue(client.id, adapter.queueId)
+                                dao.updateQueueSize(adapter.queueId, size)
+                                it.onComplete()
+                            }
+                                .observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe().addTo(CompositeDisposable())
+                        }
+                        .create()
+                        .show()
+                }
+                R.id.action_black_list -> {
+                    Completable.create {
+                        client.isChecked = false
+                        client.selected = false
+                        client.searched = false
+                        client.onBlackList = true
+                        dao.insertClient(client)
+                        it.onComplete()
+                    }.observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe().addTo(compositeDisposable)
+                }
+                R.id.action_check -> {
+                    val message =
+                        "Desea actualizar a ${client.name} como ${if (client.isChecked) "no chequeado" else "chequeado"}?"
+                    android.app.AlertDialog.Builder(context)
+                        .setMessage(message)
+                        .setPositiveButton("Actualizar") { _, _ ->
+                            Completable.create { emitter ->
+                                val clientInQueue =
+                                    dao.getClientFromQueue(client.id, adapter.queueId)
+                                clientInQueue?.isChecked = !client.isChecked
+                                dao.insertClientInQueue(clientInQueue!!)
+                                emitter.onComplete()
+                            }.observeOn(Schedulers.io())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+                        }
+                        .create().show()
+                }
+            }
+            false
+        }
+        val wrapper = androidx.appcompat.view.ContextThemeWrapper(context, R.style.PopupWhite)
+        val menuPopupHelper =
+            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.show()
+    }
 }

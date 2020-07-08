@@ -23,7 +23,7 @@ interface Dao {
     fun insertQueue(queue: Queue)
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id = :id")
-    fun getClient(id: Long): Client
+    fun getClient(id: Long): Client?
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE id IN (:idList)")
     fun getClientsInternal(idList: List<Long>): List<Client>
@@ -105,4 +105,7 @@ interface Dao {
 
     @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME} where queueId = :queue1Id or queueId = :queue2Id group by clientId order by number")
     fun getClientInQueueBy2Queues(queue1Id: Long, queue2Id: Long): List<ClientInQueue>
+
+    @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE onBlackList = 1")
+    fun getClientInBlackList(): LiveData<List<Client>>
 }

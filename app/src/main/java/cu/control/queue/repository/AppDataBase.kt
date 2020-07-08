@@ -13,7 +13,7 @@ import cu.control.queue.repository.entitys.Queue
 
 @Database(
     entities = [(Client::class), (Queue::class), (ClientInQueue::class)],
-    version = 2
+    version = 3
 )
 //@TypeConverters(Converter::class)
 abstract class AppDataBase : RoomDatabase() {
@@ -32,6 +32,13 @@ abstract class AppDataBase : RoomDatabase() {
                     )
                     database.execSQL(
                         "ALTER TABLE ${Queue.TABLE_NAME} ADD COLUMN description TEXT NOT NULL DEFAULT ''"
+                    )
+                }
+            })
+            .addMigrations(object : Migration(2, 3) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN onBlackList INTEGER"
                     )
                 }
             })
