@@ -42,6 +42,7 @@
     <string name="guardar_como_csv">Guardar como CSV</string>
     <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
     <string name="export_OK">La cola ha sido exportada al almacenamiento del dispositivo</string>
+    <string name="export_OK_black_list">La lista negra ha sido exportada al almacenamiento del dispositivo</string>
     <string name="modo_de_registro">Modo de registro.</string>
     <string name="modo_de_chequeo">Modo de chequeo.</string>
     <string name="acerca_de">Acerca de</string>

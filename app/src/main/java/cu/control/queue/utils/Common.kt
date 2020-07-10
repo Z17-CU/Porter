@@ -73,7 +73,27 @@ class Common {
             return gson.fromJson<Queue>(data, listType)
         }
 
+        fun stringToListClient(base64: String?): List<Client>? {
+            if (base64.isNullOrBlank()) {
+                return null
+            }
+            val string = Base64.decode(base64, Base64.DEFAULT)
+            val data = String(string, StandardCharsets.UTF_8)
+
+            val listType = object : TypeToken<List<Client>?>() {
+
+            }.type
+
+            return gson.fromJson(data, listType)
+        }
+
         fun queueToString(someObjects: Queue): String {
+            val text = gson.toJson(someObjects)
+            val data = text.toByteArray(StandardCharsets.UTF_8)
+            return Base64.encodeToString(data, Base64.DEFAULT)
+        }
+
+        fun clientListToString(someObjects: List<Client>): String {
             val text = gson.toJson(someObjects)
             val data = text.toByteArray(StandardCharsets.UTF_8)
             return Base64.encodeToString(data, Base64.DEFAULT)
