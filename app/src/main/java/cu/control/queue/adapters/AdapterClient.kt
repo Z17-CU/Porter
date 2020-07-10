@@ -57,6 +57,7 @@ class AdapterClient(val onClientClickListener: OnClientClickListener) : Recycler
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
+                    client.repeatedClient!! -> R.drawable.item_llelow_bg
                     client.searched!! -> R.drawable.item_accent_bg
                     client.selected!! && done -> {
                         R.drawable.item_green_bg

@@ -19,7 +19,8 @@ class Client(
     var isChecked: Boolean = false,
     var selected: Boolean? = false,
     var searched: Boolean? = false,
-    var onBlackList: Boolean? = false
+    var onBlackList: Boolean? = false,
+    var repeatedClient: Boolean? = false
 ) {
     companion object {
         const val TABLE_NAME = "Client"

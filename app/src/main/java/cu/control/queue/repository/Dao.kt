@@ -9,6 +9,7 @@ import androidx.room.Query
 import cu.control.queue.repository.entitys.Client
 import cu.control.queue.repository.entitys.ClientInQueue
 import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.utils.CustomPair
 
 @Dao
 interface Dao {
@@ -105,6 +106,9 @@ interface Dao {
 
     @Query("SELECT * FROM ${ClientInQueue.TABLE_NAME} where queueId = :queue1Id or queueId = :queue2Id group by clientId order by number")
     fun getClientInQueueBy2Queues(queue1Id: Long, queue2Id: Long): List<ClientInQueue>
+
+    @Query("SELECT clientId as first, Count(*) as second FROM ${ClientInQueue.TABLE_NAME} where queueId = :queue1Id or queueId = :queue2Id group by first order by number")
+    fun getClientRepeatedClients(queue1Id: Long, queue2Id: Long): List<CustomPair>
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE onBlackList = 1")
     fun getClientInBlackList(): LiveData<List<Client>>

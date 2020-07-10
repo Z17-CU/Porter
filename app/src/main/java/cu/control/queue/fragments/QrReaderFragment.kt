@@ -374,6 +374,7 @@ class QrReaderFragment(
                         client.reIntent = thisClientInQueue.reIntent
                         client.number = thisClientInQueue.number
                         client.isChecked = thisClientInQueue.isChecked
+                        client.repeatedClient = thisClientInQueue.repeatedClient
                     }
 
                     clientList = clientList.sortedBy { it.number }
@@ -857,12 +858,15 @@ class QrReaderFragment(
                         client.isChecked = false
                         client.selected = false
                         client.searched = false
+                        client.repeatedClient = false
                         client.onBlackList = true
                         dao.insertClient(client)
                         it.onComplete()
                     }.observeOn(Schedulers.io())
                         .subscribeOn(Schedulers.io())
-                        .subscribe().addTo(compositeDisposable)
+                        .subscribe{
+                            showError("${client.name} añadido a lista negra.")
+                        }.addTo(compositeDisposable)
                 }
                 R.id.action_check -> {
                     val message =

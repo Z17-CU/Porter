@@ -32,17 +32,17 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_settings"
-        android:orderInCategory="100"
-        android:title="@string/ajustes"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_black_list"
         android:icon="@drawable/ic_baseline_view_list"
         android:orderInCategory="100"
         android:title="@string/lista_negra"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:orderInCategory="100"
+        android:title="@string/ajustes"
         app:showAsAction="never" />
 
     <item

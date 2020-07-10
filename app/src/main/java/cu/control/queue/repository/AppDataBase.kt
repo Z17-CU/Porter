@@ -40,6 +40,12 @@ abstract class AppDataBase : RoomDatabase() {
                     database.execSQL(
                         "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN onBlackList INTEGER"
                     )
+                    database.execSQL(
+                        "ALTER TABLE ${Client.TABLE_NAME} ADD COLUMN repeatedClient INTEGER"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ${ClientInQueue.TABLE_NAME} ADD COLUMN repeatedClient INTEGER"
+                    )
                 }
             })
             .build()

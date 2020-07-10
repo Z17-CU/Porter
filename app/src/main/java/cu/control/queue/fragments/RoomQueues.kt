@@ -474,8 +474,17 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             newQueue.clientsNumber = allClientsInQueue.size
 
+            dao.getClientRepeatedClients(queue1.id!!, queue2.id!!).map { pair ->
+                if (pair.second > 1) {
+                    allClientsInQueue.find { client -> client.clientId == pair.first }?.repeatedClient =
+                        true
+                }
+            }
+
             dao.deleteQueue(queue1)
+            dao.deleteAllClientsFromQueue(queue1.id!!)
             dao.deleteQueue(queue2)
+            dao.deleteAllClientsFromQueue(queue2.id!!)
             dao.insertQueue(newQueue)
             dao.insertClientInQueue(allClientsInQueue)
 
