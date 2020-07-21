@@ -1,32 +1,20 @@
 package cu.control.queue.adapters
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.interfaces.OnClientClickListener
-import cu.control.queue.interfaces.onClickListener
-import cu.control.queue.repository.AppDataBase
 import cu.control.queue.repository.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 
-class AdapterClient(val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
+class AdapterClient(private val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
