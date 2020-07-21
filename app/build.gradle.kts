@@ -121,15 +121,15 @@ dependencies {
 
     implementation("androidx.fragment:fragment-ktx:1.2.5")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.navigation:navigation-runtime-ktx:2.3.0-rc01")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.0-rc01")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.0-rc01")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.3.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.3.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.3.0")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
 
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    implementation("org.ocpsoft.prettytime:prettytime:4.0.1.Final")
+    implementation("org.ocpsoft.prettytime:prettytime:4.0.3.Final")
 
     implementation("io.reactivex.rxjava3:rxjava:3.0.0")
 
@@ -137,8 +137,8 @@ dependencies {
     implementation("com.mikhaellopez:circularimageview:3.2.0")
 
     /**RX*/
-    implementation("io.reactivex.rxjava2:rxandroid:2.1.0")
-    implementation("io.reactivex.rxjava2:rxkotlin:2.3.0")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
 
     /**retrofit*/
     implementation("com.squareup.okhttp3:okhttp:4.4.0")
@@ -183,7 +183,7 @@ dependencies {
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
     /** Firebase */
-    implementation("com.google.firebase:firebase-analytics:17.4.3")
+    implementation("com.google.firebase:firebase-analytics:17.4.4")
     implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
 
     /** ScrollView */

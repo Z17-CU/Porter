@@ -57,12 +57,12 @@ class AdapterClient(val onClientClickListener: OnClientClickListener) : Recycler
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
-                    client.repeatedClient!! -> R.drawable.item_llelow_bg
-                    client.searched!! -> R.drawable.item_accent_bg
-                    client.selected!! && done -> {
+                    client.repeatedClient ?: false -> R.drawable.item_llelow_bg
+                    client.searched ?: false -> R.drawable.item_accent_bg
+                    client.selected ?: false && done -> {
                         R.drawable.item_green_bg
                     }
-                    client.selected!! && !done -> {
+                    client.selected ?: false && !done -> {
                         R.drawable.item_red_bg
                     }
                     checkMode && position % 2 != 0 -> R.drawable.item_blue_bg
