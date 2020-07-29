@@ -1,6 +1,7 @@
 package cu.control.queue
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -8,12 +9,15 @@ import com.github.paolorotolo.appintro.AppIntro2
 import com.github.paolorotolo.appintro.AppIntro2Fragment
 import com.github.paolorotolo.appintro.model.SliderPagerBuilder
 import cu.control.queue.dialogs.DialogHiClient
+import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.utils.PreferencesManager
 import io.reactivex.disposables.CompositeDisposable
 
 class WelcomeActivity : AppIntro2() {
 
     private lateinit var manager: PreferencesManager
+
+    private var onDialogHiClientEvent: OnDialogHiClientEvent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -127,6 +131,30 @@ class WelcomeActivity : AppIntro2() {
         setFadeAnimation()
     }
 
+    override fun onResume() {
+        super.onResume()
+        onDialogHiClientEvent?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        onDialogHiClientEvent?.onPause()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        for (index in permissions.indices.reversed()) {
+            if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                return
+            }
+        }
+        // all permissions were granted
+        onDialogHiClientEvent?.onCameraPermissionOk()
+    }
+
     private fun goToMain() {
         manager.setFirstRun()
         startActivity(Intent(this, MainActivity::class.java))
@@ -144,7 +172,9 @@ class WelcomeActivity : AppIntro2() {
     }
 
     private fun showDialog() {
-        val dialog = DialogHiClient(this, CompositeDisposable(), manager).create()
+        val dialogHiClient = DialogHiClient(this, CompositeDisposable(), manager)
+        onDialogHiClientEvent = dialogHiClient
+        val dialog = dialogHiClient.create()
         dialog.setOnDismissListener {
             goToMain()
         }

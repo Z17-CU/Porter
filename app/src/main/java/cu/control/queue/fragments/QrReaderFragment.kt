@@ -217,7 +217,7 @@ class QrReaderFragment(
 
         compositeDisposable.add(Completable.create {
 
-            val client = stringToClient(rawResult)
+            val client = Common.stringToClient(rawResult)
 
             saveClient(client)
 
@@ -645,41 +645,6 @@ class QrReaderFragment(
         activity?.runOnUiThread {
             Toast.makeText(_zXingScannerView.context, error, Toast.LENGTH_LONG).show()
         }
-    }
-
-    @SuppressLint("LogNotTimber")
-    private fun stringToClient(rawResult: Result): Client? {
-
-        var client: Client? = null
-
-        rawResult.text?.let {
-
-            Log.d("stringToClient", it)
-
-            val name = Regex("N:(.+?)*").find(it)?.value?.split(':')?.get(1)
-            val lastName = Regex("A:(.+?)*").find(it)?.value?.split(':')?.get(1)
-            val idString = Regex("CI:(.+?)*").find(it)?.value?.split(':')?.get(1)
-            val id = idString?.toLong()
-            val sex = getSex(idString)
-            val fv = Regex("FV:(.+?)*").find(it)?.value?.split(':')?.get(1)
-
-            Log.d("Regex result", " \n$name\n$lastName\n$id\n$fv ")
-
-            if (name != null && lastName != null && id != null && fv != null && sex != null) {
-
-                client =
-                    Client(
-                        "$name $lastName",
-                        id,
-                        idString,
-                        fv,
-                        sex,
-                        getAge(idString)
-                    )
-            }
-        }
-
-        return client
     }
 
     private fun turnFlash() {

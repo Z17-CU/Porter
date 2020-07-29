@@ -1,5 +1,6 @@
 package cu.control.queue.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +13,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.zxing.Result
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
@@ -174,6 +176,70 @@ class Common {
             }
 
             return false
+        }
+
+        @SuppressLint("LogNotTimber")
+        fun stringToClient(rawResult: Result): Client? {
+
+            var client: Client? = null
+
+            rawResult.text?.let {
+
+                Log.d("stringToClient", it)
+
+                val name = Regex("N:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val lastName = Regex("A:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val idString = Regex("CI:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val id = idString?.toLong()
+                val sex = getSex(idString)
+                val fv = Regex("FV:(.+?)*").find(it)?.value?.split(':')?.get(1)
+
+                Log.d("Regex result", " \n$name\n$lastName\n$id\n$fv ")
+
+                if (name != null && lastName != null && id != null && fv != null && sex != null) {
+
+                    client =
+                        Client(
+                            "$name $lastName",
+                            id,
+                            idString,
+                            fv,
+                            sex,
+                            getAge(idString)
+                        )
+                }
+            }
+
+            return client
+        }
+
+        @SuppressLint("LogNotTimber")
+        fun stringToPorterHistruct(rawResult: Result): PorterHistruct? {
+
+            var porterHistruct: PorterHistruct? = null
+
+            rawResult.text?.let {
+
+                Log.d("stringToClient", it)
+
+                val name = Regex("N:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val lastName = Regex("A:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val idString = Regex("CI:(.+?)*").find(it)?.value?.split(':')?.get(1)
+                val fv = Regex("FV:(.+?)*").find(it)?.value?.split(':')?.get(1)
+
+                if (name != null && lastName != null && idString != null && fv != null) {
+
+                    porterHistruct =
+                        PorterHistruct(
+                            name,
+                            lastName,
+                            idString,
+                            fv
+                        )
+                }
+            }
+
+            return porterHistruct
         }
     }
 }
