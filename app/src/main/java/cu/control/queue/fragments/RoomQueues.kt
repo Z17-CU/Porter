@@ -26,19 +26,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import cu.control.queue.utils.MediaUtil
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterQueue
 import cu.control.queue.dialogs.DialogCreateQueue
 import cu.control.queue.interfaces.onClickListener
-import cu.control.queue.repository.AppDataBase
-import cu.control.queue.repository.Dao
-import cu.control.queue.repository.entitys.Queue
-import cu.control.queue.utils.Common
-import cu.control.queue.utils.Conts
-import cu.control.queue.utils.MaterialSearchView
-import cu.control.queue.utils.Progress
+import cu.control.queue.repository.dataBase.AppDataBase
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.utils.*
 import cu.control.queue.viewModels.ClientViewModel
 import cu.control.queue.viewModels.ClientViewModelFactory
 import io.reactivex.Completable
@@ -496,6 +492,32 @@ class RoomQueues : SupportFragment(), onClickListener {
             }
             .addTo(compositeDisposable)
     }
+
+//    private fun checkVersion(){
+//        Single.create<Int> {
+//            it.onSuccess(APIService.apiService.checkVersion().execute().code())
+//        }.subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .doOnError {
+//                showDialogCheckVersionError()
+//            }
+//            .subscribe { result ->
+//
+//            }.addTo(compositeDisposable)
+//    }
+//
+//    private fun showDialogCheckVersionError(){
+//        AlertDialog.Builder(requireContext())
+//            .setTitle("Error de verificación")
+//            .setMessage("Por favor verifique su conexión de datos.")
+//            .setCancelable(false)
+//            .setPositiveButton("Reintentar"){ _, _ ->
+//                checkVersion()
+//            }
+//            .setPositiveButton("Salir"){ _, _ ->
+//                requireActivity().finish()
+//            }.create().show()
+//    }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }

@@ -12,8 +12,9 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import cu.control.queue.repository.entitys.Client
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.PorterHistruct
+import cu.control.queue.repository.dataBase.entitys.Queue
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -87,6 +88,10 @@ class Common {
             return gson.fromJson(data, listType)
         }
 
+        fun porterHiToString(someObjects: PorterHistruct): String {
+            return gson.toJson(someObjects)
+        }
+
         fun queueToString(someObjects: Queue): String {
             val text = gson.toJson(someObjects)
             val data = text.toByteArray(StandardCharsets.UTF_8)
@@ -154,6 +159,21 @@ class Common {
                 ).show()
                 e.printStackTrace()
             }
+        }
+
+        fun isValidCI(ci: String, context: Context): Boolean {
+
+            if (ci.length == 11) {
+                val mount = ci.substring(2, 4).toInt()
+                val day = ci.substring(4, 6).toInt()
+                val isValid = mount in 1..12 && day in 1..31
+                if (!isValid) {
+                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG).show()
+                }
+                return isValid
+            }
+
+            return false
         }
     }
 }

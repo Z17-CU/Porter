@@ -19,9 +19,9 @@ import cu.control.queue.adapters.AdapterClient
 import cu.control.queue.dialogs.DialogInsertClient
 import cu.control.queue.interfaces.OnClientClickListener
 import cu.control.queue.interfaces.onSave
-import cu.control.queue.repository.AppDataBase
-import cu.control.queue.repository.Dao
-import cu.control.queue.repository.entitys.Client
+import cu.control.queue.repository.dataBase.AppDataBase
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Conts
 import cu.control.queue.utils.MediaUtil

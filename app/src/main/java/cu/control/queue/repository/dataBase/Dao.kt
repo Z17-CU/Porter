@@ -1,4 +1,4 @@
-package cu.control.queue.repository
+package cu.control.queue.repository.dataBase
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -6,9 +6,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
-import cu.control.queue.repository.entitys.Client
-import cu.control.queue.repository.entitys.ClientInQueue
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.ClientInQueue
+import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.CustomPair
 
 @Dao

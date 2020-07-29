@@ -9,10 +9,11 @@ import android.view.View
 import android.widget.Toast
 import cu.control.queue.R
 import cu.control.queue.interfaces.onSave
-import cu.control.queue.repository.AppDataBase
-import cu.control.queue.repository.Dao
-import cu.control.queue.repository.entitys.Client
+import cu.control.queue.repository.dataBase.AppDataBase
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Common
+import cu.control.queue.utils.Common.Companion.isValidCI
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -82,28 +83,13 @@ class DialogInsertClient(
 
             override fun afterTextChanged(s: Editable) {
 
-                view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim())
+                view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim(), context)
             }
         })
 
-        view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim())
+        view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim(), context)
 
         return view
-    }
-
-    private fun isValidCI(ci: String): Boolean {
-
-        if (ci.length == 11) {
-            val mount = ci.substring(2, 4).toInt()
-            val day = ci.substring(4, 6).toInt()
-            val isValid = mount < 13 && day < 32
-            if (!isValid) {
-                showError("Carné de identidad incorrecto")
-            }
-            return isValid
-        }
-
-        return false
     }
 
     private fun showError(error: String) {

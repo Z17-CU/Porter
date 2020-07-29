@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro2
 import com.github.paolorotolo.appintro.AppIntro2Fragment
 import com.github.paolorotolo.appintro.model.SliderPagerBuilder
+import cu.control.queue.dialogs.DialogHiClient
 import cu.control.queue.utils.PreferencesManager
+import io.reactivex.disposables.CompositeDisposable
 
 class WelcomeActivity : AppIntro2() {
 
@@ -133,11 +135,19 @@ class WelcomeActivity : AppIntro2() {
 
     override fun onSkipPressed(currentFragment: Fragment?) {
         super.onSkipPressed(currentFragment)
-        goToMain()
+        showDialog()
     }
 
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
-        goToMain()
+        showDialog()
+    }
+
+    private fun showDialog() {
+        val dialog = DialogHiClient(this, CompositeDisposable(), manager).create()
+        dialog.setOnDismissListener {
+            goToMain()
+        }
+        dialog.show()
     }
 }

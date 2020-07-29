@@ -1,7 +1,7 @@
 package cu.control.queue.interfaces
 
 import android.view.View
-import cu.control.queue.repository.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.Client
 
 interface OnClientClickListener {
     fun onClick(client: Client)

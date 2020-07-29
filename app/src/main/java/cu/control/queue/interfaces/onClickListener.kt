@@ -1,7 +1,7 @@
 package cu.control.queue.interfaces
 
 import android.view.View
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Queue
 
 
 interface onClickListener {

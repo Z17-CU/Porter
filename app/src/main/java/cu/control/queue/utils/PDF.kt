@@ -7,8 +7,8 @@ import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
 import cu.control.queue.R
-import cu.control.queue.repository.entitys.Client
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Common.Companion.shareQueue
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
 import cu.control.queue.utils.Conts.Companion.formatDateBig

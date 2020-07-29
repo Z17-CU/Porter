@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cu.control.queue.R
 import cu.control.queue.repository.ClientRepository
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Conts
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY

@@ -1,8 +1,8 @@
-package cu.control.queue.repository.entitys
+package cu.control.queue.repository.dataBase.entitys
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cu.control.queue.repository.entitys.Client.Companion.TABLE_NAME
+import cu.control.queue.repository.dataBase.entitys.Client.Companion.TABLE_NAME
 
 @Entity(tableName = TABLE_NAME)
 class Client(

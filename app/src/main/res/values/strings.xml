@@ -5,6 +5,7 @@
     <string name="readError">Lectura incorrecta, inténtalo otra vez.</string>
     <string name="clientExist">El cliente fue regisitrado recientemente.</string>
     <string name="error">Ha ocurrido un error.</string>
+    <string name="conection_error">Ha ocurrido un error. Verifique su conexión de datos.</string>
     <string name="nombre">Nombre</string>
     <string name="apellidos">Apellidos</string>
     <string name="carn_identidad">Carné de identidad</string>
@@ -87,4 +88,6 @@
     <string name="borrar_busqueda">Borrar busqueda</string>
     <string name="chequear_deschequiar">Chequear / Deschequiar</string>
     <string name="lista_negra">Lista Negra</string>
+    <string name="su_nombre">Su nombre</string>
+    <string name="guardar">Guardar</string>
 </resources>

@@ -1,4 +1,4 @@
-package cu.control.queue.repository.entitys
+package cu.control.queue.repository.dataBase.entitys
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package cu.control.queue.repository
+package cu.control.queue.repository.dataBase
 
 
 open class  SingletonHolder<T, A>(creator: (A) -> T) {

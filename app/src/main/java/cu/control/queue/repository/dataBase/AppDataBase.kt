@@ -1,4 +1,4 @@
-package cu.control.queue.repository
+package cu.control.queue.repository.dataBase
 
 import android.content.Context
 import androidx.room.Database
@@ -6,9 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import cu.control.queue.repository.entitys.Client
-import cu.control.queue.repository.entitys.ClientInQueue
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.ClientInQueue
+import cu.control.queue.repository.dataBase.entitys.Queue
 
 
 @Database(

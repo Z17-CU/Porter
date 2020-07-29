@@ -11,7 +11,7 @@ import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.interfaces.OnClientClickListener
-import cu.control.queue.repository.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
 
 class AdapterClient(private val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {

@@ -1,8 +1,9 @@
 package cu.control.queue.repository
 
-import cu.control.queue.repository.entitys.Client
-import cu.control.queue.repository.entitys.ClientInQueue
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.ClientInQueue
+import cu.control.queue.repository.dataBase.entitys.Queue
 import javax.inject.Inject
 import javax.inject.Singleton
 

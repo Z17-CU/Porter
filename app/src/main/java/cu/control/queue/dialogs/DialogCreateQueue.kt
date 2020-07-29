@@ -9,9 +9,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cu.control.queue.R
-import cu.control.queue.repository.AppDataBase
-import cu.control.queue.repository.Dao
-import cu.control.queue.repository.entitys.Queue
+import cu.control.queue.repository.dataBase.AppDataBase
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Queue
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
