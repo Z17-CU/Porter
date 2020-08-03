@@ -12,6 +12,11 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
+import cu.control.queue.utils.PreferencesManager
+import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,7 +31,8 @@ import java.util.*
 class DialogCreateQueue(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val id: Long = -1L
+    private val id: Long = -1L,
+    private val clientViewModel: ClientViewModel
 ) {
 
     private lateinit var dao: Dao
@@ -56,20 +62,42 @@ class DialogCreateQueue(
 
             compositeDisposable.add(Completable.create {
 
-                dao.insertQueue(
-                    if (queue == null)
-                        Queue(
-                            Calendar.getInstance().timeInMillis,
-                            view._editTextName.text.toString().trim(),
-                            Calendar.getInstance().timeInMillis,
-                            description = view._editTextDescription.text.toString().trim()
-                        )
-                    else {
-                        queue!!.name = view._editTextName.text.toString().trim()
-                        queue!!.description = view._editTextDescription.text.toString().trim()
-                        queue!!
-                    }
-                )
+                val time = Calendar.getInstance().timeInMillis
+
+                val thisqueue = if (queue == null)
+                    Queue(
+                        time,
+                        view._editTextName.text.toString().trim(),
+                        Calendar.getInstance().timeInMillis,
+                        description = view._editTextDescription.text.toString().trim(),
+                        uuid = PreferencesManager(context).getCi() + time,
+                        created_date = time,
+                        updated_date = time,
+                        //Todo update this
+                        business = 1,
+                        province = "",
+                        municipality = ""
+                    )
+                else {
+                    queue!!.name = view._editTextName.text.toString().trim()
+                    queue!!.description = view._editTextDescription.text.toString().trim()
+                    queue!!
+                }
+                dao.insertQueue(thisqueue)
+
+                var tag = ""
+                val map = mutableMapOf<String, String>()
+                map[Param.KEY_QUEUE_NAME] = thisqueue.name
+                map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
+                val param = if (queue == null) {
+                    tag = Param.TAG_CREATE_QUEUE
+                    ParamCreateQueue(thisqueue.business, map, thisqueue.created_date)
+                } else {
+                    tag = Param.TAG_UPDATE_QUEUE
+                    ParamUpdateQueue(map, thisqueue.updated_date)
+                }
+
+                clientViewModel.onRegistreAction(thisqueue.uuid, param, tag, context)
 
                 it.onComplete()
             }

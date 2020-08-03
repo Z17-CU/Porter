@@ -1,14 +1,11 @@
 package cu.control.queue.dialogs
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Vibrator
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Base64
 import android.view.View
 import android.widget.Toast
@@ -20,14 +17,11 @@ import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.PreferencesManager
-import cu.control.queue.utils.permissions.Permissions
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
-import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
-import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view._editTextName
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class DialogHiClient(
@@ -38,44 +32,14 @@ class DialogHiClient(
 
     private lateinit var dialog: AlertDialog
     private lateinit var view: View
-    private val textWatcher = object : TextWatcher {
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        }
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-        }
-
-        override fun afterTextChanged(s: Editable) {
-
-            val nameOk = view._editTextName.text.trim().isNotEmpty()
-            val lastNameOk = view._editTextLastName.text.trim().isNotEmpty()
-            val ciOk = Common.isValidCI(view._editTextCI.text.trim().toString(), context)
-
-            view._okButton.isEnabled = nameOk && lastNameOk && ciOk
-
-            view.textViewRequeridoName.visibility = if (nameOk) {
-                View.INVISIBLE
-            } else {
-                View.VISIBLE
-            }
-            view.textViewRequeridoLastName.visibility = if (lastNameOk) {
-                View.INVISIBLE
-            } else {
-                View.VISIBLE
-            }
-            view.textViewRequeridoCI.visibility = if (ciOk) {
-                View.INVISIBLE
-            } else {
-                View.VISIBLE
-            }
-        }
-    }
 
     fun create(): AlertDialog {
         dialog = AlertDialog.Builder(context)
             .setView(getView())
             .setCancelable(false)
             .create()
+
+        startReader()
 
         return dialog
     }
@@ -84,29 +48,6 @@ class DialogHiClient(
     private fun getView(): View {
 
         view = View.inflate(context, R.layout.layout_dialog_hi_client, null)
-
-        view._okButton.setOnClickListener {
-
-            saveAndSendData(
-                view._editTextName.text.toString().trim(),
-                view._editTextLastName.text.toString().trim(),
-                view._editTextCI.text.toString().trim()
-            )
-        }
-
-        view._editTextName.addTextChangedListener(textWatcher)
-        view._editTextLastName.addTextChangedListener(textWatcher)
-        view._editTextCI.addTextChangedListener(textWatcher)
-
-        view._okButton.isEnabled = false
-
-        view._QrButton.setOnClickListener {
-            changeQrReaderVisivility()
-        }
-
-        view._hideQr.setOnClickListener {
-            changeQrReaderVisivility()
-        }
 
         return view
     }
@@ -149,36 +90,15 @@ class DialogHiClient(
                 if (it.first == 200) {
                     stopReader()
                     dialog.dismiss()
-                } else
+                } else {
                     showError(it.second ?: "Error ${it.first}")
+                    startReader()
+                }
             }, {
                 it.printStackTrace()
                 showError(context.getString(R.string.conection_error))
+                startReader()
             }))
-    }
-
-    private fun changeQrReaderVisivility() {
-
-        if (view._qrView.visibility == View.GONE || view._qrView.visibility == View.INVISIBLE) {
-            Permissions.with(context as Activity)
-                .request(Manifest.permission.CAMERA)
-                .withPermanentDenialDialog(context.getString(R.string.qr_fragment_permanent_denial_camera))
-                .ifNecessary()
-                .onAllGranted {
-                    showQR()
-                }
-                .execute()
-        } else {
-            view._qrView.visibility = View.GONE
-            view._manualData.visibility = View.VISIBLE
-            stopReader()
-        }
-    }
-
-    private fun showQR() {
-        view._qrView.visibility = View.VISIBLE
-        view._manualData.visibility = View.GONE
-        startReader()
     }
 
     private fun startReader() {
@@ -201,7 +121,7 @@ class DialogHiClient(
 
         val client = Common.stringToPorterHistruct(result)
         client?.let {
-            saveAndSendData(it.Name, it.LastName, it.Ci, it.Fv)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv)
             return
         }
         showError("Lectura incorrecta")
@@ -209,7 +129,7 @@ class DialogHiClient(
     }
 
     override fun onCameraPermissionOk() {
-        showQR()
+        startReader()
     }
 
     override fun onResume() {

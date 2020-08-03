@@ -16,11 +16,13 @@ class PreferencesManager(context: Context) {
 
     fun setName(name: String) = editor.putString(NAME, name).commit()
 
+    fun getCi() = preferences.getString(CI, "Null_CI") ?: ""
+
     fun setLastName(lastName: String) = editor.putString(LATS_NAME, lastName).commit()
 
     fun setCI(ci: String) = editor.putString(CI, ci).commit()
 
-    fun setFV(fv: String) = editor.putString(CI, fv).commit()
+    fun setFV(fv: String) = editor.putString(FV, fv).commit()
 
     fun setFirstRun() {
         editor.putBoolean(FIRST_TIME, false).commit()
@@ -30,7 +32,7 @@ class PreferencesManager(context: Context) {
     companion object {
         private const val PRIVATE_MODE = 0
         private const val PREFERENCE_CONFIGURATION_NAME = "configuration"
-        private const val FIRST_TIME = "isFirstRun"
+        private const val FIRST_TIME = "isFirstRun2"
         private const val NAME = "NAME"
         private const val LATS_NAME = "LATS_NAME"
         private const val CI = "CI"

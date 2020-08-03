@@ -59,7 +59,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             resValue("string", "content_provider", "cu.control.queue.android.provider")
 
-            buildConfigField("String", "BASE_URL", "\"https://apisondeo.mprc.cu/\"")
+            buildConfigField("String", "BASE_URL", "\"https://apisondeo.mprc.cu/porter/\"")
             buildConfigField(
                 "String",
                 "PORTER_SERIAL_KEY",
@@ -73,7 +73,7 @@ android {
             proguardFile(getDefaultProguardFile("proguard-android.txt"))
             proguardFile("proguard-rules.pro")
 
-            buildConfigField("String", "BASE_URL", "\"https://apisondeo.mprc.cu/\"")
+            buildConfigField("String", "BASE_URL", "\"https://apisondeo.mprc.cu/porter/\"")
             buildConfigField(
                 "String",
                 "PORTER_SERIAL_KEY",

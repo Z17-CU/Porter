@@ -9,10 +9,23 @@ import androidx.room.Query
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import cu.control.queue.utils.CustomPair
 
 @Dao
 interface Dao {
+
+    @Insert(onConflict = REPLACE)
+    fun insertPayload(payload: Payload)
+
+    @Query("SELECT * FROM ${Payload.TABLE_NAME} WHERE queue_uuid = :id")
+    fun getPayload(id: String): Payload?
+
+    @Delete
+    fun deletePayload(payloads: List<Payload>)
+
+    @Query("SELECT * FROM ${Payload.TABLE_NAME}")
+    fun getAllPayloadLive(): LiveData<List<Payload>>
 
     @Insert(onConflict = REPLACE)
     fun insertClient(client: Client)

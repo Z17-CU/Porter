@@ -13,7 +13,7 @@ class ClientViewModelFactory(private val context: Context) :
         return ClientViewModel(
             ClientRepository(
                 AppDataBase.getInstance(context).dao()
-            )
+            ), context
         ) as ClientViewModel
     }
 }

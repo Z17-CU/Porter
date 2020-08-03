@@ -4,8 +4,8 @@ import androidx.annotation.Keep
 
 @Keep
 class PorterHistruct(
-    val Name: String,
-    val LastName: String,
-    val Ci: String,
-    val Fv: String
+    val name: String,
+    val last_name: String,
+    val ci: String,
+    val fv: String
 )

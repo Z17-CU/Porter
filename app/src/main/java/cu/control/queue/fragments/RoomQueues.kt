@@ -98,7 +98,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         initToolBar()
 
         _fabAdd.setOnClickListener {
-            DialogCreateQueue(it.context, compositeDisposable).create().show()
+            DialogCreateQueue(it.context, compositeDisposable, clientViewModel = viewModel).create().show()
         }
 
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
@@ -128,6 +128,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                     }.addTo(compositeDisposable)
             }
         })
+
+        viewModel.observePayloads(viewLifecycleOwner)
     }
 
     override fun onBackPressedSupport(): Boolean {
@@ -260,7 +262,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                     DialogCreateQueue(
                         requireContext(),
                         CompositeDisposable(),
-                        queue.id!!
+                        queue.id!!,
+                        viewModel
                     ).create().show()
                 }
                 R.id.action_merge -> {
@@ -447,6 +450,8 @@ class RoomQueues : SupportFragment(), onClickListener {
         progress.show()
         Completable.create {
 
+            val time = Calendar.getInstance().timeInMillis
+
             val newQueue = Queue(
                 Calendar.getInstance().timeInMillis,
                 "${queue1.name} y ${queue2.name}",
@@ -456,7 +461,14 @@ class RoomQueues : SupportFragment(), onClickListener {
                     queue1.description!!.isNotEmpty() && queue2.description!!.isEmpty() -> queue1.description
                     queue1.description!!.isEmpty() && queue2.description!!.isNotEmpty() -> queue2.description
                     else -> "${queue1.description} y ${queue2.description}"
-                }
+                },
+                uuid = PreferencesManager(requireContext()).getCi() + time,
+                created_date = time,
+                updated_date = time,
+                //Todo update this
+                business = 1,
+                province = "",
+                municipality = ""
             )
 
             val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id!!, queue2.id!!)

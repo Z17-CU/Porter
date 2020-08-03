@@ -17,6 +17,7 @@ import com.google.zxing.Result
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -91,6 +92,10 @@ class Common {
         }
 
         fun porterHiToString(someObjects: PorterHistruct): String {
+            return gson.toJson(someObjects)
+        }
+
+        fun payloadToString(someObjects: Payload): String {
             return gson.toJson(someObjects)
         }
 

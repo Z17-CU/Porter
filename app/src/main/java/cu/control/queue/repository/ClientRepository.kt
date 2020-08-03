@@ -4,6 +4,7 @@ import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,4 +24,12 @@ class ClientRepository @Inject constructor(
     fun getAllClientInQueue() = dao.getClientsInQueue()
 
     fun getClientInQueue(id: Long) = dao.getClientsInQueue(id)
+
+    fun getPayload(id: String) = dao.getPayload(id)
+
+    fun insertPayload(payload: Payload) = dao.insertPayload(payload)
+
+    fun getAllPayloads() = dao.getAllPayloadLive()
+
+    fun deletePayloads(payloads: ArrayList<Payload>) = dao.deletePayload(payloads)
 }

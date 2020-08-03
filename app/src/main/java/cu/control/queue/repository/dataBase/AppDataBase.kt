@@ -4,18 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import cu.control.queue.repository.dataBase.converters.Converters
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Payload
 
 
 @Database(
-    entities = [(Client::class), (Queue::class), (ClientInQueue::class)],
+    entities = [(Client::class), (Queue::class), (ClientInQueue::class), (Payload::class)],
     version = 3
 )
-//@TypeConverters(Converter::class)
+@TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {
 
     abstract fun dao(): Dao
