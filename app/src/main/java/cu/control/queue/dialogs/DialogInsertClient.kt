@@ -14,6 +14,8 @@ import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Common.Companion.isValidCI
+import cu.control.queue.utils.Hash
+import cu.control.queue.utils.PreferencesManager
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -49,15 +51,19 @@ class DialogInsertClient(
 
         view._okButton.setOnClickListener {
 
+            val preferences = PreferencesManager(context)
+
             compositeDisposable.add(Completable.create {
 
+                val dni = view._editTextCI.text.toString().trim()
+
                 val client = Client(
-                    view._editTextCI.text.toString().trim(),
-                    view._editTextCI.text.trim().toString().toLong(),
-                    view._editTextCI.text.toString().trim(),
+                    "${dni.substring(0..1)}*******${dni.substring(9..10)}",
+                    Hash.getLongHash(dni, preferences.getSecureHasCode()),
+                    Hash.getMd5(dni, preferences.getSecureHasCode()),
                     null,
-                    Common.getSex(view._editTextCI.text.toString().trim()),
-                    Common.getAge(view._editTextCI.text.toString().trim())
+                    Common.getSex(dni),
+                    Common.getAge(dni)
                 )
 
                 onSave.save(client)
@@ -83,7 +89,8 @@ class DialogInsertClient(
 
             override fun afterTextChanged(s: Editable) {
 
-                view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim(), context)
+                view._okButton.isEnabled =
+                    isValidCI(view._editTextCI.text.toString().trim(), context)
             }
         })
 

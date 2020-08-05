@@ -39,28 +39,70 @@ class Common {
             }
         }
 
-        fun getAge(idString: String): Int {
-            val currentYearBig = Calendar.getInstance().get(Calendar.YEAR)
-            val currentYear = currentYearBig.toString().substring(2, 4).toInt()
-            var clientYear = idString.substring(0, 2).toInt()
+        fun getAge(target: String, now: Calendar = GregorianCalendar()): Int {
 
-            clientYear = if (currentYear < clientYear) {
+            var age: Int
 
-                if (clientYear < 10) {
-                    "190$clientYear".toInt()
-                } else {
-                    "19$clientYear".toInt()
+            require(target.length == 11) { "Invalid CI" }
+
+            val month = target.substring(2, 4).toInt()
+            require(month <= 12) { "Invalid CI" }
+
+            val year = target.substring(0, 2).toInt() + getCentury(target)
+
+            val day = target.substring(4, 6).toInt()
+
+            val date1 =
+                Date(GregorianCalendar(year, month - 1, day).timeInMillis) //fecha de nacimiento
+            val dob = Calendar.getInstance()
+            dob.time = date1
+
+            require(!dob.after(now)) { "Can't be born in the future" }
+
+            val year1 = now.get(Calendar.YEAR)
+            val year2 = dob.get(Calendar.YEAR)
+
+            age = year1 - year2
+
+            val month1 = now.get(Calendar.MONTH)
+            val month2 = dob.get(Calendar.MONTH)
+
+            if (month2 > month1)
+                age--
+            else if (month1 == month2) {
+
+                val day1 = now.get(Calendar.DAY_OF_MONTH)
+                val day2 = dob.get(Calendar.DAY_OF_MONTH)
+
+                if (day2 > day1)
+                    age--
+
+            }
+
+            return age
+
+        }
+
+        private fun getCentury(ci: String): Int {
+
+            return when (ci[6].toString().toInt()) {
+                9 -> {
+                    if (ci.substring(0, 2).toInt() == 0)
+                        1900
+                    else
+                        1800
                 }
-            } else {
-                if (clientYear < 10) {
-                    "200$clientYear".toInt()
-                } else {
-                    "20$clientYear".toInt()
+                0, 1, 2, 3, 4, 5 -> {
+                    if (ci.substring(0, 2).toInt() == 0)
+                        2000
+                    else
+                        1900
+                }
+                else -> {
+                    2000
                 }
             }
 
-            Log.d("Ages", "$currentYearBig $clientYear")
-            return currentYearBig - clientYear
         }
 
         fun stringToQueue(base64: String?): Queue? {
@@ -168,23 +210,56 @@ class Common {
             }
         }
 
-        fun isValidCI(ci: String, context: Context): Boolean {
+        fun isValidCI(ci: CharSequence, context: Context): Boolean {
 
-            if (ci.length == 11) {
-                val mount = ci.substring(2, 4).toInt()
-                val day = ci.substring(4, 6).toInt()
-                val isValid = mount in 1..12 && day in 1..31
-                if (!isValid) {
-                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG).show()
-                }
-                return isValid
+            val message = "Carné de identidad incorrecto"
+
+            //limpiar lo que no sea numero
+            val target = ci.replace(Regex("[^0123456789]"), "")
+
+            //si se borro algo, ya es false
+            if (target.length != ci.length)
+                return false
+
+            if (target.length != 11)
+                return false
+
+            val month = target.substring(2, 4).toInt()
+            if (month < 1 || month > 12) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG)
+                    .show()
+                return false
             }
 
-            return false
+            var calendar = GregorianCalendar()
+            var year = target.substring(0, 2).toInt() + 2000
+            if (year >= calendar.get(Calendar.YEAR))
+                year -= 1000
+
+            val day = target.substring(4, 6).toInt()
+            calendar = GregorianCalendar(year, month - 1, 1)
+            val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+            if (day < 1 || day > daysInMonth) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG)
+                    .show()
+                return false
+            }
+
+            try {
+                getAge(target, GregorianCalendar())
+            } catch (e: IllegalArgumentException) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG)
+                    .show()
+                return false
+            }
+
+            return true
+
         }
 
         @SuppressLint("LogNotTimber")
-        fun stringToClient(rawResult: Result): Client? {
+        fun stringToClient(rawResult: Result, secure: String = ""): Client? {
 
             var client: Client? = null
 
@@ -206,9 +281,9 @@ class Common {
                     client =
                         Client(
                             "$name $lastName",
-                            id,
-                            idString,
-                            fv,
+                            Hash.getLongHash(idString, secure),
+                            Hash.getMd5(idString, secure),
+                            Hash.getMd5(fv, secure),
                             sex,
                             getAge(idString)
                         )

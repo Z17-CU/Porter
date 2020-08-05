@@ -2,6 +2,7 @@ package cu.control.queue.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.util.*
 
 class PreferencesManager(context: Context) {
     private val preferences: SharedPreferences
@@ -29,10 +30,29 @@ class PreferencesManager(context: Context) {
         editor.commit()
     }
 
+    fun getSecureHasCode() = preferences.getString(HASH_SECURE, "") ?: ""
+
+    fun setSecureHasCode() {
+
+        //crear una nueva clave aleatoria para el hash
+        val uuid = UUID.randomUUID()
+
+        //eliminar los guiones del UUID
+        val string = uuid.toString().replace("-", "")
+
+        //tomar solo los primeros 20 caracteres
+        val hash = if (string.length > 20)
+            string.substring(0, 20)
+        else string
+
+        editor.putString(HASH_SECURE, hash).commit()
+    }
+
     companion object {
         private const val PRIVATE_MODE = 0
         private const val PREFERENCE_CONFIGURATION_NAME = "configuration"
         private const val FIRST_TIME = "isFirstRun2"
+        private const val HASH_SECURE = "HASH_SECURE"
         private const val NAME = "NAME"
         private const val LATS_NAME = "LATS_NAME"
         private const val CI = "CI"

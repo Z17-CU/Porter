@@ -215,9 +215,12 @@ class QrReaderFragment(
         val vibratorService = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
+        //preferences
+        val preferences = PreferencesManager(requireContext())
+
         compositeDisposable.add(Completable.create {
 
-            val client = Common.stringToClient(rawResult)
+            val client = Common.stringToClient(rawResult, preferences.getSecureHasCode())
 
             saveClient(client)
 

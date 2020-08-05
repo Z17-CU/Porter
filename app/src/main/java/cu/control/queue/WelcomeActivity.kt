@@ -157,6 +157,8 @@ class WelcomeActivity : AppIntro2() {
 
     private fun goToMain() {
         manager.setFirstRun()
+        if (manager.getSecureHasCode().isBlank())
+            manager.setSecureHasCode()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
