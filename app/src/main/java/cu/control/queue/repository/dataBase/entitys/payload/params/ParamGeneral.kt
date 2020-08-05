@@ -9,8 +9,8 @@ open class ParamGeneral(
     val establishment: Int? = null,
     val info: Map<String, String>? = null,
     val created_date: Long? = null,
-    val finished_date: Long? = null,
+    val deleted_date: Long? = null,
     val person_id: Array<String>? = null,
     val member_id: String? = null,
     val update_date: Long? = null
-): Param()
+) : Param()

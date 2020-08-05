@@ -1,5 +1,6 @@
 package cu.control.queue.dialogs
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -7,6 +8,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.Vibrator
 import android.util.Base64
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import com.google.zxing.Result
@@ -17,11 +19,13 @@ import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.PreferencesManager
+import cu.control.queue.utils.permissions.Permissions
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
+import kotlinx.android.synthetic.main.layout_server_message.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class DialogHiClient(
@@ -81,7 +85,7 @@ class DialogHiClient(
                 data = data, headers = headerMap
             ).execute()
             it.onSuccess(
-                Pair(result.code(), result.message())
+                Pair(result.code(), result.errorBody()?.string() ?: result.message())
             )
         }
             .observeOn(AndroidSchedulers.mainThread())
@@ -91,8 +95,18 @@ class DialogHiClient(
                     stopReader()
                     dialog.dismiss()
                 } else {
-                    showError(it.second ?: "Error ${it.first}")
-                    startReader()
+                    val message = it.second ?: "Error ${it.first}"
+                    val inflater =
+                        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val view = inflater.inflate(R.layout.layout_server_message, null)
+                    view._textViewMessage.text = message
+                    AlertDialog.Builder(context)
+                        .setView(view)
+                        .setOnDismissListener {
+                            startReader()
+                        }
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create().show()
                 }
             }, {
                 it.printStackTrace()
@@ -102,9 +116,16 @@ class DialogHiClient(
     }
 
     private fun startReader() {
-        view._zXingScannerView.stopCamera()
-        view._zXingScannerView.setResultHandler(this)
-        view._zXingScannerView.startCamera()
+
+        Permissions.with(context as Activity)
+            .request(Manifest.permission.CAMERA)
+            .ifNecessary()
+            .onAllGranted {
+                view._zXingScannerView.stopCamera()
+                view._zXingScannerView.setResultHandler(this)
+                view._zXingScannerView.startCamera()
+            }
+            .execute()
     }
 
     private fun stopReader() {

@@ -118,7 +118,7 @@ class ClientViewModel @Inject constructor(
             if (payload == null) {
                 val map = mutableMapOf<String, Param>()
                 map[paramTag] = param
-                payload = Payload(PreferencesManager(context).getCi(), queueId, map)
+                payload = Payload(PreferencesManager(context).getId(), queueId, map)
             } else {
                 (payload.methods as MutableMap)[paramTag] = param
             }
@@ -169,8 +169,8 @@ class ClientViewModel @Inject constructor(
             .observeOn(Schedulers.computation())
             .subscribe { pair, error ->
                 if (error != null) {
-                    showToast(error.message ?: "")
-                } else if (pair.first != 200) {
+                    showToast(error.message ?: "Null error")
+                } else if (pair.first != 200 && pair.second.isNotEmpty()) {
                     showToast(pair.second)
                 }
             }.addTo(compositeDisposable)

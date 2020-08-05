@@ -172,6 +172,7 @@ class WelcomeActivity : AppIntro2() {
     }
 
     private fun showDialog() {
+
         val dialogHiClient = DialogHiClient(this, CompositeDisposable(), manager)
         onDialogHiClientEvent = dialogHiClient
         val dialog = dialogHiClient.create()

@@ -12,12 +12,12 @@ class Queue(
     var startDate: Long,
     var clientsNumber: Int = 0,
     var description: String = "",
-    val uuid: String,
-    val province: String,
-    val municipality: String,
-    val business: Int,
-    val created_date: Long,
-    val updated_date: Long
+    val uuid: String?,
+    val province: String?,
+    val municipality: String?,
+    val business: Int?,
+    val created_date: Long?,
+    val updated_date: Long?
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()

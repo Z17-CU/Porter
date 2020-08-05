@@ -3,10 +3,7 @@ package cu.control.queue.repository.dataBase.converters
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import cu.control.queue.repository.dataBase.entitys.payload.params.Param
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamGeneral
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
+import cu.control.queue.repository.dataBase.entitys.payload.params.*
 
 class Converters {
     private val gson = Gson()
@@ -35,6 +32,12 @@ class Converters {
                     val param = ParamUpdateQueue(
                         it.value.info!!,
                         it.value.update_date!!
+                    )
+                    map.put(it.key, param)
+                }
+                Param.TAG_DELETE_QUEUE -> {
+                    val param = ParamDeleteQueue(
+                        it.value.deleted_date!!
                     )
                     map.put(it.key, param)
                 }

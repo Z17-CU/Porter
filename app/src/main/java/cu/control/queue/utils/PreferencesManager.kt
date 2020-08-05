@@ -18,6 +18,10 @@ class PreferencesManager(context: Context) {
 
     fun getCi() = preferences.getString(CI, "Null_CI") ?: ""
 
+    fun getFv() = preferences.getString(FV, "Null_FV") ?: ""
+
+    fun getId() = getCi() + "." + getFv()
+
     fun setLastName(lastName: String) = editor.putString(LATS_NAME, lastName).commit()
 
     fun setCI(ci: String) = editor.putString(CI, ci).commit()

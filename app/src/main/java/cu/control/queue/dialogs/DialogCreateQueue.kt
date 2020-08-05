@@ -70,7 +70,7 @@ class DialogCreateQueue(
                         view._editTextName.text.toString().trim(),
                         Calendar.getInstance().timeInMillis,
                         description = view._editTextDescription.text.toString().trim(),
-                        uuid = PreferencesManager(context).getCi() + time,
+                        uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(context).getFv() + "-" + time,
                         created_date = time,
                         updated_date = time,
                         //Todo update this
@@ -91,13 +91,13 @@ class DialogCreateQueue(
                 map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
                 val param = if (queue == null) {
                     tag = Param.TAG_CREATE_QUEUE
-                    ParamCreateQueue(thisqueue.business, map, thisqueue.created_date)
+                    ParamCreateQueue(thisqueue.business ?: 1, map, thisqueue.created_date ?: time)
                 } else {
                     tag = Param.TAG_UPDATE_QUEUE
-                    ParamUpdateQueue(map, thisqueue.updated_date)
+                    ParamUpdateQueue(map, thisqueue.updated_date ?: time)
                 }
 
-                clientViewModel.onRegistreAction(thisqueue.uuid, param, tag, context)
+                clientViewModel.onRegistreAction(thisqueue.uuid ?: "", param, tag, context)
 
                 it.onComplete()
             }

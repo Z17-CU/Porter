@@ -209,6 +209,9 @@ dependencies {
 
     /** ScrollView */
     implementation("com.github.turing-tech:MaterialScrollBar:13.3.2")
+
+    /** Range Bar */
+    implementation("me.bendik.simplerangeview:simplerangeview:0.2.0")
 }
 
 fun updateVersionCode() {

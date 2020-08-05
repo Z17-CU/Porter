@@ -34,6 +34,10 @@ import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
 import cu.control.queue.utils.*
 import cu.control.queue.viewModels.ClientViewModel
 import cu.control.queue.viewModels.ClientViewModelFactory
@@ -98,7 +102,8 @@ class RoomQueues : SupportFragment(), onClickListener {
         initToolBar()
 
         _fabAdd.setOnClickListener {
-            DialogCreateQueue(it.context, compositeDisposable, clientViewModel = viewModel).create().show()
+            DialogCreateQueue(it.context, compositeDisposable, clientViewModel = viewModel).create()
+                .show()
         }
 
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
@@ -248,6 +253,14 @@ class RoomQueues : SupportFragment(), onClickListener {
                             Completable.create {
                                 dao.deleteQueue(queue)
                                 dao.deleteAllClientsFromQueue(queue.id!!)
+
+                                viewModel.onRegistreAction(
+                                    queue.uuid ?: "",
+                                    ParamDeleteQueue(Calendar.getInstance().timeInMillis),
+                                    Param.TAG_DELETE_QUEUE,
+                                    requireContext()
+                                )
+
                                 it.onComplete()
                             }
                                 .observeOn(Schedulers.io())
@@ -462,7 +475,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     queue1.description!!.isEmpty() && queue2.description!!.isNotEmpty() -> queue2.description
                     else -> "${queue1.description} y ${queue2.description}"
                 },
-                uuid = PreferencesManager(requireContext()).getCi() + time,
+                uuid = PreferencesManager(requireContext()).getCi() + "-" + PreferencesManager(requireContext()).getFv() + "-" + time,
                 created_date = time,
                 updated_date = time,
                 //Todo update this

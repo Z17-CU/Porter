@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/_textViewMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:clickable="true"
+        android:focusable="true"
+        android:linksClickable="true"
+        android:padding="16dp"
+        android:textColorLink="@color/colorAccent"
+        android:textSize="16sp"
+        tools:text="¡ACTUALIZACIÓN NECESARIA! \n\nPara continuar utilizando la aplicación portero debe actualizar la versión: \n\n desde www.apklis.cu"/>
+
+</RelativeLayout>

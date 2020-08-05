@@ -58,7 +58,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.layout_rangue_select.view.*
 import kotlinx.android.synthetic.main.qr_reader.*
+import me.bendik.simplerangeview.SimpleRangeView
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.File
@@ -94,6 +96,10 @@ class QrReaderFragment(
 
     private var client: Client? = null
     private var done: Boolean? = null
+
+    private var exportFrom = 0
+    private var exportTo = 0
+    private var exportInRangue = false
 
     private var isAddClient = false
 
@@ -268,7 +274,7 @@ class QrReaderFragment(
                         true
                     }
                     R.id.action_save -> {
-                        showSaveOptions()
+                        selectRangeToExport()
                         true
                     }
                     R.id.action_search -> {
@@ -664,7 +670,8 @@ class QrReaderFragment(
         bottomSheetDialog.findViewById<TextView>(R.id._optionSavePDF)?.setOnClickListener {
             bottomSheetDialog.dismiss()
             try {
-                PDF(requireContext()).write(queue, adapter.contentList)
+                val list = adapter.contentList.subList(exportFrom, exportTo)
+                PDF(requireContext()).write(queue, list)
             } catch (e: NoSuchFileException) {
                 e.printStackTrace()
                 showError("La función de exportar no es compatible con su dispositivo.")
@@ -694,6 +701,7 @@ class QrReaderFragment(
 
     private fun exportQueueCSV() {
         if (adapter.contentList.isNotEmpty()) {
+            val list = adapter.contentList.subList(exportFrom, exportTo)
             val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
             val dateFormat = SimpleDateFormat("d 'de' MMM 'del' yyyy", Locale("es", "CU"))
 
@@ -711,7 +719,7 @@ class QrReaderFragment(
                 file.createNewFile()
                 val csvWriter = CSVWriter(FileWriter(file))
                 csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
-                adapter.contentList.forEachIndexed { index, client ->
+                list.forEachIndexed { index, client ->
                     csvWriter.writeNext(
                         arrayOf(
                             "$index",
@@ -829,7 +837,7 @@ class QrReaderFragment(
                         it.onComplete()
                     }.observeOn(Schedulers.io())
                         .subscribeOn(Schedulers.io())
-                        .subscribe{
+                        .subscribe {
                             showError("${client.name} añadido a lista negra.")
                         }.addTo(compositeDisposable)
                 }
@@ -859,5 +867,81 @@ class QrReaderFragment(
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    private fun selectRangeToExport() {
+
+        if (adapter.contentList.isEmpty())
+            return
+
+        exportInRangue = false
+
+        val view = View.inflate(context, R.layout.layout_rangue_select, null)
+
+        view.fixed_rangeview.showLabels = true
+
+        view.fixed_rangeview.count = adapter.contentList[adapter.contentList.size - 1].number
+        view.fixed_rangeview.start = adapter.contentList[0].number
+        view.fixed_rangeview.end = adapter.contentList[adapter.contentList.size - 1].number
+
+        exportTo = adapter.contentList.size
+        exportFrom = 0
+
+        view.startValue.text = adapter.contentList[0].number.toString()
+        view.endValue.text = adapter.contentList[adapter.contentList.size - 1].number.toString()
+
+        view.fixed_rangeview.onTrackRangeListener = object : SimpleRangeView.OnTrackRangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onEndRangeChanged(rangeView: SimpleRangeView, end: Int) {
+                val pos = findPositionOfNumber(end + 1)
+                exportTo = if (pos == -1) exportTo else pos + 1
+                view.endValue.text = (end + 1).toString()
+
+                view.endValue.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (pos == -1) {
+                            view.endValue.text = "${end + 1} No existe"
+                            R.color.google_red
+                        } else R.color.colorAccent
+                    )
+                )
+
+                exportInRangue = true
+            }
+
+            @SuppressLint("SetTextI18n")
+            override fun onStartRangeChanged(rangeView: SimpleRangeView, start: Int) {
+                val pos = findPositionOfNumber(start + 1)
+                exportFrom = if (pos == -1) exportFrom else pos
+                view.startValue.text = (start + 1).toString()
+
+                view.startValue.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (pos == -1) {
+                            view.startValue.text = "${start + 1} No existe"
+                            R.color.google_red
+                        } else R.color.colorAccent
+                    )
+                )
+
+                exportInRangue = true
+            }
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setView(view)
+            .setCancelable(false)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+
+                showSaveOptions()
+
+            }
+            .create().show()
+    }
+
+    private fun findPositionOfNumber(number: Int): Int {
+        return adapter.contentList.indexOf(adapter.contentList.find { it.number == number })
     }
 }
