@@ -166,8 +166,7 @@ class QrReaderFragment(
 
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (!it.isNullOrEmpty()) {
-                val id = it.toLong()
-                val index = adapter.contentList.indexOfLast { client -> client.id == id }
+                val index = adapter.contentList.indexOfLast { client -> client.ci == it }
                 adapter.contentList.map { client ->
                     client.searched = false
                 }
@@ -296,6 +295,8 @@ class QrReaderFragment(
                 pop()
             }
 
+            val preferences = PreferencesManager(context)
+
             searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     //Do some magic
@@ -304,7 +305,9 @@ class QrReaderFragment(
 
                 override fun onQueryTextChange(newText: String?): Boolean {
                     when (newText?.length) {
-                        11 -> searchQuery.postValue(newText)
+                        11 -> searchQuery.postValue(
+                            Hash.getMd5(newText, preferences.getSecureHasCode())
+                        )
                         else -> searchQuery.postValue("")
                     }
                     return false
@@ -832,7 +835,7 @@ class QrReaderFragment(
                         it.onComplete()
                     }.observeOn(Schedulers.io())
                         .subscribeOn(Schedulers.io())
-                        .subscribe{
+                        .subscribe {
                             showError("${client.name} añadido a lista negra.")
                         }.addTo(compositeDisposable)
                 }
