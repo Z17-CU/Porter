@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Vibrator
 import android.util.Base64
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
@@ -39,7 +42,17 @@ class DialogHiClient(
             .setCancelable(false)
             .create()
 
-        startReader()
+        if (
+            ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        )
+            startReader()
+        else {
+            ActivityCompat.requestPermissions(
+                context as Activity, arrayOf(android.Manifest.permission.CAMERA),
+                1232
+            )
+        }
 
         return dialog
     }
@@ -87,12 +100,19 @@ class DialogHiClient(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.first == 200) {
-                    stopReader()
-                    dialog.dismiss()
-                } else {
-                    showError(it.second ?: "Error ${it.first}")
-                    startReader()
+                when {
+                    BuildConfig.DEBUG -> {
+                        stopReader()
+                        dialog.dismiss()
+                    }
+                    it.first == 200 -> {
+                        stopReader()
+                        dialog.dismiss()
+                    }
+                    else -> {
+                        showError(it.second ?: "Error ${it.first}")
+                        startReader()
+                    }
                 }
             }, {
                 it.printStackTrace()
