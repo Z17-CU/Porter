@@ -45,7 +45,7 @@ class Hash {
             }
 
             val maxLength = Long.MAX_VALUE.toString().length
-            return longString.substring(0 until maxLength).toLong()
+            return longString.substring(0 until maxLength-1).toLong()
         }
 
     }

@@ -98,7 +98,8 @@ class RoomQueues : SupportFragment(), onClickListener {
         initToolBar()
 
         _fabAdd.setOnClickListener {
-            DialogCreateQueue(it.context, compositeDisposable, clientViewModel = viewModel).create().show()
+            DialogCreateQueue(it.context, compositeDisposable, clientViewModel = viewModel).create()
+                .show()
         }
 
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
@@ -333,6 +334,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 findNavController().popBackStack()
             }
 
+            val preferences = PreferencesManager(requireContext())
+
             searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     //Do some magic
@@ -341,7 +344,9 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                 override fun onQueryTextChange(newText: String?): Boolean {
                     when (newText?.length) {
-                        11 -> searchQuery.postValue(newText)
+                        11 -> searchQuery.postValue(
+                            Hash.getLongHash(newText, preferences.getSecureHasCode()).toString()
+                        )
                         else -> searchQuery.postValue("")
                     }
                     return false
