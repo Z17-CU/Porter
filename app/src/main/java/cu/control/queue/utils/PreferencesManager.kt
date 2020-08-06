@@ -45,7 +45,17 @@ class PreferencesManager(context: Context) {
             string.substring(0, 20)
         else string
 
-        editor.putString(HASH_SECURE, hash).commit()
+        /**
+         * Si se activa el hash random, las funciones de exportar/importar no funcionaran
+         * Ventaja: Mayor seguridad
+         */
+//        editor.putString(HASH_SECURE, hash).commit()
+
+        /**
+         * De esta forma funcionan las opciones de exportar/importar
+         * Desventaja: Menor seguridad
+         */
+        editor.putString(HASH_SECURE, "a937ff5df73b44aa9b86").commit()
     }
 
     companion object {
