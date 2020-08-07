@@ -41,6 +41,24 @@ class Converters {
                     )
                     map.put(it.key, param)
                 }
+                Param.TAG_ADD_MEMBER -> {
+                    val param = ParamAddMember(
+                        it.value.person!!
+                    )
+                    map.put(it.key, param)
+                }
+                Param.TAG_UPDATE_MEMBER -> {
+                    val param = ParamUpdateMember(
+                        it.value.person!!
+                    )
+                    map.put(it.key, param)
+                }
+                Param.TAG_DELETE_MEMBER -> {
+                    val param = ParamDeleteMember(
+                        it.value.info!!
+                    )
+                    map.put(it.key, param)
+                }
                 else -> {
 
                 }

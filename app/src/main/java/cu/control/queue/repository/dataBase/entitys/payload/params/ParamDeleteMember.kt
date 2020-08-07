@@ -4,6 +4,5 @@ import androidx.annotation.Keep
 
 @Keep
 class ParamDeleteMember (
-    val person_id: Array<String>,
-    val deleted_date: Long
+    val info: Map<String, String>
 ): Param()

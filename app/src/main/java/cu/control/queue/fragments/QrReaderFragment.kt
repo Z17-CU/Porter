@@ -43,9 +43,22 @@ import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Person
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_CHECK
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_INCREMENT_REINTENT
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_UNCHECK
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_ADD_MEMBER
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_DELETE_MEMBER
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_UPDATE_MEMBER
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamAddMember
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteMember
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateMember
 import cu.control.queue.utils.*
-import cu.control.queue.utils.Common.Companion.getAge
-import cu.control.queue.utils.Common.Companion.getSex
 import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
@@ -533,16 +546,21 @@ class QrReaderFragment(
                 return false
             }
 
+            var clientInQueu: ClientInQueue? = null
             done = if (tempClient.isChecked) {
                 dao.getClientFromQueue(client.id, queue.id!!)?.let {
                     it.reIntent++
                     it.lastRegistry = Calendar.getInstance().timeInMillis
+                    clientInQueu = it
                     dao.insertClientInQueue(it)
+                    payloadUpdateMember(clientInQueu!!, client, MODE_INCREMENT_REINTENT)
                 }
                 false
             } else {
                 tempClient.isChecked = true
+                clientInQueu = tempClient
                 dao.insertClientInQueue(tempClient)
+                payloadUpdateMember(clientInQueu!!, client, MODE_CHECK)
                 true
             }
         } else {
@@ -564,6 +582,7 @@ class QrReaderFragment(
                         Calendar.getInstance().timeInMillis,
                         number = dao.getLastNumberInQueue(queue.id!!) + 1
                     )
+                payloadAddMember(clientInQueue, client)
             } else {
                 if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) < (PreferenceManager.getDefaultSharedPreferences(
                         context
@@ -572,6 +591,7 @@ class QrReaderFragment(
                     clientInQueue.reIntent++
                     queue.clientsNumber--
                     done = false
+                    payloadUpdateMember(clientInQueue, client, MODE_INCREMENT_REINTENT)
                 }
                 clientInQueue.lastRegistry = Calendar.getInstance().timeInMillis
             }
@@ -581,6 +601,92 @@ class QrReaderFragment(
         }
         showDone(done)
         return done!!
+    }
+
+    private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
+
+        Completable.create {
+
+            val payload = dao.getPayload(queue.uuid!!)
+            var param: ParamAddMember? = payload?.methods?.get(TAG_ADD_MEMBER) as ParamAddMember?
+
+            val map = mutableMapOf<String, String>()
+            map[KEY_ADD_DATE] = clientInQueue.lastRegistry.toString()
+            map[KEY_REINTENT_COUNT] = clientInQueue.reIntent.toString()
+            map[Person.KEY_NUMBER] = clientInQueue.number.toString()
+
+            val person = Person(client.ci, client.fv ?: "", map)
+
+            if (param != null) {
+                param.person.add(person)
+            } else {
+                param = ParamAddMember(arrayListOf(person))
+            }
+
+            viewModel.onRegistreAction(queue.uuid, param, TAG_ADD_MEMBER, requireContext())
+
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe().addTo(compositeDisposable)
+    }
+
+    private fun payloadUpdateMember(clientInQueue: ClientInQueue, client: Client, mode: String) {
+
+        Completable.create {
+
+            val payload = dao.getPayload(queue.uuid!!)
+            var param: ParamUpdateMember? =
+                payload?.methods?.get(TAG_UPDATE_MEMBER) as ParamUpdateMember?
+
+            val map = mutableMapOf<String, String>()
+            map[KEY_MEMBER_UPDATED_DATE] = clientInQueue.lastRegistry.toString()
+            when (mode) {
+                MODE_CHECK -> map[KEY_CHECKED] = clientInQueue.lastRegistry.toString()
+                MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry.toString()
+                MODE_INCREMENT_REINTENT -> map[KEY_REINTENT_COUNT] =
+                    clientInQueue.reIntent.toString()
+            }
+
+            val person = Person(client.ci, client.fv ?: "", map)
+
+            if (param != null) {
+                param.person.add(person)
+            } else {
+                param = ParamUpdateMember(arrayListOf(person))
+            }
+
+            viewModel.onRegistreAction(queue.uuid, param, TAG_UPDATE_MEMBER, requireContext())
+
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe().addTo(compositeDisposable)
+    }
+
+    private fun payloadDeleteMember(client: Client) {
+
+        Completable.create {
+
+            val payload = dao.getPayload(queue.uuid!!)
+            var param: ParamDeleteMember? =
+                payload?.methods?.get(TAG_DELETE_MEMBER) as ParamDeleteMember?
+
+            val map = mutableMapOf<String, String>()
+            map[client.ci] = Calendar.getInstance().timeInMillis.toString()
+
+            if (param != null) {
+                param.info.plus(map)
+            } else {
+                param = ParamDeleteMember(map)
+            }
+
+            viewModel.onRegistreAction(queue.uuid, param, TAG_DELETE_MEMBER, requireContext())
+
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe().addTo(compositeDisposable)
     }
 
     private fun resumeReader() {
@@ -814,6 +920,7 @@ class QrReaderFragment(
                         .setNegativeButton("Cancelar", null)
                         .setPositiveButton("Eliminar") { _, _ ->
                             Completable.create {
+                                payloadDeleteMember(client)
                                 val size = adapter.contentList.size - 1
                                 dao.deleteClientFromQueue(client.id, adapter.queueId)
                                 dao.updateQueueSize(adapter.queueId, size)
@@ -851,7 +958,12 @@ class QrReaderFragment(
                                 val clientInQueue =
                                     dao.getClientFromQueue(client.id, adapter.queueId)
                                 clientInQueue?.isChecked = !client.isChecked
-                                dao.insertClientInQueue(clientInQueue!!)
+                                if (clientInQueue?.isChecked!!) {
+                                    payloadUpdateMember(clientInQueue, client, MODE_CHECK)
+                                } else {
+                                    payloadUpdateMember(clientInQueue, client, MODE_UNCHECK)
+                                }
+                                dao.insertClientInQueue(clientInQueue)
                                 emitter.onComplete()
                             }.observeOn(Schedulers.io())
                                 .subscribeOn(Schedulers.io())

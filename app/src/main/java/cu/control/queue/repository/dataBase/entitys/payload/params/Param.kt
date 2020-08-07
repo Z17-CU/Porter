@@ -9,6 +9,10 @@ open class Param {
         const val TAG_UPDATE_QUEUE = "update_queue"
         const val TAG_DELETE_QUEUE = "delete_queue"
 
+        const val TAG_ADD_MEMBER = "add_member"
+        const val TAG_UPDATE_MEMBER = "update_member"
+        const val TAG_DELETE_MEMBER = "delete_member"
+
         const val KEY_QUEUE_NAME = "name"
         const val KEY_QUEUE_DESCRIPTION = "description"
 

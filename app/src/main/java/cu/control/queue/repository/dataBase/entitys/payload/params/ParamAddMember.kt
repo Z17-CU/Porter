@@ -5,5 +5,5 @@ import androidx.annotation.Keep
 
 @Keep
 class ParamAddMember (
-    val person: Array<Person>
+    val person: ArrayList<Person>
 ): Param()
