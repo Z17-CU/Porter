@@ -20,7 +20,7 @@ buildscript {
         //maven { url = uri("https://maven.fabric.io/public") }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.0")
+        classpath("com.android.tools.build:gradle:4.0.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
         //firebase

@@ -18,6 +18,10 @@ class PreferencesManager(context: Context) {
 
     fun getCi() = preferences.getString(CI, "Null_CI") ?: ""
 
+    fun getName() = preferences.getString(NAME, "Null_NAME") ?: ""
+
+    fun getLastName() = preferences.getString(LATS_NAME, "Null_LAST_NAME") ?: ""
+
     fun getFv() = preferences.getString(FV, "Null_FV") ?: ""
 
     fun getId() = getCi() + "." + getFv()

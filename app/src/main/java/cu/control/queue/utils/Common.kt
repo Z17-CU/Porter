@@ -17,6 +17,7 @@ import com.google.zxing.Result
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -37,6 +38,47 @@ class Common {
             } else {
                 null
             }
+        }
+
+        fun showHiErrorMessage(context: Context, message: String): AlertDialog {
+
+            val type = object : TypeToken<Hi403Message>() {
+
+            }.type
+
+            val hi403Message = Gson().fromJson<Hi403Message>(message, type)
+
+            val dialog = AlertDialog.Builder(context)
+                .setTitle(hi403Message.title)
+                .setMessage(hi403Message.message)
+
+            var count = 0
+            hi403Message.url.map {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
+                when (count) {
+                    0 -> {
+                        dialog.setPositiveButton(it.key) { _, _ ->
+                            context.startActivity(intent)
+                        }
+                    }
+                    1 -> {
+                        dialog.setNegativeButton(it.key) { _, _ ->
+                            context.startActivity(intent)
+                        }
+                    }
+                    2 -> {
+                        dialog.setNeutralButton(it.key) { _, _ ->
+                            context.startActivity(intent)
+                        }
+                    }
+                    else -> {
+
+                    }
+                }
+                count++
+            }
+
+            return dialog.create()
         }
 
         fun getAge(idString: String): Int {

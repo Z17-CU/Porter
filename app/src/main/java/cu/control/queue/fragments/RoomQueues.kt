@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterQueue
@@ -33,11 +35,11 @@ import cu.control.queue.dialogs.DialogCreateQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
+import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.viewModels.ClientViewModel
 import cu.control.queue.viewModels.ClientViewModelFactory
@@ -92,6 +94,8 @@ class RoomQueues : SupportFragment(), onClickListener {
             factoryProducer = { ClientViewModelFactory(view.context) }
         )
         viewModel = tempViewModel
+
+        sendHi()
 
         return view
     }
@@ -475,7 +479,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                     queue1.description!!.isEmpty() && queue2.description!!.isNotEmpty() -> queue2.description
                     else -> "${queue1.description} y ${queue2.description}"
                 },
-                uuid = PreferencesManager(requireContext()).getCi() + "-" + PreferencesManager(requireContext()).getFv() + "-" + time,
+                uuid = PreferencesManager(requireContext()).getCi() + "-" + PreferencesManager(
+                    requireContext()
+                ).getFv() + "-" + time,
                 created_date = time,
                 updated_date = time,
                 //Todo update this
@@ -518,31 +524,46 @@ class RoomQueues : SupportFragment(), onClickListener {
             .addTo(compositeDisposable)
     }
 
-//    private fun checkVersion(){
-//        Single.create<Int> {
-//            it.onSuccess(APIService.apiService.checkVersion().execute().code())
-//        }.subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .doOnError {
-//                showDialogCheckVersionError()
-//            }
-//            .subscribe { result ->
-//
-//            }.addTo(compositeDisposable)
-//    }
-//
-//    private fun showDialogCheckVersionError(){
-//        AlertDialog.Builder(requireContext())
-//            .setTitle("Error de verificación")
-//            .setMessage("Por favor verifique su conexión de datos.")
-//            .setCancelable(false)
-//            .setPositiveButton("Reintentar"){ _, _ ->
-//                checkVersion()
-//            }
-//            .setPositiveButton("Salir"){ _, _ ->
-//                requireActivity().finish()
-//            }.create().show()
-//    }
+    private fun sendHi() {
+        Single.create<Pair<Int, String?>> {
+
+            val preferences = PreferencesManager(requireContext())
+
+            val struct = PorterHistruct(
+                preferences.getName(),
+                preferences.getLastName(),
+                preferences.getCi(),
+                preferences.getFv()
+            )
+
+            val data = Common.porterHiToString(struct)
+
+            val headerMap = mutableMapOf<String, String>().apply {
+                this["Content-Type"] = "application/json"
+                this["Authorization"] = Base64.encodeToString(
+                    BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+                ) ?: ""
+            }
+
+            val result = APIService.apiService.hiPorter(
+                data = data, headers = headerMap
+            ).execute()
+            it.onSuccess(
+                Pair(result.code(), result.errorBody()?.string() ?: result.message())
+            )
+        }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.first != 200) {
+                    val message = it.second ?: "Error ${it.first}"
+                    val dialog = Common.showHiErrorMessage(requireContext(), message)
+                    dialog.show()
+                }
+            }, {
+                it.printStackTrace()
+            }).addTo(compositeDisposable)
+    }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }

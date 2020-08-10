@@ -5,19 +5,24 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Vibrator
 import android.util.Base64
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
+import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
+import cu.control.queue.utils.Common.Companion.showHiErrorMessage
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.utils.permissions.Permissions
 import io.reactivex.Single
@@ -25,7 +30,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
-import kotlinx.android.synthetic.main.layout_server_message.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class DialogHiClient(
@@ -96,17 +100,11 @@ class DialogHiClient(
                     dialog.dismiss()
                 } else {
                     val message = it.second ?: "Error ${it.first}"
-                    val inflater =
-                        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val view = inflater.inflate(R.layout.layout_server_message, null)
-                    view._textViewMessage.text = message
-                    AlertDialog.Builder(context)
-                        .setView(view)
-                        .setOnDismissListener {
-                            startReader()
-                        }
-                        .setPositiveButton(android.R.string.ok, null)
-                        .create().show()
+                    val dialog = showHiErrorMessage(context, message)
+                    dialog.setOnDismissListener {
+                        startReader()
+                    }
+                    dialog.show()
                 }
             }, {
                 it.printStackTrace()

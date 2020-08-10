@@ -31,6 +31,7 @@ import java.io.FileWriter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ClientViewModel @Inject constructor(
     private val clientRepository: ClientRepository,
@@ -120,7 +121,7 @@ class ClientViewModel @Inject constructor(
                 map[paramTag] = param
                 payload = Payload(PreferencesManager(context).getId(), queueId, map)
             } else {
-                (payload.methods as MutableMap)[paramTag] = param
+                (payload.methods as HashMap).put(paramTag, param)
             }
 
             clientRepository.insertPayload(payload)
