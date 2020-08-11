@@ -1,6 +1,5 @@
 package cu.control.queue.repository.dataBase.converters
 
-import android.util.Log
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -23,16 +22,16 @@ class Converters {
             when (it.key) {
                 Param.TAG_CREATE_QUEUE -> {
                     val param = ParamCreateQueue(
-                        it.value.establishment!!,
-                        it.value.info!!,
+                        it.value.store!!,
+                        it.value.info!! as Map<String, String>,
                         it.value.created_date!!
                     )
                     map.put(it.key, param)
                 }
                 Param.TAG_UPDATE_QUEUE -> {
                     val param = ParamUpdateQueue(
-                        it.value.info!!,
-                        it.value.update_date!!
+                        it.value.info!! as Map<String, String>,
+                        it.value.updated_date!!
                     )
                     map.put(it.key, param)
                 }
@@ -56,7 +55,7 @@ class Converters {
                 }
                 Param.TAG_DELETE_MEMBER -> {
                     val param = ParamDeleteMember(
-                        it.value.info!!
+                        it.value.person!!
                     )
                     map.put(it.key, param)
                 }

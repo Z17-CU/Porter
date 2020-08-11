@@ -46,6 +46,7 @@ import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_DELETE_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
@@ -610,10 +611,10 @@ class QrReaderFragment(
             val payload = dao.getPayload(queue.uuid!!)
             var param: ParamAddMember? = payload?.methods?.get(TAG_ADD_MEMBER) as ParamAddMember?
 
-            val map = mutableMapOf<String, String>()
-            map[KEY_ADD_DATE] = clientInQueue.lastRegistry.toString()
-            map[KEY_REINTENT_COUNT] = clientInQueue.reIntent.toString()
-            map[Person.KEY_NUMBER] = clientInQueue.number.toString()
+            val map = mutableMapOf<String, Long>()
+            map[KEY_ADD_DATE] = clientInQueue.lastRegistry
+            map[KEY_REINTENT_COUNT] = clientInQueue.reIntent.toLong()
+            map[Person.KEY_NUMBER] = clientInQueue.number.toLong()
 
             val person = Person(client.ci, client.fv ?: "", map)
 
@@ -639,13 +640,13 @@ class QrReaderFragment(
             var param: ParamUpdateMember? =
                 payload?.methods?.get(TAG_UPDATE_MEMBER) as ParamUpdateMember?
 
-            val map = mutableMapOf<String, String>()
-            map[KEY_MEMBER_UPDATED_DATE] = clientInQueue.lastRegistry.toString()
+            val map = mutableMapOf<String, Long>()
+            map[KEY_MEMBER_UPDATED_DATE] = clientInQueue.lastRegistry
             when (mode) {
-                MODE_CHECK -> map[KEY_CHECKED] = clientInQueue.lastRegistry.toString()
-                MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry.toString()
+                MODE_CHECK -> map[KEY_CHECKED] = clientInQueue.lastRegistry
+                MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry
                 MODE_INCREMENT_REINTENT -> map[KEY_REINTENT_COUNT] =
-                    clientInQueue.reIntent.toString()
+                    clientInQueue.reIntent.toLong()
             }
 
             val person = Person(client.ci, client.fv ?: "", map)
@@ -672,13 +673,15 @@ class QrReaderFragment(
             var param: ParamDeleteMember? =
                 payload?.methods?.get(TAG_DELETE_MEMBER) as ParamDeleteMember?
 
-            val map = mutableMapOf<String, String>()
-            map[client.ci] = Calendar.getInstance().timeInMillis.toString()
+            val map = mutableMapOf<String, Long>()
+            map[KEY_DELETE_DATE] = Calendar.getInstance().timeInMillis
+
+            val person = Person(client.ci, client.fv ?: "", map)
 
             if (param != null) {
-                param.info.plus(map)
+                param.person.add(person)
             } else {
-                param = ParamDeleteMember(map)
+                param = ParamDeleteMember(arrayListOf(person))
             }
 
             viewModel.onRegistreAction(queue.uuid, param, TAG_DELETE_MEMBER, requireContext())
