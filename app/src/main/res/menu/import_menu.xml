@@ -28,6 +28,7 @@
         android:id="@+id/action_import"
         android:icon="@drawable/ic_download"
         android:orderInCategory="100"
+        android:visible="false"
         android:title="@string/insertar"
         app:showAsAction="ifRoom" />
 
