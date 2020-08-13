@@ -53,12 +53,15 @@
                 android:gravity="end|bottom">
 
                 <ImageView
-                    android:id="@+id/_flash"
+                    android:id="@+id/_showAddClient"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_margin="16dp"
+                    android:background="@drawable/round_accent_bg"
                     android:contentDescription="@string/lantern"
                     android:foreground="?selectableItemBackground"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_keyboard"
                     tools:ignore="UnusedAttribute" />
 
             </LinearLayout>

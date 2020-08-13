@@ -5,8 +5,10 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 @Singleton
 class ClientRepository @Inject constructor(
@@ -14,6 +16,8 @@ class ClientRepository @Inject constructor(
 ) {
 
     fun getAllQueues() = dao.getAllQueues()
+
+    fun getQueue(uuid: String) = dao.getQueueByUUID(uuid)
 
     fun saveCLients(clients: List<Client>) = dao.insertClient(clients)
 

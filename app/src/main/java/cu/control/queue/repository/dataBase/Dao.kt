@@ -10,6 +10,7 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.utils.CustomPair
 
 @Dao
@@ -69,6 +70,12 @@ interface Dao {
     @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id = :id")
     fun getQueue(id: Long): Queue
 
+    @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE id = :id")
+    fun getQueueLive(id: Long): LiveData<Queue>
+
+    @Query("SELECT * FROM ${Queue.TABLE_NAME} WHERE uuid = :uuid")
+    fun getQueueByUUID(uuid: String): Queue?
+
     @Delete
     fun deleteQueue(queue: Queue)
 
@@ -125,4 +132,37 @@ interface Dao {
 
     @Query("SELECT * FROM ${Client.TABLE_NAME} WHERE onBlackList = 1")
     fun getClientInBlackList(): LiveData<List<Client>>
+
+    @Query("SELECT * FROM ${Person.TABLE_NAME} WHERE ci IN (:idList)")
+    fun getCollaboratorsPrivate(idList: List<String>): List<Person>
+
+    @Insert(onConflict = REPLACE)
+    fun insertCollaborator(person: Person)
+
+    @Query("DELETE FROM ${Person.TABLE_NAME} WHERE ci = :personId")
+    fun deleteCollaborator(personId: String)
+
+    @Query("SELECT * FROM ${Person.TABLE_NAME}")
+    fun getAllCollaborators(): LiveData<List<Person>>
+
+    fun getCollaborators(idList: List<String>): List<Person> {
+        var clientList: List<Person> = ArrayList()
+
+        if (idList.size < 1000) {
+            clientList = getCollaboratorsPrivate(idList)
+        } else {
+            var a = 0
+            var b = 999
+
+            while (a < idList.size) {
+                if (b > idList.size) {
+                    b = idList.size
+                }
+                clientList = clientList + getCollaboratorsPrivate(idList.subList(a, b))
+                a = b
+                b += 999
+            }
+        }
+        return clientList
+    }
 }

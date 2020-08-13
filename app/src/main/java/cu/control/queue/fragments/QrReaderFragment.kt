@@ -85,7 +85,7 @@ import kotlin.collections.ArrayList
 
 
 class QrReaderFragment(
-    private val queue: Queue,
+    thisQueue: Queue,
     private val viewModel: ClientViewModel,
     private val checkList: Boolean
 ) :
@@ -98,6 +98,8 @@ class QrReaderFragment(
         const val MODE_READ = 1
         const val MODE_LIST = 2
     }
+
+    private var queue = thisQueue
 
     private var currentMode = MutableLiveData<Int>().default(MODE_READ)
     private lateinit var menu: Menu
@@ -143,9 +145,8 @@ class QrReaderFragment(
 
         initToolBar()
 
-        _flash.setOnClickListener {
-            _zXingScannerView.flash = !_zXingScannerView.flash
-            turnFlash()
+        _showAddClient.setOnClickListener {
+            showDialogInsertClient()
         }
 
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
@@ -163,7 +164,6 @@ class QrReaderFragment(
                         pauseScanner()
                         _qrReader.visibility = View.GONE
                         menu.findItem(R.id.action_show_filter_menu).isVisible = true
-                        menu.findItem(R.id.action_insert_client).isVisible = false
                         menu.findItem(R.id.action_list).title =
                             requireContext().getString(R.string.readQR)
                         R.drawable.ic_qr_reader
@@ -171,7 +171,6 @@ class QrReaderFragment(
                         _qrReader.visibility = View.VISIBLE
                         resumeReader()
                         menu.findItem(R.id.action_show_filter_menu).isVisible = false
-                        menu.findItem(R.id.action_insert_client).isVisible = true
                         menu.findItem(R.id.action_list).title =
                             requireContext().getString(R.string.lista)
                         updateObserver(queue.id!!)
@@ -200,6 +199,11 @@ class QrReaderFragment(
                 adapter.notifyDataSetChanged()
             }
         })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            queue = it
+            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
+        })
     }
 
     override fun onResume() {
@@ -217,12 +221,28 @@ class QrReaderFragment(
         return if (searchView.isOpen) {
             searchView.closeSearch()
             true
+        } else if (!queue.isSaved) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Cambios sin guardar")
+                .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
+                .setPositiveButton("Guardar") { _, _ ->
+                    sendPayloads()
+                }
+                .setNegativeButton("Salir") { _, _ ->
+                    requireActivity().title = requireContext().getString(R.string.app_name)
+                    (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
+                        false
+                    )
+                    pop()
+                }.create().show()
+            true
         } else {
             requireActivity().title = requireContext().getString(R.string.app_name)
             (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
                 false
             )
-            return super.onBackPressedSupport()
+            pop()
+            true
         }
     }
 
@@ -266,19 +286,6 @@ class QrReaderFragment(
 
             setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.action_insert_client -> {
-                        pauseScanner()
-                        val dialog = DialogInsertClient(
-                            progress.context,
-                            compositeDisposable,
-                            this@QrReaderFragment
-                        ).create()
-                        dialog.setOnDismissListener {
-                            resumeReader()
-                        }
-                        dialog.show()
-                        true
-                    }
                     R.id.action_list -> {
                         changeMode()
                         true
@@ -289,6 +296,10 @@ class QrReaderFragment(
                     }
                     R.id.action_save -> {
                         selectRangeToExport()
+                        true
+                    }
+                    R.id.action_save_online -> {
+                        sendPayloads()
                         true
                     }
                     R.id.action_search -> {
@@ -306,11 +317,7 @@ class QrReaderFragment(
             title = queue.name
 
             setNavigationOnClickListener {
-                requireActivity().title = requireContext().getString(R.string.app_name)
-                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
-                    false
-                )
-                pop()
+                onBackPressedSupport()
             }
 
             searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
@@ -340,6 +347,20 @@ class QrReaderFragment(
 
             this@QrReaderFragment.menu = this.menu
         }
+    }
+
+    private fun sendPayloads() {
+        progress.show()
+        Completable.create {
+            dao.getPayload(queue.uuid!!)?.let {
+                viewModel.sendPayloads(listOf(it))
+            }
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe {
+                progress.dismiss()
+            }.addTo(compositeDisposable)
     }
 
     @SuppressLint("LogNotTimber")
@@ -468,7 +489,7 @@ class QrReaderFragment(
         this.client = client
         isAddClient = true
         if (client == null) {
-            showError(_flash.context.getString(R.string.readError))
+            showError(_showAddClient.context.getString(R.string.readError))
             return
         }
 
@@ -624,7 +645,7 @@ class QrReaderFragment(
                 param = ParamAddMember(arrayListOf(person))
             }
 
-            viewModel.onRegistreAction(queue.uuid, param, TAG_ADD_MEMBER, requireContext())
+            viewModel.onRegistreAction(queue.uuid!!, param, TAG_ADD_MEMBER, requireContext())
 
             it.onComplete()
         }.observeOn(Schedulers.computation())
@@ -657,7 +678,7 @@ class QrReaderFragment(
                 param = ParamUpdateMember(arrayListOf(person))
             }
 
-            viewModel.onRegistreAction(queue.uuid, param, TAG_UPDATE_MEMBER, requireContext())
+            viewModel.onRegistreAction(queue.uuid!!, param, TAG_UPDATE_MEMBER, requireContext())
 
             it.onComplete()
         }.observeOn(Schedulers.computation())
@@ -684,7 +705,7 @@ class QrReaderFragment(
                 param = ParamDeleteMember(arrayListOf(person))
             }
 
-            viewModel.onRegistreAction(queue.uuid, param, TAG_DELETE_MEMBER, requireContext())
+            viewModel.onRegistreAction(queue.uuid!!, param, TAG_DELETE_MEMBER, requireContext())
 
             it.onComplete()
         }.observeOn(Schedulers.computation())
@@ -697,7 +718,6 @@ class QrReaderFragment(
             _zXingScannerView.stopCamera()
             _zXingScannerView.setResultHandler(this)
             _zXingScannerView.startCamera()
-            turnFlash()
         }
         progress.dismiss()
     }
@@ -762,15 +782,6 @@ class QrReaderFragment(
         }
     }
 
-    private fun turnFlash() {
-        _flash.setImageDrawable(
-            ContextCompat.getDrawable(
-                _zXingScannerView.context,
-                if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
-            )
-        )
-    }
-
     private fun showSaveOptions() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(R.layout.layout_buttom_sheet_dialog)
@@ -806,6 +817,19 @@ class QrReaderFragment(
                 showError("La función de exportar no es compatible con su dispositivo.")
             }
         }
+    }
+
+    private fun showDialogInsertClient() {
+        pauseScanner()
+        val dialog = DialogInsertClient(
+            progress.context,
+            compositeDisposable,
+            this@QrReaderFragment
+        ).create()
+        dialog.setOnDismissListener {
+            resumeReader()
+        }
+        dialog.show()
     }
 
     private fun exportQueueCSV() {

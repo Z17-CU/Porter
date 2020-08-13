@@ -25,10 +25,10 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_insert_client"
-        android:icon="@drawable/ic_keyboard"
+        android:id="@+id/action_save_online"
+        android:icon="@drawable/ic_save_white"
         android:orderInCategory="100"
-        android:title="@string/teclado"
+        android:title="@string/guardar"
         app:showAsAction="ifRoom" />
 
     <item

@@ -27,6 +27,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
@@ -35,8 +38,17 @@ import cu.control.queue.dialogs.DialogCreateQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
 import cu.control.queue.repository.retrofit.APIService
@@ -52,6 +64,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.room_queues.*
 import me.yokeyword.fragmentation.SupportFragment
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -138,7 +151,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             }
         })
 
-        viewModel.observePayloads(viewLifecycleOwner)
+        //viewModel.observePayloads(viewLifecycleOwner)
     }
 
     override fun onBackPressedSupport(): Boolean {
@@ -197,7 +210,105 @@ class RoomQueues : SupportFragment(), onClickListener {
         }
     }
 
+    override fun onSaveClick(queue: Queue) {
+        Completable.create {
+            dao.getPayload(queue.uuid!!)?.let {
+                viewModel.sendPayloads(listOf(it))
+            }
+            it.onComplete()
+        }.observeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe().addTo(compositeDisposable)
+    }
+
+    override fun onDownloadClick(queue: Queue) {
+        progress.show()
+        Completable.create {
+
+            val headerMap = mutableMapOf<String, String>().apply {
+                this["Content-Type"] = "application/json"
+                this["collaborator"] = PreferencesManager(requireContext()).getId()
+                this["queue"] = queue.uuid!!
+                this["Authorization"] = Base64.encodeToString(
+                    BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+                ) ?: ""
+            }
+
+            val result = APIService.apiService.getQueue(
+                headers = headerMap
+            ).execute()
+
+            if (result.code() == 200) {
+                val thisQueue = result.body()
+                thisQueue?.let {
+                    val savedQueue = dao.getQueueByUUID(it.uuid)!!
+
+                    it.members.map { person ->
+                        val name = (person.info["name"]
+                            ?: person.ci + " " + person.info["last_name"]) as String
+                        val client = Client(
+                            name,
+                            person.ci.toLong(),
+                            person.ci,
+                            person.fv,
+                            Common.getSex(person.ci),
+                            Common.getAge(person.ci),
+                            person.info[KEY_MEMBER_UPDATED_DATE] as Long,
+                            person.info[KEY_REINTENT_COUNT] as Int,
+                            person.info[KEY_NUMBER] as Int,
+                            person.info[KEY_CHECKED] as Long > person.info[KEY_UNCHECKED] as Int
+                        )
+
+                        dao.insertClient(client)
+
+                        val clientInQueue = ClientInQueue(
+                            person.info[KEY_ADD_DATE] as Long,
+                            it.created_date,
+                            client.id,
+                            person.info[KEY_MEMBER_UPDATED_DATE] as Long,
+                            client.reIntent,
+                            client.number,
+                            client.isChecked
+                        )
+
+                        dao.insertClientInQueue(clientInQueue)
+                    }
+
+                    savedQueue.business = it.store
+                    savedQueue.clientsNumber = it.members.size
+                    savedQueue.downloaded = true
+
+                    dao.insertQueue(savedQueue)
+                }
+            } else {
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
+                }
+            }
+
+            it.onComplete()
+        }.subscribeOn(Schedulers.computation())
+            .observeOn(Schedulers.computation())
+            .subscribe {
+                requireActivity().runOnUiThread {
+                    progress.dismiss()
+                }
+            }.addTo(compositeDisposable)
+    }
+
     override fun onClick(queue: Queue) {
+
+        if (!queue.downloaded) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Descargar cola")
+                .setMessage("Debe descargar la cola antes de continuar.")
+                .setPositiveButton("Descargar") { _, _ ->
+                    onDownloadClick(queue)
+                }.setNegativeButton(android.R.string.cancel, null)
+                .create().show()
+            return
+        }
+
         if (toMerge && queueToMerge != null) {
             if (queue.id == queueToMerge!!.id) {
                 Toast.makeText(
@@ -295,6 +406,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                             queueToMerge = null
                         }.create().show()
                 }
+                R.id.action_collaborators -> start(CollaboratorsFragment(queue))
             }
             false
         }
@@ -525,6 +637,9 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun sendHi() {
+
+        progress.show()
+
         Single.create<Pair<Int, String?>> {
 
             val preferences = PreferencesManager(requireContext())
@@ -548,11 +663,52 @@ class RoomQueues : SupportFragment(), onClickListener {
             val result = APIService.apiService.hiPorter(
                 data = data, headers = headerMap
             ).execute()
+
+            if (result.code() == 200) {
+                result.body()?.let { body ->
+                    val type = object : TypeToken<Map<String, Map<String, Any>>>() {
+
+                    }.type
+
+                    Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
+
+                        if (dao.getQueueByUUID(entry.key) == null) {
+                            val name = entry.value["name"] as String
+                            val description = entry.value["description"] as String
+                            val createdDate = (entry.value["created_date"] as Double).toLong()
+                            val tags = entry.value["tags"] as String
+
+                            dao.insertQueue(
+                                Queue(
+                                    createdDate,
+                                    name,
+                                    createdDate,
+                                    0,
+                                    description,
+                                    entry.key,
+                                    null,
+                                    null,
+                                    null,
+                                    createdDate,
+                                    createdDate,
+                                    ArrayList(),
+                                    false,
+                                    isSaved = true
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
             it.onSuccess(
                 Pair(result.code(), result.errorBody()?.string() ?: result.message())
             )
         }
             .observeOn(AndroidSchedulers.mainThread())
+            .onErrorReturn {
+                Pair(200, "Error")
+            }
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.first != 200) {
@@ -560,6 +716,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val dialog = Common.showHiErrorMessage(requireContext(), message)
                     dialog.show()
                 }
+                progress.dismiss()
             }, {
                 it.printStackTrace()
             }).addTo(compositeDisposable)

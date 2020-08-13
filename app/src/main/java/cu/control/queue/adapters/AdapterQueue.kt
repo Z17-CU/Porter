@@ -44,6 +44,8 @@ class AdapterQueue(
                 if (position % 2 != 0) R.drawable.item_white_bg else R.drawable.bg_item_dark
             )
 
+        holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
+        holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
         holder.textViewName.text = queue.name
         holder.textViewDate.text = formatDateBig.format(queue.startDate)
         holder.textViewID.text = queue.clientsNumber.toString()
@@ -52,6 +54,14 @@ class AdapterQueue(
                 holder.imageView.context, R.drawable.ic_recurso_3
             )
         )
+
+        holder.imageDownload.setOnClickListener {
+            onClickListener.onDownloadClick(queue)
+        }
+
+        holder.imageSave.setOnClickListener {
+            onClickListener.onSaveClick(queue)
+        }
 
         holder.layoutBackground.setOnClickListener {
             onClickListener.onClick(queue)

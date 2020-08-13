@@ -114,6 +114,11 @@ class ClientViewModel @Inject constructor(
     ) {
         Completable.create {
 
+            clientRepository.getQueue(queueId)?.let { queue ->
+                queue.isSaved = false
+                clientRepository.saveQueue(queue)
+            }
+
             var payload = clientRepository.getPayload(queueId)
 
             if (payload == null) {
@@ -138,7 +143,7 @@ class ClientViewModel @Inject constructor(
         })
     }
 
-    private fun sendPayloads(payloads: List<Payload>) {
+    fun sendPayloads(payloads: List<Payload>) {
         Single.create<Pair<Int, String>> {
 
             val payloadToDelete: ArrayList<Payload> = ArrayList()
@@ -159,8 +164,13 @@ class ClientViewModel @Inject constructor(
                 if (result == null || tempResult.code() != 200) {
                     result = tempResult
                 }
-                if (tempResult.code() == 200)
+                if (tempResult.code() == 200) {
                     payloadToDelete.add(payload)
+                    clientRepository.getQueue(payload.queue_uuid)?.let { queue ->
+                        queue.isSaved = true
+                        clientRepository.saveQueue(queue)
+                    }
+                }
             }
 
             clientRepository.deletePayloads(payloadToDelete)

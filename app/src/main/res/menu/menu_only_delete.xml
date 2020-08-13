@@ -17,32 +17,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_edit"
-        android:icon="@drawable/ic_baseline_edit"
-        android:orderInCategory="100"
-        android:title="@string/editar"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_merge"
-        android:icon="@drawable/ic_baseline_call_merge"
-        android:orderInCategory="100"
-        android:title="@string/merge"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
         android:orderInCategory="100"
         android:title="@string/eliminar"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_collaborators"
-        android:icon="@drawable/ic_baseline_group"
-        android:orderInCategory="100"
-        android:title="@string/colaboradores"
         app:showAsAction="never" />
 
 </menu>

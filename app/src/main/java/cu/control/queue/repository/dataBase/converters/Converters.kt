@@ -72,4 +72,34 @@ class Converters {
     fun actionsToString(someObjects: Map<String, Param>): String {
         return gson.toJson(someObjects)
     }
+
+    @TypeConverter
+    fun stringToArrayList(data: String): ArrayList<String> {
+
+        val type = object : TypeToken<ArrayList<String>>() {
+
+        }.type
+
+        return gson.fromJson(data, type)
+    }
+
+    @TypeConverter
+    fun arraylistToString(someObjects: ArrayList<String>): String {
+        return gson.toJson(someObjects)
+    }
+
+    @TypeConverter
+    fun stringToMap(data: String): Map<String, Any> {
+
+        val type = object : TypeToken<Map<String, Any>>() {
+
+        }.type
+
+        return gson.fromJson(data, type)
+    }
+
+    @TypeConverter
+    fun mapToString(someObjects: Map<String, Any>): String {
+        return gson.toJson(someObjects)
+    }
 }
