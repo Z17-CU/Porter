@@ -114,24 +114,29 @@ class ClientViewModel @Inject constructor(
     ) {
         Completable.create {
 
-            clientRepository.getQueue(queueId)?.let { queue ->
-                queue.isSaved = false
-                clientRepository.saveQueue(queue)
-            }
+            val queue = clientRepository.getQueue(queueId)
 
-            var payload = clientRepository.getPayload(queueId)
-
-            if (payload == null) {
-                val map = mutableMapOf<String, Param>()
-                map[paramTag] = param
-                payload = Payload(PreferencesManager(context).getId(), queueId, map)
+            if (queue == null || queue.isOffline) {
+                it.onComplete()
             } else {
-                (payload.methods as HashMap).put(paramTag, param)
+                queue.let { queue ->
+                    queue.isSaved = false
+                    clientRepository.saveQueue(queue)
+                }
+
+                var payload = clientRepository.getPayload(queueId)
+
+                if (payload == null) {
+                    val map = mutableMapOf<String, Param>()
+                    map[paramTag] = param
+                    payload = Payload(PreferencesManager(context).getId(), queueId, map)
+                } else {
+                    (payload.methods as HashMap).put(paramTag, param)
+                }
+
+                clientRepository.insertPayload(payload)
+                it.onComplete()
             }
-
-            clientRepository.insertPayload(payload)
-
-            it.onComplete()
         }.observeOn(Schedulers.computation())
             .subscribeOn(Schedulers.computation())
             .subscribe().addTo(compositeDisposable)

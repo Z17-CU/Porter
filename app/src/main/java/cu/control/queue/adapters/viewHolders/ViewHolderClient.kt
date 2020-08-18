@@ -20,4 +20,6 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val imageDetails: ImageView = itemView.imageViewDetails
     val imageDownload: ImageView = itemView.imageViewDownloadQueue
     val imageSave: ImageView = itemView.imageViewSaveQueue
+    val imageOwner: ImageView = itemView.imageViewOwner
+    val imageOffline: ImageView = itemView.imageViewOffline
 }

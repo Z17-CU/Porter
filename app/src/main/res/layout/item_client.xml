@@ -136,6 +136,30 @@
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_baseline_save_24" />
 
+                    <ImageView
+                        android:id="@+id/imageViewOffline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/details"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_baseline_signal_cellular_connected_no_internet_4_bar_24" />
+
+                    <ImageView
+                        android:id="@+id/imageViewOwner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/details"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_baseline_star_24" />
+
                 </LinearLayout>
 
                 <LinearLayout

@@ -28,6 +28,7 @@
         android:id="@+id/action_merge"
         android:icon="@drawable/ic_baseline_call_merge"
         android:orderInCategory="100"
+        android:visible="false"
         android:title="@string/merge"
         app:showAsAction="never" />
 

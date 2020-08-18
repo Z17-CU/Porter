@@ -48,8 +48,10 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_DELETE_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_ADD_OWNER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_CHECK
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_INCREMENT_REINTENT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_UNCHECK
@@ -360,6 +362,7 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.computation())
             .subscribe {
                 progress.dismiss()
+                pop()
             }.addTo(compositeDisposable)
     }
 
@@ -627,6 +630,11 @@ class QrReaderFragment(
 
     private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
 
+        if(client.ci == PreferencesManager(requireContext()).getCi()){
+            payloadUpdateMember(clientInQueue, client, MODE_ADD_OWNER)
+            return
+        }
+
         Completable.create {
 
             val payload = dao.getPayload(queue.uuid!!)
@@ -635,7 +643,7 @@ class QrReaderFragment(
             val map = mutableMapOf<String, Long>()
             map[KEY_ADD_DATE] = clientInQueue.lastRegistry
             map[KEY_REINTENT_COUNT] = clientInQueue.reIntent.toLong()
-            map[Person.KEY_NUMBER] = clientInQueue.number.toLong()
+            map[KEY_NUMBER] = clientInQueue.number.toLong()
 
             val person = Person(client.ci, client.fv ?: "", map)
 
@@ -668,6 +676,7 @@ class QrReaderFragment(
                 MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry
                 MODE_INCREMENT_REINTENT -> map[KEY_REINTENT_COUNT] =
                     clientInQueue.reIntent.toLong()
+                MODE_ADD_OWNER -> map[KEY_NUMBER] = clientInQueue.number.toLong()
             }
 
             val person = Person(client.ci, client.fv ?: "", map)

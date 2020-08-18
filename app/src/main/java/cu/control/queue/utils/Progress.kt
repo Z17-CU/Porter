@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import cu.control.queue.R
+import java.util.logging.Handler
 
 class Progress @SuppressLint("InflateParams")
 constructor(val context: Context) {
@@ -47,7 +48,6 @@ constructor(val context: Context) {
                     builder.setView(view)
                     dialog = builder.create()
                     dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                    dialog?.setCancelable(false)
                     dialog?.show()
                     dialog?.window?.setLayout(
                         context.resources.getDimension(R.dimen.progressSize).toInt(),

@@ -12,6 +12,7 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
@@ -27,6 +28,7 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelBu
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view.*
 import java.util.*
+import kotlin.collections.HashMap
 
 class DialogCreateQueue(
     private val context: Context,
@@ -64,21 +66,26 @@ class DialogCreateQueue(
 
                 val time = Calendar.getInstance().timeInMillis
 
-                val thisqueue = if (queue == null)
+                val thisqueue = if (queue == null) {
+
                     Queue(
                         time,
                         view._editTextName.text.toString().trim(),
                         Calendar.getInstance().timeInMillis,
                         description = view._editTextDescription.text.toString().trim(),
-                        uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(context).getFv() + "-" + time,
+                        uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(
+                            context
+                        ).getFv() + "-" + time,
                         created_date = time,
                         updated_date = time,
                         //Todo update this
                         business = 1,
                         province = "",
-                        municipality = ""
+                        municipality = "",
+                        collaborators = arrayListOf(PreferencesManager(context).getCi()),
+                        owner = PreferencesManager(context).getCi()
                     )
-                else {
+                } else {
                     queue!!.name = view._editTextName.text.toString().trim()
                     queue!!.description = view._editTextDescription.text.toString().trim()
                     queue!!

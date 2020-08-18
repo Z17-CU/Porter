@@ -18,8 +18,10 @@ import com.google.zxing.Result
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.interfaces.OnDialogHiClientEvent
+import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Common.Companion.showHiErrorMessage
@@ -73,6 +75,17 @@ class DialogHiClient(
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
+
+            val info = HashMap<String, Any>()
+            info.put(Person.KEY_NAME, name)
+            info.put(Person.KEY_LAST_NAME, lastName)
+            val person = Person(
+                ci,
+                fv,
+                info
+            )
+
+            AppDataBase.getInstance(context).dao().insertCollaborator(person)
 
             val struct = PorterHistruct(name, lastName, ci, fv)
 

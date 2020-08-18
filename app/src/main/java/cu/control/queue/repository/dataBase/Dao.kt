@@ -139,6 +139,9 @@ interface Dao {
     @Insert(onConflict = REPLACE)
     fun insertCollaborator(person: Person)
 
+    @Insert(onConflict = REPLACE)
+    fun insertCollaborator(persons: ArrayList<Person>)
+
     @Query("DELETE FROM ${Person.TABLE_NAME} WHERE ci = :personId")
     fun deleteCollaborator(personId: String)
 

@@ -43,6 +43,7 @@ import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
@@ -51,6 +52,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
+import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.viewModels.ClientViewModel
@@ -221,7 +223,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             .subscribe().addTo(compositeDisposable)
     }
 
-    override fun onDownloadClick(queue: Queue) {
+    override fun onDownloadClick(queue: Queue, openQueue: Boolean) {
         progress.show()
         Completable.create {
 
@@ -240,10 +242,13 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             if (result.code() == 200) {
                 val thisQueue = result.body()
-                thisQueue?.let {
+                thisQueue?.let { it ->
                     val savedQueue = dao.getQueueByUUID(it.uuid)!!
 
-                    it.members.map { person ->
+                    var owner = ""
+
+                    it.members?.map { person ->
+
                         val name = (person.info["name"]
                             ?: person.ci + " " + person.info["last_name"]) as String
                         val client = Client(
@@ -253,19 +258,21 @@ class RoomQueues : SupportFragment(), onClickListener {
                             person.fv,
                             Common.getSex(person.ci),
                             Common.getAge(person.ci),
-                            person.info[KEY_MEMBER_UPDATED_DATE] as Long,
-                            person.info[KEY_REINTENT_COUNT] as Int,
-                            person.info[KEY_NUMBER] as Int,
-                            person.info[KEY_CHECKED] as Long > person.info[KEY_UNCHECKED] as Int
+                            ((person.info[KEY_MEMBER_UPDATED_DATE] as Double?)
+                                ?: person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
+                            ((person.info[KEY_REINTENT_COUNT] as Double?) ?: 0.toDouble()).toInt(),
+                            ((person.info[KEY_NUMBER] as Double?) ?: 0.toDouble()).toInt(),
+                            (person.info[KEY_CHECKED] as Double?) ?: 0.toDouble() > (person.info[KEY_UNCHECKED] as Double?) ?: 0.toDouble()
                         )
 
                         dao.insertClient(client)
 
                         val clientInQueue = ClientInQueue(
-                            person.info[KEY_ADD_DATE] as Long,
+                            (person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
                             it.created_date,
                             client.id,
-                            person.info[KEY_MEMBER_UPDATED_DATE] as Long,
+                            (person.info[KEY_MEMBER_UPDATED_DATE] as Double?
+                                ?: person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
                             client.reIntent,
                             client.number,
                             client.isChecked
@@ -274,21 +281,85 @@ class RoomQueues : SupportFragment(), onClickListener {
                         dao.insertClientInQueue(clientInQueue)
                     }
 
+                    it.operators?.map { person ->
+                        if (person.info[Person.KEY_AFFILIATION] == "owner")
+                            owner = person.ci
+                        savedQueue.collaborators.add(person.ci)
+                    }
+
+                    it.operators?.let {
+                        dao.insertCollaborator(it)
+                    }
+
                     savedQueue.business = it.store
-                    savedQueue.clientsNumber = it.members.size
+                    savedQueue.clientsNumber = it.members?.size ?: 0
                     savedQueue.downloaded = true
+                    savedQueue.owner = owner
+                    savedQueue.isSaved = false
 
                     dao.insertQueue(savedQueue)
+
+                    val map = mutableMapOf<String, String>()
+                    map[Param.KEY_QUEUE_NAME] = savedQueue.name
+                    map[Param.KEY_QUEUE_DESCRIPTION] = savedQueue.description
+
+                    viewModel.onRegistreAction(
+                        savedQueue.uuid!!,
+                        ParamUpdateQueue(map, Calendar.getInstance().timeInMillis),
+                        Param.TAG_UPDATE_QUEUE,
+                        requireContext()
+                    )
+
+                    requireActivity().runOnUiThread {
+                        showReaderOptions(queue)
+                    }
                 }
             } else {
                 requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
+                    val errorBody = result.errorBody()?.string()
+                    if (errorBody != null && result.code() == 405) {
+
+                        val type = object : TypeToken<Person>() {
+
+                        }.type
+
+                        val person: Person = Gson().fromJson(errorBody, type)
+
+                        val message =
+                            "La cola está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
+
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Cola en uso")
+                            .setMessage(message)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setNeutralButton("Abrir") { _, _ ->
+                                showDialogWorkOffline(queue, openQueue)
+                            }
+                            .create().show()
+                    } else if (errorBody != null) {
+                        showDialogWorkOffline(queue, openQueue)
+                        Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
+                    } else {
+                        showDialogWorkOffline(queue, openQueue)
+                        Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
+                    }
                 }
             }
 
             it.onComplete()
         }.subscribeOn(Schedulers.computation())
             .observeOn(Schedulers.computation())
+            .onErrorComplete {
+                requireActivity().runOnUiThread {
+                    Toast.makeText(
+                        requireContext(),
+                        it.message ?: "Error de red",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                showDialogWorkOffline(queue, openQueue)
+                true
+            }
             .subscribe {
                 requireActivity().runOnUiThread {
                     progress.dismiss()
@@ -298,14 +369,11 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     override fun onClick(queue: Queue) {
 
-        if (!queue.downloaded) {
-            AlertDialog.Builder(requireContext())
-                .setTitle("Descargar cola")
-                .setMessage("Debe descargar la cola antes de continuar.")
-                .setPositiveButton("Descargar") { _, _ ->
-                    onDownloadClick(queue)
-                }.setNegativeButton(android.R.string.cancel, null)
-                .create().show()
+        if (!queue.downloaded && !queue.isOffline) {
+            downloadQueueDialog(queue, true)
+            return
+        } else if (queue.isSaved && !queue.isOffline) {
+            onDownloadClick(queue, true)
             return
         }
 
@@ -348,8 +416,37 @@ class RoomQueues : SupportFragment(), onClickListener {
         }
     }
 
+    private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Descargar cola")
+            .setMessage("Debe descargar la cola antes de continuar.")
+            .setPositiveButton("Descargar") { _, _ ->
+                onDownloadClick(queue, openMode)
+            }.setNegativeButton(android.R.string.cancel, null)
+            .create().show()
+    }
+
     override fun onLongClick(view: View, queue: Queue) {
+        if (!queue.downloaded && !queue.isOffline) {
+            downloadQueueDialog(queue)
+            return
+        } else if (!queue.isSaved && !queue.isOffline) {
+            saveDialog(queue)
+            return
+        }
+
         showPopup(view, queue)
+    }
+
+    private fun saveDialog(queue: Queue) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Guardar")
+            .setMessage("Debe guardar la cola antes de continuar.")
+            .setPositiveButton("Guardar") { _, _ ->
+                onSaveClick(queue)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create().show()
     }
 
     @SuppressLint("RestrictedApi")
@@ -357,6 +454,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         val popupMenu = PopupMenu(requireContext(), view)
         (context as Activity).menuInflater.inflate(R.menu.menu_delete, popupMenu.menu)
+        popupMenu.menu.findItem(R.id.action_collaborators).isVisible = !queue.isOffline
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
@@ -599,7 +697,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 //Todo update this
                 business = 1,
                 province = "",
-                municipality = ""
+                municipality = "",
+                owner = PreferencesManager(requireContext()).getCi()
             )
 
             val allClientsInQueue = dao.getClientInQueueBy2Queues(queue1.id!!, queue2.id!!)
@@ -693,7 +792,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                                     createdDate,
                                     ArrayList(),
                                     false,
-                                    isSaved = true
+                                    isSaved = true,
+                                    owner = ""
                                 )
                             )
                         }
@@ -720,6 +820,58 @@ class RoomQueues : SupportFragment(), onClickListener {
             }, {
                 it.printStackTrace()
             }).addTo(compositeDisposable)
+    }
+
+    private fun showDialogWorkOffline(queue: Queue, openQueue: Boolean) {
+
+        requireActivity().runOnUiThread {
+            val title = "Error de Red"
+            val message =
+                "No se ha podido conectar al servidor. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
+            AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Reintentar") { _, _ ->
+                    onDownloadClick(queue, openQueue)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton("Local") { _, _ ->
+
+                    Completable.create {
+
+                        val oldQueueId = queue.id
+                        var time = Calendar.getInstance().timeInMillis
+                        queue.id = time
+                        queue.uuid =
+                            PreferencesManager(requireContext()).getCi() + "-" + PreferencesManager(
+                                requireContext()
+                            ).getFv() + "-" + time
+                        queue.name = "Copia Local - ${queue.name}"
+                        queue.description = "Copia Local de ${queue.description}"
+                        queue.owner = PreferencesManager(requireContext()).getCi()
+                        queue.collaborators = ArrayList()
+                        queue.downloaded = true
+                        queue.isSaved = true
+                        queue.isOffline = true
+
+                        val clientsInThisQueue = ArrayList<ClientInQueue>()
+
+                        dao.getClientsInQueueList(oldQueueId!!).map {
+                            it.id = time++
+                            it.queueId = queue.id!!
+                            clientsInThisQueue.add(it)
+                        }
+
+                        dao.insertQueue(queue)
+                        dao.insertClientInQueue(clientsInThisQueue)
+
+                    }.observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.computation())
+                        .subscribe()
+                        .addTo(compositeDisposable)
+
+                }.create().show()
+        }
     }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =

@@ -22,6 +22,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Common.Companion.showHiErrorMessage
+import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.utils.permissions.Permissions
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,6 +31,8 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import java.util.*
+import kotlin.collections.HashMap
 
 class DialogAddCollaborator(
     private val context: Context,
@@ -66,15 +69,16 @@ class DialogAddCollaborator(
     private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
         Single.create<Pair<Int, String?>> {
 
-            val info = HashMap<String, String>()
+            val info = HashMap<String, Any>()
 
             info.put(Person.KEY_NAME, name)
             info.put(Person.KEY_LAST_NAME, lastName)
 
+            val person = Person(ci, fv, info)
+
             val headerMap = mutableMapOf<String, String>().apply {
                 this["Content-Type"] = "application/json"
-                this["collaborator"] = "$ci.$fv"
-                this["info"] = Gson().toJson(info)
+                this["operator"] = PreferencesManager(context).getId()
                 this["queue"] = queue.uuid!!
                 this["Authorization"] = Base64.encodeToString(
                     BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
@@ -82,7 +86,8 @@ class DialogAddCollaborator(
             }
 
             val result = APIService.apiService.putCollaborator(
-                headers = headerMap
+                headers = headerMap,
+                data = Gson().toJson(person)
             ).execute()
 
             if (result.code() == 200) {
