@@ -247,6 +247,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                     var owner = ""
 
+                    dao.deleteAllClientsFromQueue(savedQueue.id!!)
+
                     it.members?.map { person ->
 
                         val name = (person.info["name"]
@@ -280,6 +282,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                         dao.insertClientInQueue(clientInQueue)
                     }
+
+                    savedQueue.collaborators = ArrayList()
 
                     it.operators?.map { person ->
                         if (person.info[Person.KEY_AFFILIATION] == "owner")
