@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorPrimary">#0A75D8</color>
+    <color name="colorPrimaryDark">#005FB7</color>
     <color name="colorAccent">#1E88E5</color>
 
+<!--    <color name="colorPrimary">#f44336</color>-->
+<!--    <color name="colorPrimaryDark">#d32f2f</color>-->
+<!--    <color name="colorAccent">#ff5252</color>-->
+
     <color name="colorEmptyArea">#F3F3F3</color>
+    <color name="transparent">#00F3F3F3</color>
 
     <color name="white">#FFF</color>
 
@@ -14,6 +19,7 @@
     <color name="google_red">#DB4437</color>
     <color name="google_yellow">#F4B400</color>
     <color name="google_green">#0F9D58</color>
+    <color name="background_queue_open_green">#D5FFCE</color>
 
     <color name="search_field_bg">#EFEBE9</color>
 

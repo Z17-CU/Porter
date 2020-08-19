@@ -44,7 +44,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/_recyclerViewQueues"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                 android:layout_height="match_parent"
                 tools:listitem="@layout/item_client" />
 
             <ImageView
@@ -66,10 +66,11 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/_fabAdd"
+            android:visibility="visible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@drawable/ic_add" />
+            app:srcCompat="@drawable/ic_pencil" />
 
     </LinearLayout>
 

@@ -121,8 +121,8 @@ class WelcomeActivity : AppIntro2() {
                     this,
                     R.color.colorIntroBG
                 )
-            )
-            .build()
+            ).build()
+
         addSlide(AppIntro2Fragment.newInstance(pageOne))
         addSlide(AppIntro2Fragment.newInstance(pageTwo))
         addSlide(AppIntro2Fragment.newInstance(pageThree))
@@ -172,13 +172,13 @@ class WelcomeActivity : AppIntro2() {
     }
 
     private fun showDialog() {
-
-        val dialogHiClient = DialogHiClient(this, CompositeDisposable(), manager)
-        onDialogHiClientEvent = dialogHiClient
-        val dialog = dialogHiClient.create()
-        dialog.setOnDismissListener {
-            goToMain()
-        }
-        dialog.show()
+        startActivity(Intent(this, ActivityHiClient::class.java))
+//        val dialogHiClient = DialogHiClient(this, CompositeDisposable(), manager)
+//        onDialogHiClientEvent = dialogHiClient
+//        val dialog = dialogHiClient.create()
+//        dialog.setOnDismissListener {
+//            goToMain()
+//        }
+//        dialog.show()
     }
 }

@@ -154,6 +154,7 @@ class DialogHiClient(
         val client = Common.stringToPorterHistruct(result)
         client?.let {
             saveAndSendData(it.name, it.last_name, it.ci, it.fv)
+
             return
         }
         showError("Lectura incorrecta")

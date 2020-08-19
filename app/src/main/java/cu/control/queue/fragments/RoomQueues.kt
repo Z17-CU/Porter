@@ -311,6 +311,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     )
 
                     requireActivity().runOnUiThread {
+
                         showReaderOptions(queue)
                     }
                 }

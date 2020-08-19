@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
+import cu.control.queue.adapters.viewHolders.ViewHolderQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Conts.Companion.formatDateBig
@@ -20,7 +21,7 @@ class AdapterQueue(
 
     var contentList: List<Queue> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient{
         return ViewHolderClient(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_client,
