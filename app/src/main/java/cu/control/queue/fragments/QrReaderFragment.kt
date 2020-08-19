@@ -47,7 +47,9 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_DELETE_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_LAST_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
@@ -630,7 +632,7 @@ class QrReaderFragment(
 
     private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
 
-        if(client.ci == PreferencesManager(requireContext()).getCi()){
+        if (client.ci == PreferencesManager(requireContext()).getCi()) {
             payloadUpdateMember(clientInQueue, client, MODE_ADD_OWNER)
             return
         }
@@ -640,10 +642,29 @@ class QrReaderFragment(
             val payload = dao.getPayload(queue.uuid!!)
             var param: ParamAddMember? = payload?.methods?.get(TAG_ADD_MEMBER) as ParamAddMember?
 
-            val map = mutableMapOf<String, Long>()
+            val nameArray = client.name.split(' ')
+            val name: String
+            var lastName = ""
+            if (nameArray.size > 1) {
+                name = nameArray[0]
+                var pos = 0
+                nameArray.map {
+                    if (pos != 0) {
+                        lastName += "$it "
+                    }
+                    pos++
+                }
+            } else {
+                name = client.name
+                lastName = ""
+            }
+
+            val map = mutableMapOf<String, Any>()
             map[KEY_ADD_DATE] = clientInQueue.lastRegistry
             map[KEY_REINTENT_COUNT] = clientInQueue.reIntent.toLong()
             map[KEY_NUMBER] = clientInQueue.number.toLong()
+            map[KEY_NAME] = name.trim()
+            map[KEY_LAST_NAME] = lastName.trim()
 
             val person = Person(client.ci, client.fv ?: "", map)
 
