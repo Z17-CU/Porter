@@ -333,7 +333,12 @@ class RoomQueues : SupportFragment(), onClickListener {
                             .setMessage(message)
                             .setPositiveButton(android.R.string.ok, null)
                             .setNeutralButton("Abrir") { _, _ ->
-                                showDialogWorkOffline(queue, openQueue)
+                                showDialogWorkOffline(
+                                    queue,
+                                    openQueue,
+                                    "Cola en uso",
+                                    "La cola está siendo usada"
+                                )
                             }
                             .create().show()
                     } else if (errorBody != null) {
@@ -822,12 +827,16 @@ class RoomQueues : SupportFragment(), onClickListener {
             }).addTo(compositeDisposable)
     }
 
-    private fun showDialogWorkOffline(queue: Queue, openQueue: Boolean) {
+    private fun showDialogWorkOffline(
+        queue: Queue,
+        openQueue: Boolean,
+        title: String = "Error de Red",
+        messageInit: String = "No se ha podido conectar al servidor"
+    ) {
 
         requireActivity().runOnUiThread {
-            val title = "Error de Red"
             val message =
-                "No se ha podido conectar al servidor. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
+                "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
             AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(message)
