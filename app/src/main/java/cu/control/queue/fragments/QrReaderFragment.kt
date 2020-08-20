@@ -632,7 +632,7 @@ class QrReaderFragment(
 
     private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
 
-        if (client.ci == PreferencesManager(requireContext()).getCi()) {
+        if (client.ci in queue.collaborators) {
             payloadUpdateMember(clientInQueue, client, MODE_ADD_OWNER)
             return
         }
