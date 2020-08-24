@@ -16,12 +16,10 @@ import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.repository.dataBase.AppDataBase
-import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
-import cu.control.queue.utils.Common.Companion.showHiErrorMessage
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.utils.permissions.Permissions
 import io.reactivex.Single
@@ -31,8 +29,6 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
-import java.util.*
-import kotlin.collections.HashMap
 
 class DialogAddCollaborator(
     private val context: Context,
@@ -153,7 +149,7 @@ class DialogAddCollaborator(
             saveAndSendData(it.name, it.last_name, it.ci, it.fv)
             return
         }
-        showError("Lectura incorrecta")
+        showError(context.getString(R.string.readWrong))
         startReader()
     }
 

@@ -100,4 +100,5 @@
     <string name="dialogInfo">Debe escanear su carné  para continnuar</string>
     <string name="dialog_ok_button">Ok</string>
     <string name="colaboradores">Colaboradores</string>
+    <string name="readWrong">Lectura incorrecta</string>
 </resources>

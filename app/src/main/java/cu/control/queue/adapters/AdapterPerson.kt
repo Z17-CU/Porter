@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -21,7 +20,6 @@ import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
-import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_AFFILIATION
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_LAST_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NAME
 import cu.control.queue.repository.retrofit.APIService
