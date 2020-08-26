@@ -271,7 +271,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                         val clientInQueue = ClientInQueue(
                             (person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
-                            it.created_date,
+                            savedQueue.id ?: it.created_date,
                             client.id,
                             (person.info[KEY_MEMBER_UPDATED_DATE] as Double?
                                 ?: person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
@@ -300,6 +300,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     savedQueue.downloaded = true
                     savedQueue.owner = owner
                     savedQueue.isSaved = false
+                    savedQueue.id = savedQueue.id ?: it.created_date
 
                     dao.insertQueue(savedQueue)
 

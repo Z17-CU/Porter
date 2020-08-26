@@ -632,11 +632,6 @@ class QrReaderFragment(
 
     private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
 
-        if (client.ci in queue.collaborators) {
-            payloadUpdateMember(clientInQueue, client, MODE_ADD_OWNER)
-            return
-        }
-
         Completable.create {
 
             val payload = dao.getPayload(queue.uuid!!)
