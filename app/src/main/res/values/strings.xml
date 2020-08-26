@@ -101,4 +101,7 @@
     <string name="dialog_ok_button">Ok</string>
     <string name="colaboradores">Colaboradores</string>
     <string name="readWrong">Lectura incorrecta</string>
+    <string name="update">Actualizar</string>
+    <string name="queue_not_found">Ha ocurrido un error al sincronizar la cola.</string>
+    <string name="error_conection">Error de red</string>
 </resources>

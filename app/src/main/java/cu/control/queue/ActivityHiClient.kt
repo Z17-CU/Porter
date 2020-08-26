@@ -23,10 +23,8 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_hi_client.*
 import kotlinx.android.synthetic.main.dialog_comment_validate.view.*
-import kotlinx.android.synthetic.main.layout_dialog_hi_client._qrView
-import kotlinx.android.synthetic.main.layout_dialog_hi_client._zXingScannerView
+import kotlinx.android.synthetic.main.layout_dialog_hi_client.*
 import kotlinx.android.synthetic.main.layout_server_message.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
@@ -116,6 +114,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
 
     override fun onPause() {
         super.onPause()
+
         stopReader()
     }
 

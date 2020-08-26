@@ -118,7 +118,12 @@ class RoomQueues : SupportFragment(), onClickListener {
         initToolBar()
 
         _fabAdd.setOnClickListener {
-            DialogCreateQueue(it.context,  compositeDisposable, clientViewModel = viewModel,supportFragment = this).create()
+            DialogCreateQueue(
+                it.context,
+                compositeDisposable,
+                clientViewModel = viewModel,
+                supportFragment = this
+            ).create()
                 .show()
         }
 
@@ -244,7 +249,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                     var owner = ""
 
-                    dao.deleteAllClientsFromQueue(savedQueue.id!!)
+                    dao.deleteAllClientsFromQueue(queue.id!!)
 
                     it.members?.map { person ->
 
@@ -316,6 +321,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                         showReaderOptions(queue)
                     }
                 }
+
+
             } else {
                 requireActivity().runOnUiThread {
                     val errorBody = result.errorBody()?.string()
@@ -344,6 +351,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
+                        if(result.code()==404){
+                            showDialogQueueNoExist(queue)
+                        }
                         showDialogWorkOffline(queue, openQueue)
                         Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
                     } else {
@@ -373,6 +383,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 }
             }.addTo(compositeDisposable)
     }
+
 
     override fun onClick(queue: Queue) {
 
@@ -435,7 +446,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     override fun onLongClick(view: View, queue: Queue) {
         if (!queue.downloaded && !queue.isOffline) {
-            downloadQueueDialog(queue)
+            downloadQueueDialog(queue, false)
             return
         } else if (!queue.isSaved && !queue.isOffline) {
             saveDialog(queue)
@@ -496,7 +507,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         requireContext(),
                         CompositeDisposable(),
                         queue.id!!,
-                        viewModel,this
+                        viewModel, this
                     ).create().show()
                 }
                 R.id.action_merge -> {
@@ -827,6 +838,33 @@ class RoomQueues : SupportFragment(), onClickListener {
             }, {
                 it.printStackTrace()
             }).addTo(compositeDisposable)
+    }
+
+    private fun showDialogQueueNoExist(queue: Queue) {
+
+        requireActivity().runOnUiThread {
+            AlertDialog.Builder(requireContext())
+                .setTitle(requireContext().getString(R.string.error_conection))
+                .setMessage(requireContext().getString(R.string.queue_not_found))
+                .setPositiveButton(requireContext().getString(R.string.update)) { _, _ ->
+                    Completable.create { deleteQueueCompletable ->
+
+                        deleteQueueCompletable.onComplete()
+                    }.subscribeOn(Schedulers.computation())
+                        .observeOn(Schedulers.computation())
+                        .subscribe {
+                            dao.deleteQueue(queue)
+                        }
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Sincronizado exitoso",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                .create().show()
+        }
     }
 
     private fun showDialogWorkOffline(
