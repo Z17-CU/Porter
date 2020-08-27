@@ -174,6 +174,7 @@ class ClientViewModel @Inject constructor(
                     clientRepository.getQueue(payload.queue_uuid)?.let { queue ->
                         queue.isSaved = true
                         clientRepository.saveQueue(queue)
+
                     }
                 }
             }

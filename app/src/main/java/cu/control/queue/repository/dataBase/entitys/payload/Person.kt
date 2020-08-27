@@ -24,7 +24,6 @@ open class Person(
         const val KEY_MEMBER_UPDATED_DATE = "updated_date"
         const val KEY_CHECKED = "checked_date"
         const val KEY_UNCHECKED = "unchecked_date"
-
         const val MODE_CHECK = "MODE_CHECK"
         const val MODE_UNCHECK = "MODE_UNCHECK"
         const val MODE_INCREMENT_REINTENT = "MODE_INCREMENT_REINTENT"

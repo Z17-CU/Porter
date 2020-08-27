@@ -104,4 +104,5 @@
     <string name="update">Actualizar</string>
     <string name="queue_not_found">Ha ocurrido un error al sincronizar la cola.</string>
     <string name="error_conection">Error de red</string>
+    <string name="fv">Fv</string>
 </resources>

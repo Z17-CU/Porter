@@ -14,6 +14,8 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import cu.control.queue.R
 import cu.control.queue.adapters.AdapterClient
 import cu.control.queue.dialogs.DialogInsertClient
@@ -67,6 +69,7 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
         _fabAdd.setOnClickListener {
             DialogInsertClient(requireContext(), CompositeDisposable(), this).create().show()
         }
+
 
         initToolBar()
 

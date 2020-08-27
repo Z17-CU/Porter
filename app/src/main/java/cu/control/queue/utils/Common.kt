@@ -217,13 +217,27 @@ class Common {
                 val day = ci.substring(4, 6).toInt()
                 val isValid = mount in 1..12 && day in 1..31
                 if (!isValid) {
-                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
+                        .show()
                 }
                 return isValid
             }
 
             return false
         }
+
+//        fun isValidFV(fv: String, context: Context): Boolean {
+//            var numbers = "0123456789"
+//            for (x in fv.indices) {
+//                val c: Char = fv.charAt(x)
+//                // Si no está entre a y z, ni entre A y Z, ni es un espacio
+//                if (!(c in 'a'..'z' || c in 'A'..'Z' || c == ' ')) {
+//                    return false
+//                }
+//            }
+//            return true
+//
+//        }
 
         @SuppressLint("LogNotTimber")
         fun stringToClient(rawResult: Result): Client? {

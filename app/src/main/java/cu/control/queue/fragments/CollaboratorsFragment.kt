@@ -13,7 +13,7 @@ import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
-import io.reactivex.Completable
+import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -22,7 +22,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.room_queues.*
 import me.yokeyword.fragmentation.SupportFragment
 
-class CollaboratorsFragment(private val queue: Queue) : SupportFragment(){
+class CollaboratorsFragment(
+    private val queue: Queue,
+    private val viewModel: ClientViewModel
+) : SupportFragment() {
 
     private lateinit var dao: Dao
     private val adapter = AdapterPerson(queue)
@@ -50,7 +53,11 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(){
         _recyclerViewQueues.adapter = adapter
 
         _fabAdd.setOnClickListener {
-            DialogAddCollaborator(requireContext(), queue).create().show()
+            DialogAddCollaborator(
+                requireContext(),
+                queue, viewModel,
+               this@CollaboratorsFragment
+            ).create().show()
         }
 
         initToolBar()
@@ -69,7 +76,7 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(){
                 it.onSuccess(list)
             }.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe{ list, error ->
+                .subscribe { list, error ->
 
                     adapter.contentList = list
                     adapter.notifyDataSetChanged()

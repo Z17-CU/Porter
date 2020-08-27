@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cardview_dark_background"
@@ -10,10 +12,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <me.dm7.barcodescanner.zxing.ZXingScannerView
-            android:id="@+id/_zXingScannerView"
+        <RelativeLayout
+            android:id="@+id/_qrReader"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <me.dm7.barcodescanner.zxing.ZXingScannerView
+                android:id="@+id/_zXingScannerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="end|bottom">
+
+                <ImageView
+                    android:id="@+id/_showAddClient"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/round_accent_bg"
+                    android:contentDescription="@string/lantern"
+                    android:foreground="?selectableItemBackground"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_keyboard"
+                    tools:ignore="UnusedAttribute" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

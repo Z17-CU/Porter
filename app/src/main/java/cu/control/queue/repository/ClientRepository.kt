@@ -36,4 +36,5 @@ class ClientRepository @Inject constructor(
     fun getAllPayloads() = dao.getAllPayloadLive()
 
     fun deletePayloads(payloads: ArrayList<Payload>) = dao.deletePayload(payloads)
+    fun deleteQueue(queue: Queue)=dao.deleteQueue(queue)
 }

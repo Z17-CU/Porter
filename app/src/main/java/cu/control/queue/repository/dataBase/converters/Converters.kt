@@ -41,7 +41,7 @@ class Converters {
                     )
                     map.put(it.key, param)
                 }
-                Param.TAG_ADD_MEMBER -> {
+                 Param.TAG_ADD_MEMBER -> {
                     val param = ParamAddMember(
                         it.value.person!!
                     )
@@ -59,6 +59,7 @@ class Converters {
                     )
                     map.put(it.key, param)
                 }
+
                 else -> {
 
                 }

@@ -68,6 +68,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class RoomQueues : SupportFragment(), onClickListener {
@@ -154,6 +155,11 @@ class RoomQueues : SupportFragment(), onClickListener {
                     }.addTo(compositeDisposable)
             }
         })
+        swipeContainer.setOnRefreshListener {
+            sendHi()                    // refresh your list contents somehow
+            swipeContainer.isRefreshing =
+                false   // reset the SwipeRefreshLayout (stop the loading spinner)
+        }
 
         //viewModel.observePayloads(viewLifecycleOwner)
     }
@@ -214,15 +220,29 @@ class RoomQueues : SupportFragment(), onClickListener {
         }
     }
 
-    override fun onSaveClick(queue: Queue) {
+    override fun onSaveClick(
+        queue: Queue,
+        delete: Boolean
+    ) {
+
         Completable.create {
             dao.getPayload(queue.uuid!!)?.let {
                 viewModel.sendPayloads(listOf(it))
             }
+
             it.onComplete()
         }.observeOn(Schedulers.computation())
             .subscribeOn(Schedulers.computation())
-            .subscribe().addTo(compositeDisposable)
+            .doOnComplete {
+                if (delete) {
+                    dao.deleteQueue(queue)
+                }
+            }
+
+            .subscribe()
+
+
+            .addTo(compositeDisposable)
     }
 
     override fun onDownloadClick(queue: Queue, openQueue: Boolean) {
@@ -352,11 +372,16 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        if(result.code()==404){
+                        if (result.code() == 404) {
                             showDialogQueueNoExist(queue)
                         }
-                        showDialogWorkOffline(queue, openQueue)
-                        Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
+                        if (result.code() == 401) {
+                            showDialogQueueNoExist(queue)
+                        } else {
+                            showDialogWorkOffline(queue, openQueue)
+                            Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
+                        }
+
                     } else {
                         showDialogWorkOffline(queue, openQueue)
                         Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
@@ -462,7 +487,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             .setTitle("Guardar")
             .setMessage("Debe guardar la cola antes de continuar.")
             .setPositiveButton("Guardar") { _, _ ->
-                onSaveClick(queue)
+                onSaveClick(queue, false)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create().show()
@@ -482,10 +507,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                         .setMessage("¿Desea eliminar " + queue.name + " de la lista?")
                         .setNegativeButton("Cancelar", null)
                         .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                dao.deleteQueue(queue)
-                                dao.deleteAllClientsFromQueue(queue.id!!)
 
+                            Completable.create {
                                 viewModel.onRegistreAction(
                                     queue.uuid ?: "",
                                     ParamDeleteQueue(Calendar.getInstance().timeInMillis),
@@ -495,10 +518,17 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                                 it.onComplete()
                             }
+                                .delay(1, TimeUnit.SECONDS, Schedulers.io())
+
                                 .observeOn(Schedulers.io())
                                 .subscribeOn(Schedulers.io())
+                                .doOnComplete {
+                                    onSaveClick(queue, true)
+                                }
+
                                 .subscribe()
 
+                                .addTo(compositeDisposable)
                         }
                         .create()
                         .show()
@@ -523,7 +553,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                             queueToMerge = null
                         }.create().show()
                 }
-                R.id.action_collaborators -> start(CollaboratorsFragment(queue))
+                R.id.action_collaborators -> start(CollaboratorsFragment(queue, viewModel))
             }
             false
         }
@@ -756,7 +786,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     private fun sendHi() {
 
-        progress.show()
+//        progress.show()
 
         Single.create<Pair<Int, String?>> {
 
@@ -823,6 +853,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             it.onSuccess(
                 Pair(result.code(), result.errorBody()?.string() ?: result.message())
             )
+
         }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn {
