@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
-import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.adapters.viewHolders.ViewHolderQueue
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.Queue

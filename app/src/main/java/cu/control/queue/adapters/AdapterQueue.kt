@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
-import cu.control.queue.adapters.viewHolders.ViewHolderClient
 import cu.control.queue.adapters.viewHolders.ViewHolderQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.entitys.Queue

@@ -1,5 +1,3 @@
-@file:Suppress("CAST_NEVER_SUCCEEDS")
-
 package cu.control.queue.dialogs
 
 import android.annotation.SuppressLint
@@ -11,7 +9,6 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cu.control.queue.R
-import cu.control.queue.fragments.QrReaderFragment
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
@@ -20,6 +17,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQu
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -28,17 +26,13 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view.*
-import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
-
 
 class DialogCreateQueue(
     private val context: Context,
-
     private val compositeDisposable: CompositeDisposable,
     private val id: Long = -1L,
-    private val clientViewModel: ClientViewModel,
-    private val supportFragment: SupportFragment
+    private val clientViewModel: ClientViewModel
 ) {
 
     private lateinit var dao: Dao
@@ -66,12 +60,12 @@ class DialogCreateQueue(
 
         view._okButton.setOnClickListener {
 
-            Single.create<Queue> {
-
+            compositeDisposable.add(Completable.create {
 
                 val time = Calendar.getInstance().timeInMillis
 
-                val thisqueue = if (queue == null)
+                val thisqueue = if (queue == null) {
+
                     Queue(
                         time,
                         view._editTextName.text.toString().trim(),
@@ -89,12 +83,13 @@ class DialogCreateQueue(
                         collaborators = arrayListOf(PreferencesManager(context).getCi()),
                         owner = PreferencesManager(context).getCi()
                     )
-                else {
+                } else {
                     queue!!.name = view._editTextName.text.toString().trim()
                     queue!!.description = view._editTextDescription.text.toString().trim()
                     queue!!
                 }
                 dao.insertQueue(thisqueue)
+
                 var tag = ""
                 val map = mutableMapOf<String, String>()
                 map[Param.KEY_QUEUE_NAME] = thisqueue.name
@@ -108,74 +103,17 @@ class DialogCreateQueue(
                 }
 
                 clientViewModel.onRegistreAction(thisqueue.uuid ?: "", param, tag, context)
-                it.onSuccess(thisqueue)
-            }.subscribeOn(Schedulers.io())
+
+                it.onComplete()
+            }
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
                 .subscribe({
-                    goToQrFragment(it)
                     dialog.dismiss()
                 }, {
                     it.printStackTrace()
                     showError(context.getString(R.string.error))
-                })
-
-
-//            compositeDisposable.add(Completable.create {
-//
-//                val time = Calendar.getInstance().timeInMillis
-//
-//                val thisqueue = if (queue == null)
-//                    Queue(
-//                        time,
-//                        view._editTextName.text.toString().trim(),
-//                        Calendar.getInstance().timeInMillis,
-//                        description = view._editTextDescription.text.toString().trim(),
-//                        uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(
-//                            context
-//                        ).getFv() + "-" + time,
-//                        created_date = time,
-//                        updated_date = time,
-//                        //Todo update this
-//                        business = 1,
-//                        province = "",
-//                        municipality = "",
-//                        collaborators = arrayListOf(PreferencesManager(context).getCi()),
-//                        owner = PreferencesManager(context).getCi()
-//                    )
-//                else {
-//                    queue!!.name = view._editTextName.text.toString().trim()
-//                    queue!!.description = view._editTextDescription.text.toString().trim()
-//                    queue!!
-//                }
-//                dao.insertQueue(thisqueue)
-//
-//                var tag = ""
-//                val map = mutableMapOf<String, String>()
-//                map[Param.KEY_QUEUE_NAME] = thisqueue.name
-//                map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
-//                val param = if (queue == null) {
-//                    tag = Param.TAG_CREATE_QUEUE
-//                    ParamCreateQueue(thisqueue.business ?: 1, map, thisqueue.created_date ?: time)
-//                } else {
-//                    tag = Param.TAG_UPDATE_QUEUE
-//                    ParamUpdateQueue(map, thisqueue.updated_date ?: time)
-//                }
-//
-//                clientViewModel.onRegistreAction(thisqueue.uuid ?: "", param, tag, context)
-//
-//                it.onComplete()
-//            }
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe({
-//                    goToQrFragment(queue!!)
-//                    dialog.dismiss()
-//                }, {
-//
-//                    it.printStackTrace()
-//                    showError(context.getString(R.string.error))
-//                }))
-
+                }))
         }
 
         view._editTextName.addTextChangedListener(object : TextWatcher {
@@ -214,18 +152,6 @@ class DialogCreateQueue(
 
         return view
     }
-
-    private fun goToQrFragment(queue: Queue) {
-
-        supportFragment.start(
-            QrReaderFragment(
-                queue,
-                clientViewModel,
-                false
-            )
-        )
-    }
-
 
     private fun showError(error: String) {
         (context as Activity).runOnUiThread {

@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.daimajia.swipe.SwipeLayout
-import com.daimajia.swipe.SwipeLayout.SwipeListener
 import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
@@ -64,6 +62,11 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
                 }
             )
 
+        holder.layoutBackground.setOnLongClickListener {
+            showPopup(it, client)
+            true
+        }
+
         when {
             !client.isChecked -> {
                 holder.clientNumber.visibility = View.VISIBLE
@@ -97,43 +100,6 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
         } else {
             View.GONE
         }
-
-        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.linearLayoutLeftSon)
-        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.linearLayoutRigthSon)
-
-        holder.swipeLayout.showMode = SwipeLayout.ShowMode.LayDown
-        holder.swipeLayout.isClickToClose = false
-
-        holder.swipeLayout.surfaceView.setOnLongClickListener {
-            showPopup(it, client)
-            false
-        }
-
-        holder.swipeLayout.addSwipeListener(object : SwipeListener {
-            override fun onClose(layout: SwipeLayout) {
-                //when the SurfaceView totally cover the BottomView.
-            }
-
-            override fun onUpdate(layout: SwipeLayout, leftOffset: Int, topOffset: Int) {
-                //you are swiping.
-            }
-
-            override fun onStartOpen(layout: SwipeLayout) {}
-
-            override fun onOpen(view: SwipeLayout) {
-                onClientClickListener.onSwipe(view, client)
-            }
-
-            override fun onStartClose(layout: SwipeLayout) {}
-
-            override fun onHandRelease(
-                layout: SwipeLayout,
-                xvel: Float,
-                yvel: Float
-            ) {
-                //when user's hand released.
-            }
-        })
     }
 
     @SuppressLint("RestrictedApi")
@@ -142,11 +108,14 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
         onClientClickListener.onLongClick(view, client)
     }
 
-
     override fun getCustomStringForElement(element: Int): String {
         return if (contentList.isEmpty())
             ""
         else
             contentList[element].number.toString()
+    }
+
+    fun deleteItem(position: Int, direction: Int) {
+        onClientClickListener.onSwipe(direction, contentList[position])
     }
 }

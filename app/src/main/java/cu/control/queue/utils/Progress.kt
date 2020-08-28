@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import cu.control.queue.R
-import java.util.logging.Handler
 
 class Progress @SuppressLint("InflateParams")
 constructor(val context: Context) {
