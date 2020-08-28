@@ -24,7 +24,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
-import com.daimajia.swipe.SwipeLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter

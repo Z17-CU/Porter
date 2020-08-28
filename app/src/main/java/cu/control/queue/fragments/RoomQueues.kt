@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
@@ -42,7 +41,6 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
-import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_ADD_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_CHECKED
@@ -66,7 +64,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.room_queues.*
 import me.yokeyword.fragmentation.SupportFragment
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader

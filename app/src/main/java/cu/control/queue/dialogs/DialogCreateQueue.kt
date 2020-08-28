@@ -12,7 +12,6 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
-import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
@@ -28,7 +27,6 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelBu
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view.*
 import java.util.*
-import kotlin.collections.HashMap
 
 class DialogCreateQueue(
     private val context: Context,

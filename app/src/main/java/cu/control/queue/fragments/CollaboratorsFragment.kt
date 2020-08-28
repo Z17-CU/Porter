@@ -13,7 +13,6 @@ import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

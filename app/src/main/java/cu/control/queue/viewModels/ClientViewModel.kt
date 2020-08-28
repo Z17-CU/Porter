@@ -31,7 +31,6 @@ import java.io.FileWriter
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ClientViewModel @Inject constructor(
     private val clientRepository: ClientRepository,

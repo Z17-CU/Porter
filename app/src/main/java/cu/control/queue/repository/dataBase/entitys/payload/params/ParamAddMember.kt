@@ -1,7 +1,7 @@
 package cu.control.queue.repository.dataBase.entitys.payload.params
 
-import cu.control.queue.repository.dataBase.entitys.payload.Person
 import androidx.annotation.Keep
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 
 @Keep
 class ParamAddMember (
