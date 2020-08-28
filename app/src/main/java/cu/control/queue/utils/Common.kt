@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
+import com.yuan.library.dmanager.download.DownloadTask
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
@@ -22,6 +23,8 @@ import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
+import com.yuan.library.dmanager.download.DownloadManager as DownloadManager1
+
 
 class Common {
     companion object {
@@ -55,6 +58,7 @@ class Common {
             var count = 0
             hi403Message.url.map {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
+
                 when (count) {
                     0 -> {
                         dialog.setPositiveButton(it.key) { _, _ ->
@@ -217,13 +221,15 @@ class Common {
                 val day = ci.substring(4, 6).toInt()
                 val isValid = mount in 1..12 && day in 1..31
                 if (!isValid) {
-                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
+                        .show()
                 }
                 return isValid
             }
 
             return false
         }
+
 
         @SuppressLint("LogNotTimber")
         fun stringToClient(rawResult: Result): Client? {
