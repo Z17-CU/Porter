@@ -18,12 +18,4 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val textViewReIntents: TextView = itemView._textViewReIntents
     val clientNumber: TextView = itemView.clientNumber
     val imageViewCheck: ImageView = itemView._imageViewCheck
-    val imageDetails: ImageView = itemView.imageViewDetails
-    val imageDownload: ImageView = itemView.imageViewDownloadQueue
-    val imageSave: ImageView = itemView.imageViewSaveQueue
-    val imageOwner: ImageView = itemView.imageViewOwner
-    val imageOffline: ImageView = itemView.imageViewOffline
-    val swipeLayout: SwipeLayout = itemView._item_Client
-    val linearLayoutLeftSon: LinearLayout = itemView.left_view
-    val linearLayoutRigthSon: LinearLayout = itemView.rigth_view
 }

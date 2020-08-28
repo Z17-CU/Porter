@@ -186,7 +186,7 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
         menuPopupHelper.show()
     }
 
-    override fun onSwipe(view: SwipeLayout, client: Client) {
+    override fun onSwipe(direction: Int, client: Client) {
 
     }
 

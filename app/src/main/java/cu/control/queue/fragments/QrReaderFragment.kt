@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.daimajia.swipe.SwipeLayout
@@ -36,6 +37,7 @@ import cu.control.queue.MainActivity
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterClient
+import cu.control.queue.adapters.SwipeToDeleteCallback
 import cu.control.queue.dialogs.DialogInsertClient
 import cu.control.queue.interfaces.OnClientClickListener
 import cu.control.queue.interfaces.onSave
@@ -156,7 +158,8 @@ class QrReaderFragment(
 
         _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewClients.adapter = adapter
-
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(adapter, requireContext()))
+        itemTouchHelper.attachToRecyclerView(_recyclerViewClients)
         dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
 
         updateObserver(queue.id!!)
@@ -1036,7 +1039,7 @@ class QrReaderFragment(
         menuPopupHelper.show()
     }
 
-    override fun onSwipe(view: SwipeLayout, client: Client) {
+    override fun onSwipe(direction: Int, client: Client) {
 
         //vibrate
         val vibratorService = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -1046,18 +1049,17 @@ class QrReaderFragment(
             val clientInQueue =
                 dao.getClientFromQueue(client.id, adapter.queueId)
 
-            if (view.dragEdge == SwipeLayout.DragEdge.Left) {
+            if (direction == ItemTouchHelper.RIGHT) {
                 if (!clientInQueue!!.isChecked) {
                     clientInQueue.isChecked = true
                     payloadUpdateMember(clientInQueue, client, MODE_CHECK)
                 }
-            } else if (view.dragEdge == SwipeLayout.DragEdge.Right) {
+            } else if (direction == ItemTouchHelper.LEFT) {
                 if (clientInQueue!!.isChecked) {
                     clientInQueue.isChecked = false
                     payloadUpdateMember(clientInQueue, client, MODE_UNCHECK)
                 }
             }
-            view.close()
             dao.insertClientInQueue(clientInQueue!!)
             emitter.onComplete()
         }.observeOn(Schedulers.io())

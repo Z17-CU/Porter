@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/_item_Client"
@@ -9,55 +9,6 @@
     tools:ignore="RtlSymmetry"
     tools:leftEdgeSwipeOffSet="0dp"
     tools:rigthEdgeSwipeOffSet="0dp">
-
-    <LinearLayout
-        android:id="@+id/left_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/google_green"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:contentDescription="@string/chequear_deschequiar"
-            app:srcCompat="@drawable/ic_check_list_white" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/chequiar"
-            android:textColor="#fff" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/rigth_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/google_red"
-        android:gravity="center_vertical|end"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="20dp"
-            android:gravity="center_vertical"
-            android:text="@string/deschequiar"
-            android:textColor="#fff" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:contentDescription="@string/chequear_deschequiar"
-            app:srcCompat="@drawable/ic_baseline_uncheck" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -280,4 +231,4 @@
 
     </LinearLayout>
 
-</com.daimajia.swipe.SwipeLayout>
+</LinearLayout>
