@@ -5,8 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.daimajia.swipe.SwipeLayout
-import com.mikhaellopez.circularimageview.CircularImageView
+ import com.mikhaellopez.circularimageview.CircularImageView
 import kotlinx.android.synthetic.main.item_client.view.*
 
 class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {

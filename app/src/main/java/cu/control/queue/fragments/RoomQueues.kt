@@ -122,8 +122,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             DialogCreateQueue(
                 it.context,
                 compositeDisposable,
-                clientViewModel = viewModel,
-                supportFragment = this
+                clientViewModel = viewModel
             ).create()
                 .show()
         }
@@ -538,7 +537,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         requireContext(),
                         CompositeDisposable(),
                         queue.id!!,
-                        viewModel, this
+                        viewModel
                     ).create().show()
                 }
                 R.id.action_merge -> {
@@ -553,7 +552,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                             queueToMerge = null
                         }.create().show()
                 }
-                R.id.action_collaborators -> start(CollaboratorsFragment(queue, viewModel))
+                R.id.action_collaborators -> start(CollaboratorsFragment(queue))
             }
             false
         }

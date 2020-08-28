@@ -99,4 +99,12 @@
     <string name="colaboradores">Colaboradores</string>
     <string name="deschequiar">Deschequear</string>
     <string name="chequiar">Chequear</string>
+    <string name="fv">Fv</string>
+    <string name="dialog_ok_button">Ok</string>
+    <string name="dialogInfo">Debe escanear su carné para continuar.</string>
+    <string name="info">Informacion</string>
+    <string name="readWrong">Error al leer</string>
+    <string name="error_conection">Error de red</string>
+    <string name="update">Actualizar</string>
+    <string name="queue_not_found">La cola no exite.</string>
 </resources>

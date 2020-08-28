@@ -213,14 +213,21 @@ class Common {
         fun isValidCI(ci: String, context: Context): Boolean {
 
             if (ci.length == 11) {
-                val mount = ci.substring(2, 4).toInt()
-                val day = ci.substring(4, 6).toInt()
-                val isValid = mount in 1..12 && day in 1..31
-                if (!isValid) {
-                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
-                        .show()
+                if (ci.contains("00000000000")) {
+                    return true
+                } else {
+                    val mount = ci.substring(2, 4).toInt()
+                    val day = ci.substring(4, 6).toInt()
+                    val isValid = mount in 1..12 && day in 1..31
+                    if (!isValid) {
+                        Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
+                            .show()
+                    }
+                    return isValid
                 }
-                return isValid
+
+            } else if (ci.length > 7 && ci.contains("00000000")) {
+                return true
             }
 
             return false

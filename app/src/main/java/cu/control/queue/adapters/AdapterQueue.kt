@@ -65,7 +65,7 @@ class AdapterQueue(
         }
 
         holder.imageSave.setOnClickListener {
-            onClickListener.onSaveClick(queue)
+            onClickListener.onSaveClick(queue,false)
         }
 
         holder.layoutBackground.setOnClickListener {
