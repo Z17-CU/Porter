@@ -1,196 +1,278 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/_layoutItemPersona"
+    android:id="@+id/_item_Client"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/item_white_bg"
-    android:gravity="center_vertical"
-    android:orientation="vertical">
+    android:layout_marginBottom="1dp"
+    tools:ignore="RtlSymmetry"
+    tools:leftEdgeSwipeOffSet="0dp"
+    tools:rigthEdgeSwipeOffSet="0dp">
+
+    <LinearLayout
+        android:id="@+id/left_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/google_green"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/chequear_deschequiar"
+            app:srcCompat="@drawable/ic_check_list_white" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/chequiar"
+            android:textColor="#fff" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rigth_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/google_red"
+        android:gravity="center_vertical|end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:text="@string/deschequiar"
+            android:textColor="#fff" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/chequear_deschequiar"
+            app:srcCompat="@drawable/ic_baseline_uncheck" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
+        android:background="@color/white"
         android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/_layoutItemPersona"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@drawable/item_white_bg"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            tools:ignore="UselessParent">
-
-            <RelativeLayout
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp">
-
-                <com.mikhaellopez.circularimageview.CircularImageView
-                    android:id="@+id/_circularImageView"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="2dp"
-                    tools:src="@drawable/ic_girl_big" />
-
-                <ImageView
-                    android:id="@+id/_imageViewCheck"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/round_green_bg"
-                    android:padding="4dp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_check_list" />
-
-                <TextView
-                    android:id="@+id/clientNumber"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/textSize"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="end|bottom">
-
-                    <TextView
-                        android:id="@+id/_textViewReIntents"
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:background="@drawable/round_white_bg"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:textColor="@color/google_red"
-                        android:textSize="12sp"
-                        tools:text="5" />
-
-                </LinearLayout>
-
-            </RelativeLayout>
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:background="?selectableItemBackground"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    tools:ignore="UselessParent">
+
+                    <RelativeLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp">
+
+                        <com.mikhaellopez.circularimageview.CircularImageView
+                            android:id="@+id/_circularImageView"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:padding="2dp"
+                            tools:src="@drawable/ic_girl_big" />
+
+                        <ImageView
+                            android:id="@+id/_imageViewCheck"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/round_green_bg"
+                            android:padding="4dp"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_check_list_white" />
+
+                        <TextView
+                            android:id="@+id/clientNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/textSize"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="end|bottom">
+
+                            <TextView
+                                android:id="@+id/_textViewReIntents"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:background="@drawable/round_white_bg"
+                                android:gravity="center_vertical|center_horizontal"
+                                android:textColor="@color/google_red"
+                                android:textSize="12sp"
+                                tools:text="5" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        tools:ignore="RtlSymmetry">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/_textViewNombre"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:maxLines="1"
+                                android:textColor="#494949"
+                                android:textSize="18sp"
+                                tools:text="Richard Anca Perurena" />
+
+                            <ImageView
+                                android:id="@+id/imageViewDetails"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/details"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_help_outline" />
+
+                            <ImageView
+                                android:id="@+id/imageViewDownloadQueue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/details"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_baseline_cloud_download_24" />
+
+                            <ImageView
+                                android:id="@+id/imageViewSaveQueue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/details"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_baseline_save_24" />
+
+                            <ImageView
+                                android:id="@+id/imageViewOffline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/details"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_baseline_signal_cellular_connected_no_internet_4_bar_24" />
+
+                            <ImageView
+                                android:id="@+id/imageViewOwner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:layout_marginBottom="4dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/details"
+                                android:visibility="gone"
+                                app:srcCompat="@drawable/ic_baseline_star_24" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/_textViewCI"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:maxLines="1"
+                                android:textColor="#A3A3A3"
+                                android:textSize="16sp"
+                                tools:ignore="RtlSymmetry"
+                                tools:text="93070511004" />
+
+                            <TextView
+                                android:id="@+id/_textViewDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:maxLines="1"
+                                android:textColor="#A3A3A3"
+                                android:textSize="16sp"
+                                tools:ignore="RtlSymmetry"
+                                tools:text="3:45:32 pm" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/_divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="74dp"
+                android:paddingLeft="74dp"
                 tools:ignore="RtlSymmetry">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/_textViewNombre"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:maxLines="1"
-                        android:textColor="#494949"
-                        android:textSize="18sp"
-                        tools:text="Richard Anca Perurena" />
-
-                    <ImageView
-                        android:id="@+id/imageViewDetails"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/details"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_help_outline" />
-
-                    <ImageView
-                        android:id="@+id/imageViewDownloadQueue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/details"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_baseline_cloud_download_24" />
-
-                    <ImageView
-                        android:id="@+id/imageViewSaveQueue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/details"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_baseline_save_24" />
-
-                    <ImageView
-                        android:id="@+id/imageViewOffline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/details"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_baseline_signal_cellular_connected_no_internet_4_bar_24" />
-
-                    <ImageView
-                        android:id="@+id/imageViewOwner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/details"
-                        android:visibility="gone"
-                        app:srcCompat="@drawable/ic_baseline_star_24" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/_textViewCI"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:maxLines="1"
-                        android:textColor="#A3A3A3"
-                        android:textSize="16sp"
-                        tools:ignore="RtlSymmetry"
-                        tools:text="93070511004" />
-
-                    <TextView
-                        android:id="@+id/_textViewDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginRight="8dp"
-                        android:maxLines="1"
-                        android:textColor="#A3A3A3"
-                        android:textSize="16sp"
-                        tools:ignore="RtlSymmetry"
-                        tools:text="3:45:32 pm" />
-
-                </LinearLayout>
+                <include layout="@layout/divider_horizontal" />
 
             </LinearLayout>
 
@@ -198,16 +280,4 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/_divider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="74dp"
-        android:paddingLeft="74dp"
-        tools:ignore="RtlSymmetry">
-
-        <include layout="@layout/divider_horizontal" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</com.daimajia.swipe.SwipeLayout>

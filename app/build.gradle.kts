@@ -220,9 +220,9 @@ dependencies {
 
     /** Range Bar */
     implementation("me.bendik.simplerangeview:simplerangeview:0.2.0")
-    /**swipe refresh*/
-    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
+    /** Swipe */
+    implementation ("com.daimajia.swipelayout:library:1.2.0@aar")
 }
 
 fun updateVersionCode() {

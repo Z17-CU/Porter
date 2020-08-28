@@ -96,13 +96,7 @@
     <string name="Permissions_permission_required">Se requiere permiso</string>
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
     <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
-    <string name="info">Informacion</string>
-    <string name="dialogInfo">Debe escanear su carné  para continnuar</string>
-    <string name="dialog_ok_button">Ok</string>
     <string name="colaboradores">Colaboradores</string>
-    <string name="readWrong">Lectura incorrecta</string>
-    <string name="update">Actualizar</string>
-    <string name="queue_not_found">Ha ocurrido un error al sincronizar la cola.</string>
-    <string name="error_conection">Error de red</string>
-    <string name="fv">Fv</string>
+    <string name="deschequiar">Deschequear</string>
+    <string name="chequiar">Chequear</string>
 </resources>

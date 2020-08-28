@@ -273,8 +273,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                     it.members?.map { person ->
 
-                        val name = (person.info["name"]
-                            ?: person.ci + " " + person.info["last_name"]) as String
+                        val name = ((person.info["name"]
+                            ?: person.ci) as String + " " + person.info["last_name"])
                         val client = Client(
                             name,
                             person.ci.toLong(),

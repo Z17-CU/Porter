@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.daimajia.swipe.SwipeLayout
+import com.daimajia.swipe.SwipeLayout.SwipeListener
 import com.turingtechnologies.materialscrollbar.ICustomAdapter
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
@@ -14,7 +16,9 @@ import cu.control.queue.interfaces.OnClientClickListener
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
 
-class AdapterClient(private val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
+
+class AdapterClient(private val onClientClickListener: OnClientClickListener) :
+    RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
@@ -60,7 +64,6 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
                 }
             )
 
-
         when {
             !client.isChecked -> {
                 holder.clientNumber.visibility = View.VISIBLE
@@ -95,10 +98,42 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
             View.GONE
         }
 
-        holder.layoutBackground.setOnLongClickListener {
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.linearLayoutLeftSon)
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.linearLayoutRigthSon)
+
+        holder.swipeLayout.showMode = SwipeLayout.ShowMode.LayDown
+        holder.swipeLayout.isClickToClose = false
+
+        holder.swipeLayout.surfaceView.setOnLongClickListener {
             showPopup(it, client)
-            return@setOnLongClickListener true
+            false
         }
+
+        holder.swipeLayout.addSwipeListener(object : SwipeListener {
+            override fun onClose(layout: SwipeLayout) {
+                //when the SurfaceView totally cover the BottomView.
+            }
+
+            override fun onUpdate(layout: SwipeLayout, leftOffset: Int, topOffset: Int) {
+                //you are swiping.
+            }
+
+            override fun onStartOpen(layout: SwipeLayout) {}
+
+            override fun onOpen(view: SwipeLayout) {
+                onClientClickListener.onSwipe(view, client)
+            }
+
+            override fun onStartClose(layout: SwipeLayout) {}
+
+            override fun onHandRelease(
+                layout: SwipeLayout,
+                xvel: Float,
+                yvel: Float
+            ) {
+                //when user's hand released.
+            }
+        })
     }
 
     @SuppressLint("RestrictedApi")
@@ -106,6 +141,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
 
         onClientClickListener.onLongClick(view, client)
     }
+
 
     override fun getCustomStringForElement(element: Int): String {
         return if (contentList.isEmpty())

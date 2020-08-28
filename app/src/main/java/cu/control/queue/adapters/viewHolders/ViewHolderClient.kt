@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.daimajia.swipe.SwipeLayout
 import com.mikhaellopez.circularimageview.CircularImageView
 import kotlinx.android.synthetic.main.item_client.view.*
 
@@ -22,4 +23,7 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val imageSave: ImageView = itemView.imageViewSaveQueue
     val imageOwner: ImageView = itemView.imageViewOwner
     val imageOffline: ImageView = itemView.imageViewOffline
+    val swipeLayout: SwipeLayout = itemView._item_Client
+    val linearLayoutLeftSon: LinearLayout = itemView.left_view
+    val linearLayoutRigthSon: LinearLayout = itemView.rigth_view
 }
