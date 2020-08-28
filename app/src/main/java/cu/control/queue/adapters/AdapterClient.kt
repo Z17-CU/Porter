@@ -17,7 +17,8 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
 
 
-class AdapterClient(private val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
+class AdapterClient(private val onClientClickListener: OnClientClickListener) :
+    RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
@@ -62,7 +63,6 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
                     else -> R.drawable.bg_item_dark
                 }
             )
-
 
         when {
             !client.isChecked -> {
@@ -119,11 +119,13 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
             }
 
             override fun onStartOpen(layout: SwipeLayout) {}
+
             override fun onOpen(view: SwipeLayout) {
                 onClientClickListener.onSwipe(view, client)
             }
 
             override fun onStartClose(layout: SwipeLayout) {}
+
             override fun onHandRelease(
                 layout: SwipeLayout,
                 xvel: Float,
@@ -139,6 +141,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
 
         onClientClickListener.onLongClick(view, client)
     }
+
 
     override fun getCustomStringForElement(element: Int): String {
         return if (contentList.isEmpty())
