@@ -18,6 +18,7 @@ import com.google.gson.Gson
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
+import cu.control.queue.adapters.viewHolders.ViewHolderQueue
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
@@ -32,18 +33,18 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
 class AdapterPerson(private val queue: Queue) :
-    RecyclerView.Adapter<ViewHolderClient>() {
+    RecyclerView.Adapter<ViewHolderQueue>() {
 
     var contentList: List<Person> = ArrayList()
     private lateinit var context: Context
     private var myCi = ""
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderQueue {
         context = parent.context
         myCi = PreferencesManager(context).getCi()
-        return ViewHolderClient(
+        return ViewHolderQueue(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.item_client,
+                R.layout.item_queue,
                 parent,
                 false
             )
@@ -55,7 +56,7 @@ class AdapterPerson(private val queue: Queue) :
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewHolderClient, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderQueue, position: Int) {
         val person = contentList[position]
 
         holder.layoutBackground.background =

@@ -97,4 +97,6 @@
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
     <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
     <string name="colaboradores">Colaboradores</string>
+    <string name="deschequiar">Deschequear</string>
+    <string name="chequiar">Chequear</string>
 </resources>

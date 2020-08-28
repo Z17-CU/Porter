@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderClient
+import cu.control.queue.adapters.viewHolders.ViewHolderQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Conts.Companion.formatDateBig
@@ -16,14 +17,14 @@ import cu.control.queue.utils.Conts.Companion.formatDateBig
 class AdapterQueue(
     private val onClickListener: onClickListener
 ) :
-    RecyclerView.Adapter<ViewHolderClient>() {
+    RecyclerView.Adapter<ViewHolderQueue>() {
 
     var contentList: List<Queue> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClient {
-        return ViewHolderClient(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderQueue {
+        return ViewHolderQueue(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.item_client,
+                R.layout.item_queue,
                 parent,
                 false
             )
@@ -35,7 +36,7 @@ class AdapterQueue(
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewHolderClient, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderQueue, position: Int) {
         val queue = contentList[position]
 
         holder.layoutBackground.background =

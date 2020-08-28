@@ -14,6 +14,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.daimajia.swipe.SwipeLayout
 import cu.control.queue.R
 import cu.control.queue.adapters.AdapterClient
 import cu.control.queue.dialogs.DialogInsertClient
@@ -183,6 +184,10 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    override fun onSwipe(view: SwipeLayout, client: Client) {
+
     }
 
     @SuppressLint("RestrictedApi")

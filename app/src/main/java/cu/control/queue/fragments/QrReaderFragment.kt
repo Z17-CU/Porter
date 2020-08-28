@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.daimajia.swipe.SwipeLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter
@@ -1031,6 +1032,35 @@ class QrReaderFragment(
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    override fun onSwipe(view: SwipeLayout, client: Client) {
+
+        //vibrate
+        val vibratorService = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibratorService.vibrate(120)
+
+        Completable.create { emitter ->
+            val clientInQueue =
+                dao.getClientFromQueue(client.id, adapter.queueId)
+
+            if (view.dragEdge == SwipeLayout.DragEdge.Left) {
+                if (!clientInQueue!!.isChecked) {
+                    clientInQueue.isChecked = true
+                    payloadUpdateMember(clientInQueue, client, MODE_CHECK)
+                }
+            } else if (view.dragEdge == SwipeLayout.DragEdge.Right) {
+                if (clientInQueue!!.isChecked) {
+                    clientInQueue.isChecked = false
+                    payloadUpdateMember(clientInQueue, client, MODE_UNCHECK)
+                }
+            }
+            view.close()
+            dao.insertClientInQueue(clientInQueue!!)
+            emitter.onComplete()
+        }.observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .subscribe().addTo(compositeDisposable)
     }
 
     private fun selectRangeToExport() {
