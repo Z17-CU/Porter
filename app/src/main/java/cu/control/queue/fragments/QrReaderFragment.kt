@@ -687,10 +687,12 @@ class QrReaderFragment(
                 payload?.methods?.get(TAG_UPDATE_MEMBER) as ParamUpdateMember?
 
             val map = mutableMapOf<String, Long>()
-            map[KEY_MEMBER_UPDATED_DATE] = clientInQueue.lastRegistry
+
+            val time = Calendar.getInstance().timeInMillis
+            map[KEY_MEMBER_UPDATED_DATE] = time
             when (mode) {
-                MODE_CHECK -> map[KEY_CHECKED] = clientInQueue.lastRegistry
-                MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry
+                MODE_CHECK -> map[KEY_CHECKED] = time
+                MODE_UNCHECK -> map[KEY_UNCHECKED] = time
                 MODE_INCREMENT_REINTENT -> map[KEY_REINTENT_COUNT] =
                     clientInQueue.reIntent.toLong()
                 MODE_ADD_OWNER -> map[KEY_NUMBER] = clientInQueue.number.toLong()
