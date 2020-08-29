@@ -220,6 +220,11 @@ dependencies {
 
     /** Range Bar */
     implementation("me.bendik.simplerangeview:simplerangeview:0.2.0")
+
+   /**download*/
+    implementation ("com.download.library:Downloader:4.1.4")
+    /**PrDownload*/
+    implementation ("com.mindorks.android:prdownloader:0.6.0")
 }
 
 fun updateVersionCode() {

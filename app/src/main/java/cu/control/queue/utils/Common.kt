@@ -1,9 +1,14 @@
 package cu.control.queue.utils
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.os.StrictMode
 import android.util.Base64
 import android.util.Log
@@ -11,22 +16,32 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import com.download.library.DownloadImpl
+import com.download.library.DownloadListenerAdapter
+import com.download.library.Extra
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
+import com.downloader.PRDownloaderConfig
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
+import cu.control.queue.BuildConfig
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
+import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
+
 
 class Common {
     companion object {
 
         private val gson = Gson()
+        var APK_MIME_TYPE = "application/vnd.android.package-archive"
 
         fun getSex(idString: String?): Int? {
             return if (idString?.length == 11) {
@@ -54,11 +69,16 @@ class Common {
 
             var count = 0
             hi403Message.url.map {
+
+
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
                 when (count) {
                     0 -> {
                         dialog.setPositiveButton(it.key) { _, _ ->
-                            context.startActivity(intent)
+//                            context.startActivity(intent)
+//                            DownloadApk(it.value)
+                            donloadUpdate(context, it.value)
+
                         }
                     }
                     1 -> {
@@ -80,6 +100,136 @@ class Common {
 
             return dialog.create()
         }
+
+        private fun donloadUpdate(context: Context, value: String): Int {
+
+            val path: File =
+                Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
+            val config = PRDownloaderConfig.newBuilder()
+                .setReadTimeout(30000)
+                .setConnectTimeout(30000)
+                .build()
+            PRDownloader.initialize(context, config)
+
+           val progress = ProgressDialog.show(context, "Actualizando...",
+                "Descargando actualización", true);
+            return PRDownloader.download(value, path.absolutePath, "/Porter@_v"+BuildConfig.VERSION_NAME+".apk")
+                .build()
+                .start(object : OnDownloadListener {
+
+                    override fun onDownloadComplete() {
+                        progress.dismiss()
+                        val file = context.getFileStreamPath( "Porter@_v"+BuildConfig.VERSION_NAME+".apk")
+                        if(file.exists()){
+                            file.deleteOnExit()
+                        }
+
+                        val toInstall =
+                            File(path.absolutePath,"/Porter@_v"+BuildConfig.VERSION_NAME+".apk")
+                        val intent: Intent
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val apkUri = FileProvider.getUriForFile(
+                                context,
+                                BuildConfig.APPLICATION_ID + ".fileprovider",
+                                toInstall
+                            )
+                            intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                            intent.data = apkUri
+                            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        } else {
+                            val apkUri = Uri.fromFile(toInstall)
+                            intent = Intent(Intent.ACTION_VIEW)
+                            intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(intent)
+
+                    }
+
+                    override fun onError(error: com.downloader.Error?) {
+                        Timber.e("onError: $error")
+                    }
+
+                    fun onError(error: Error) {
+                        Timber.e("onError: $error")
+                    }
+                })
+
+        }
+
+
+        private fun DownloadApk(url: String) {
+            val nameApp = "/porteroUpdate." + BuildConfig.VERSION_CODE + ".apk"
+            val req = DownloadManager.Request(Uri.parse(url))
+
+            req.setAllowedNetworkTypes(
+                DownloadManager.Request.NETWORK_WIFI
+                        or DownloadManager.Request.NETWORK_MOBILE
+            )
+                .setAllowedOverRoaming(false)
+                .setTitle("Demo")
+                .setDescription("Something useful. No, really.")
+                .setDestinationInExternalPublicDir(
+                    DIRECTORY_DOWNLOADS,
+                    nameApp
+                )
+        }
+
+
+        private fun gotToDownloadUpdate(context: Context, url: String) {
+            val nameApp = "/porteroUpdate." + BuildConfig.VERSION_CODE + ".apk"
+            DownloadImpl.getInstance()
+                .with(context)
+                .target(
+                    File(
+                        Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS),
+                        "update.apk"
+                    )
+                )
+                .setUniquePath(false)
+                .setForceDownload(true)
+                .url(url)
+                .enqueue(object : DownloadListenerAdapter() {
+                    override fun onStart(
+                        url: String,
+                        userAgent: String,
+                        contentDisposition: String,
+                        mimetype: String,
+                        contentLength: Long,
+                        extra: Extra
+                    ) {
+                        super.onStart(
+                            url,
+                            userAgent,
+                            contentDisposition,
+                            mimetype,
+                            contentLength,
+                            extra
+                        )
+                    }
+
+                    override fun onProgress(
+                        url: String,
+                        downloaded: Long,
+                        length: Long,
+                        usedTime: Long
+                    ) {
+                        super.onProgress(url, downloaded, length, usedTime)
+                        Timber.e(" progress:$downloaded url:$url")
+                    }
+
+                    override fun onResult(
+                        throwable: Throwable,
+                        path: Uri,
+                        url: String,
+                        extra: Extra
+                    ): Boolean {
+
+                        return super.onResult(throwable, path, url, extra)
+                    }
+                })
+        }
+
 
         fun getAge(idString: String): Int {
             val currentYearBig = Calendar.getInstance().get(Calendar.YEAR)

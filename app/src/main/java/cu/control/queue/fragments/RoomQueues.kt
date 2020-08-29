@@ -239,8 +239,6 @@ class RoomQueues : SupportFragment(), onClickListener {
             }
 
             .subscribe()
-
-
             .addTo(compositeDisposable)
     }
 
@@ -335,7 +333,6 @@ class RoomQueues : SupportFragment(), onClickListener {
                         Param.TAG_UPDATE_QUEUE,
                         requireContext()
                     )
-
                     requireActivity().runOnUiThread {
 
                         showReaderOptions(queue)
@@ -376,6 +373,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                         }
                         if (result.code() == 401) {
                             showDialogQueueNoExist(queue)
+                        } else if (result.code() == 403) {
+                            val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
+                            dialog.show()
                         } else {
                             showDialogWorkOffline(queue, openQueue)
                             Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
@@ -403,6 +403,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 true
             }
             .subscribe {
+
                 requireActivity().runOnUiThread {
                     progress.dismiss()
                 }
