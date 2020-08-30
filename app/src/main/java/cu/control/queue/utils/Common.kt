@@ -1,7 +1,7 @@
 package cu.control.queue.utils
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
@@ -16,9 +16,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import com.download.library.DownloadImpl
-import com.download.library.DownloadListenerAdapter
-import com.download.library.Extra
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.downloader.PRDownloaderConfig
@@ -55,7 +52,11 @@ class Common {
             }
         }
 
-        fun showHiErrorMessage(context: Context, message: String): AlertDialog {
+        fun showHiErrorMessage(
+            context: Context,
+            message: String
+
+        ): AlertDialog {
 
             val type = object : TypeToken<Hi403Message>() {
 
@@ -70,13 +71,11 @@ class Common {
             var count = 0
             hi403Message.url.map {
 
-
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
                 when (count) {
                     0 -> {
                         dialog.setPositiveButton(it.key) { _, _ ->
-//                            context.startActivity(intent)
-//                            DownloadApk(it.value)
+
                             donloadUpdate(context, it.value)
 
                         }
@@ -101,7 +100,11 @@ class Common {
             return dialog.create()
         }
 
-        private fun donloadUpdate(context: Context, value: String): Int {
+        private fun donloadUpdate(
+            context: Context,
+            value: String
+
+        ): Int {
 
             val path: File =
                 Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
@@ -111,18 +114,62 @@ class Common {
                 .build()
             PRDownloader.initialize(context, config)
 
-           val progress = ProgressDialog.show(context, "Actualizando...",
-                "Descargando actualización", true);
-            return PRDownloader.download(value, path.absolutePath, "/Porter@_v"+BuildConfig.VERSION_NAME+".apk")
+            val progress = ProgressDialog.show(
+                context, "Actualizando...",
+                "Descargando actualización", true
+            );
+            return PRDownloader.download(
+                value,
+                path.absolutePath,
+                "/Porter@_v" + BuildConfig.VERSION_NAME + ".apk"
+            )
                 .build()
                 .start(object : OnDownloadListener {
 
                     override fun onDownloadComplete() {
+
                         progress.dismiss()
-                        val file = context.getFileStreamPath( "Porter@_v"+BuildConfig.VERSION_NAME+".apk")
-                        if(file.exists()){
-                            file.deleteOnExit()
-                        }
+                        val test = context as Activity
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                            val permission = context.packageManager.canRequestPackageInstalls()
+//                            if (permission) {
+                        installPackage(context, path)
+//                            } else {
+//
+//                                Permissions.with(test)
+//                                    .request(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+//                                    .ifNecessary()
+//                                    .onAllGranted {
+//                                        inntallPackage(context, value, path)
+//                                    }
+//                                    .execute()
+//                            }
+
+
+                    }
+
+
+                    override fun onError(error: com.downloader.Error?) {
+                        Timber.e("onError: $error")
+                    }
+
+                    fun onError(error: Error) {
+                        Timber.e("onError: $error")
+                    }
+                })
+
+        }
+
+        private fun installPackage(
+            context: Context,
+            path: File
+        ) {
+
+            val file =
+                context.getFileStreamPath("Porter@_v" + BuildConfig.VERSION_NAME + ".apk")
+            if (file.exists()) {
+                file.deleteOnExit()
+            }
 
                         val toInstall =
                             File(path.absolutePath,"/Porter@_v"+BuildConfig.VERSION_NAME+".apk")
@@ -144,92 +191,7 @@ class Common {
                         }
                         context.startActivity(intent)
 
-                    }
-
-                    override fun onError(error: com.downloader.Error?) {
-                        Timber.e("onError: $error")
-                    }
-
-                    fun onError(error: Error) {
-                        Timber.e("onError: $error")
-                    }
-                })
-
         }
-
-
-        private fun DownloadApk(url: String) {
-            val nameApp = "/porteroUpdate." + BuildConfig.VERSION_CODE + ".apk"
-            val req = DownloadManager.Request(Uri.parse(url))
-
-            req.setAllowedNetworkTypes(
-                DownloadManager.Request.NETWORK_WIFI
-                        or DownloadManager.Request.NETWORK_MOBILE
-            )
-                .setAllowedOverRoaming(false)
-                .setTitle("Demo")
-                .setDescription("Something useful. No, really.")
-                .setDestinationInExternalPublicDir(
-                    DIRECTORY_DOWNLOADS,
-                    nameApp
-                )
-        }
-
-
-        private fun gotToDownloadUpdate(context: Context, url: String) {
-            val nameApp = "/porteroUpdate." + BuildConfig.VERSION_CODE + ".apk"
-            DownloadImpl.getInstance()
-                .with(context)
-                .target(
-                    File(
-                        Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS),
-                        "update.apk"
-                    )
-                )
-                .setUniquePath(false)
-                .setForceDownload(true)
-                .url(url)
-                .enqueue(object : DownloadListenerAdapter() {
-                    override fun onStart(
-                        url: String,
-                        userAgent: String,
-                        contentDisposition: String,
-                        mimetype: String,
-                        contentLength: Long,
-                        extra: Extra
-                    ) {
-                        super.onStart(
-                            url,
-                            userAgent,
-                            contentDisposition,
-                            mimetype,
-                            contentLength,
-                            extra
-                        )
-                    }
-
-                    override fun onProgress(
-                        url: String,
-                        downloaded: Long,
-                        length: Long,
-                        usedTime: Long
-                    ) {
-                        super.onProgress(url, downloaded, length, usedTime)
-                        Timber.e(" progress:$downloaded url:$url")
-                    }
-
-                    override fun onResult(
-                        throwable: Throwable,
-                        path: Uri,
-                        url: String,
-                        extra: Extra
-                    ): Boolean {
-
-                        return super.onResult(throwable, path, url, extra)
-                    }
-                })
-        }
-
 
         fun getAge(idString: String): Int {
             val currentYearBig = Calendar.getInstance().get(Calendar.YEAR)
@@ -382,19 +344,6 @@ class Common {
 
             return false
         }
-
-//        fun isValidFV(fv: String, context: Context): Boolean {
-//            var numbers = "0123456789"
-//            for (x in fv.indices) {
-//                val c: Char = fv.charAt(x)
-//                // Si no está entre a y z, ni entre A y Z, ni es un espacio
-//                if (!(c in 'a'..'z' || c in 'A'..'Z' || c == ' ')) {
-//                    return false
-//                }
-//            }
-//            return true
-//
-//        }
 
         @SuppressLint("LogNotTimber")
         fun stringToClient(rawResult: Result): Client? {

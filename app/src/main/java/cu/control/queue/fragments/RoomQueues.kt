@@ -863,7 +863,10 @@ class RoomQueues : SupportFragment(), onClickListener {
             .subscribe({
                 if (it.first != 200) {
                     val message = it.second ?: "Error ${it.first}"
-                    val dialog = Common.showHiErrorMessage(requireContext(), message)
+                    val dialog = Common.showHiErrorMessage(
+                        requireContext(),
+                        message
+                    )
                     dialog.show()
                 }
                 progress.dismiss()

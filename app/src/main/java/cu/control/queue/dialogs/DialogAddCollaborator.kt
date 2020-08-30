@@ -44,17 +44,24 @@ class DialogAddCollaborator(
             .create()
 
         startReader()
-
         return dialog
     }
+
 
     @SuppressLint("LogNotTimber")
     private fun getView(): View {
 
         view = View.inflate(context, R.layout.layout_dialog_hi_client, null)
 
+
+        view._showAddClient.setOnClickListener {
+            DialogInsertColaborator(context, queue, compositeDisposable = CompositeDisposable()).create().show()
+
+        }
+
         return view
     }
+
 
     private fun showError(error: String) {
         (context as Activity).runOnUiThread {

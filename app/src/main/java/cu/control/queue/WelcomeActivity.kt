@@ -8,8 +8,7 @@ import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro2
 import com.github.paolorotolo.appintro.AppIntro2Fragment
 import com.github.paolorotolo.appintro.model.SliderPagerBuilder
-import cu.control.queue.dialogs.DialogHiClient
-import cu.control.queue.interfaces.OnDialogHiClientEvent
+ import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.utils.PreferencesManager
 import io.reactivex.disposables.CompositeDisposable
 
