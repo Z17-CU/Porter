@@ -129,7 +129,7 @@ class Common {
                     override fun onDownloadComplete() {
 
                         progress.dismiss()
-                        val test = context as Activity
+                        context as Activity
 
                         installPackage(context, path)
 
@@ -331,6 +331,12 @@ class Common {
 
             return false
         }
+        fun isValidFV(fv:String ):Boolean{
+            if(!fv.isBlank()){
+                return  true
+            }
+            return false
+        }
 
         @SuppressLint("LogNotTimber")
         fun stringToClient(rawResult: Result): Client? {
@@ -391,8 +397,8 @@ class Common {
                             name,
                             lastName,
                             idString,
-                            fv, 1,
-                            listOf()
+                            fv,1
+
                         )
                 }
             }

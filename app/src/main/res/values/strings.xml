@@ -111,6 +111,8 @@
     <string name="province">Seleccione la provincia</string>
     <string name="municipie">Seleccione un municipio</string>
     <string name="store">Seleccione una tienda</string>
+    <string name="select_municipe">Seleccione un municipio</string>
+    <string name="select_store">Seleccione una tienda</string>
 
 
     <array name="provinceArray">

@@ -2,7 +2,7 @@ package cu.control.queue.repository.dataBase.entitys.payload
 
 class Queue(
     val uuid: String,
-    val store: Int,
+    val store: String,
     val members: ArrayList<Person>?,
     val operators: ArrayList<Person>?,
     val created_date: Long,

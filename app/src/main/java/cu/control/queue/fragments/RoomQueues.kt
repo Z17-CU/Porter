@@ -744,7 +744,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 created_date = time,
                 updated_date = time,
                 //Todo update this
-                business = 1,
+                business = "",
                 province = "",
                 municipality = "",
                 owner = PreferencesManager(requireContext()).getCi()
@@ -796,8 +796,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(),
-                preferences.getStoreVersion(), listOf()
+                preferences.getFv(),1
+
             )
 
             val data = Common.porterHiToString(struct)
@@ -820,10 +820,10 @@ class RoomQueues : SupportFragment(), onClickListener {
                     }.type
                     val gson: Gson = GsonBuilder().create()
                     val porterHistruct: PorterHistruct = gson.fromJson(body, PorterHistruct::class.java)
-                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
-                        JsonWrite(requireContext()).writeToFile(body)
-//                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
-                    }
+//                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
+//                        JsonWrite(requireContext()).writeToFile(body)
+////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
+//                    }
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
                         if (dao.getQueueByUUID(entry.key) == null) {
@@ -842,7 +842,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                                     entry.key,
                                     null,
                                     null,
-                                    null,
+                                    "",
                                     createdDate,
                                     createdDate,
                                     ArrayList(),

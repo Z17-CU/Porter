@@ -83,7 +83,7 @@ class DialogHiClient(
 
             AppDataBase.getInstance(context).dao().insertCollaborator(person)
 
-            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion, listOf())
+            val struct = PorterHistruct(name, lastName, ci, fv,1  )
 
             val data = Common.porterHiToString(struct)
 
@@ -149,7 +149,7 @@ class DialogHiClient(
 
         val client = Common.stringToPorterHistruct(result, context)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv,it.store_version )
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,1 )
 
             return
         }

@@ -46,7 +46,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         dialogInfo(this)
 
         val fab: View = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ ->
             dialogInfo(this)
         }
 
@@ -94,7 +94,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
 
         val client = Common.stringToPorterHistruct(result, this)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv,it.store_version)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,1)
             goToMain()
             return
         }
@@ -141,7 +141,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
             preferences.setFV(fv)
             preferences.setStoreVersion(1)
 
-            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion, listOf())
+            val struct = PorterHistruct(name, lastName, ci, fv,1)
 
             val data = Common.porterHiToString(struct)
 

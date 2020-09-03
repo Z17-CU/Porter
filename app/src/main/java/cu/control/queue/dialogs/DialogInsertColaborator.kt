@@ -24,6 +24,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._editTextCI
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._editTextFV
+import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
+import kotlinx.android.synthetic.main.layout_dialog_insert_manual_colaborator.view.*
 
 class DialogInsertColaborator(
     private val context: Context,
@@ -58,7 +63,16 @@ class DialogInsertColaborator(
 
                 val ci: String = view._editTextCI.text.toString()
                 val fv: String = view._editTextFV.text.toString().toUpperCase()
-                saveAndSendDataInsertColaborator("", "", ci, fv)
+                if (!Common.isValidFV(fv)) {
+                    Toast.makeText(
+                        context,
+                        "El campo FV no puede estar en blanco",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    saveAndSendDataInsertColaborator(ci, fv)
+
+                }
 
             }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -86,19 +100,19 @@ class DialogInsertColaborator(
                     Common.isValidCI(view._editTextCI.text.toString().trim(), context)
             }
         })
-//        view._editTextFV.addTextChangedListener(object : TextWatcher {
-//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-//             }
-//
-//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-//            }
-//
-//            override fun afterTextChanged(s: Editable) {
-//
-//                view._okButton.isEnabled =
-//                    Common.isValidCI(view._editTextCI.text.toString().trim(), context)
-//            }
-//        })
+        view._editTextFV.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+             }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable) {
+
+                view._okButton.isEnabled =
+                    Common.isValidFV(view._editTextCI.text.toString().trim())
+            }
+        })
 
         view._okButton.isEnabled =
             Common.isValidCI(view._editTextCI.text.toString().trim(), context)
@@ -113,8 +127,6 @@ class DialogInsertColaborator(
     }
 
     private fun saveAndSendDataInsertColaborator(
-        name: String,
-        lastName: String,
         ci: String,
         fv: String = "00"
     ) {

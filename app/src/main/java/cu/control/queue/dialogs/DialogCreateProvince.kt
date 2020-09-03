@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getColor
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import cu.control.queue.R
@@ -16,7 +17,6 @@ import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucI
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
-import cu.control.queue.utils.JsonWrite
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -44,9 +44,9 @@ class DialogCreateProvince(
     private lateinit var dao: Dao
     private lateinit var dialog: AlertDialog
     private var queue: Queue? = null
-    private var idProvince = 0
-    private var idMunicipie = 0
-    private var idStore = 0
+    private var idProvince = -1
+    private var idMunicipie = -1
+    private var idStore = -1
     fun create(): AlertDialog {
         dao = AppDataBase.getInstance(context).dao()
         dialog = AlertDialog.Builder(context)
@@ -69,12 +69,14 @@ class DialogCreateProvince(
 
         view._okButton.setOnClickListener {
 
-            if(idProvince!=PreferencesManager(context).getLastInfoCreateQueue()!!.split(",")[0].toInt()){
-                idMunicipie=0
-                idStore=0
-                PreferencesManager(context).setLastInfoCreateQueue(idProvince,idMunicipie,idStore)
+            if (idProvince != PreferencesManager(context).getLastInfoCreateQueue()!!
+                    .split(",")[0].toInt()
+            ) {
+                idMunicipie = -1
+                idStore = -1
+                PreferencesManager(context).setLastInfoCreateQueue(idProvince, idMunicipie, idStore)
             }
-            if (idProvince != 0 && idMunicipie != 0 && idStore != 0) {
+            if (idProvince != -1 && idMunicipie != -1 && idStore != -1) {
 
                 val resultReadJson = getCharts()
 
@@ -100,7 +102,7 @@ class DialogCreateProvince(
                             created_date = time,
                             updated_date = time,
                             //Todo update this
-                            business = 1,
+                            business = "",
                             province = "",
                             municipality = "",
                             collaborators = arrayListOf(PreferencesManager(context).getCi()),
@@ -113,7 +115,7 @@ class DialogCreateProvince(
                     }
                     dao.insertQueue(thisqueue)
 
-                    var tag = ""
+                    val tag: String
                     val map = mutableMapOf<String, String>()
                     map[Param.KEY_QUEUE_NAME] = thisqueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
@@ -126,7 +128,11 @@ class DialogCreateProvince(
                     }
 
                     clientViewModel.onRegistreAction(thisqueue.uuid ?: "", param, tag, context)
-                    PreferencesManager(context).setLastInfoCreateQueue(idProvince, idMunicipie, idStore)
+                    PreferencesManager(context).setLastInfoCreateQueue(
+                        idProvince,
+                        idMunicipie,
+                        idStore
+                    )
                     it.onComplete()
                 }
                     .observeOn(AndroidSchedulers.mainThread())
@@ -139,9 +145,12 @@ class DialogCreateProvince(
                     }))
 
 
-            }
-            else{
-                Toast.makeText(context,"Debe seleccionar una provincia,municipio y tienda",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    "Debe seleccionar una provincia,municipio y tienda",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }
@@ -156,7 +165,7 @@ class DialogCreateProvince(
                 it.onSuccess(queue!!)
             }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { queue ->
+                .subscribe { _ ->
 //                    view._editTextName.setText(queue.name)
 //                    view._editTextDescription.setText(queue.description)
 //                    view._okButton.setText(context.getString(R.string.editar))
@@ -174,21 +183,21 @@ class DialogCreateProvince(
 
 
         val lastInfoCreateQueue = PreferencesManager(context).getLastInfoCreateQueue()
-        if(lastInfoCreateQueue!=""){
+        if (lastInfoCreateQueue != "") {
             val split = lastInfoCreateQueue!!.split(",")
             idProvince = split[0].toInt()
             idMunicipie = split[1].toInt()
             idStore = split[2].toInt()
         }
 
-        val data = genericList.map { it.name }.toString()
+        genericList.map { it.name }.toString()
         view.spn_my_spinner.setItems(genericList.map { it.name }.toTypedArray())
         view.spn_my_spinner.setTitle("Seleccione una provincia")
+
         view.spn_my_spinner.setExpandTint(R.color.colorAccent)
-        if (idProvince != 0 && idMunicipie != 0 && idStore != 0) {
+        if (idProvince != -1 && idMunicipie != -1 && idStore != -1) {
             view.spn_store.visibility = View.VISIBLE
             view.spn_municipie.visibility = View.VISIBLE
-
             view.spn_my_spinner.hint = genericList[idProvince].name
             view.spn_municipie.hint = genericList[idProvince].municipality[idMunicipie].name
             view.spn_store.hint =
@@ -202,23 +211,32 @@ class DialogCreateProvince(
             view.spn_municipie.setItems(genericList[idProvince].municipality.map {
                 it.name
             }.toTypedArray())
-            view.spn_municipie.setExpandTint(R.color.colorAccent)
 
-            view.spn_municipie.setOnItemClickListener { idMunicipe ->
+            view.spn_municipie.setExpandTint(R.color.colorAccent)
+            view.spn_municipie.setText(context.getString(R.string.select_municipe))
+            view.spn_store.setText(context.getString(R.string.select_store))
+
+            view.spn_municipie.setTitle("Seleccione un municipio")
+               view.spn_municipie.setOnItemClickListener { idMunicipe ->
                 idMunicipie = idMunicipe
                 view.spn_store.visibility = View.VISIBLE
-                view.spn_store.setItems(genericList[idProvince].municipality[idMunicipe].store.map { store ->
+                 view.spn_store.setItems(genericList[idProvince].municipality[idMunicipe].store.map { store ->
                     store.name
                 }.toTypedArray())
                 view.spn_store.setExpandTint(R.color.colorAccent)
-                view.spn_store.setOnItemClickListener {
-                    idStore=it
+                  view.spn_store.setTitle("Seleccione una tienda")
+                   view.spn_store.setText(context.getString(R.string.select_store))
+                  view.spn_store.setOnItemClickListener {
+                    idStore = it
                     storeId = genericList[idProvince].municipality[idMunicipe].store[it].id
-                    PreferencesManager(context).setLastInfoCreateQueue(idProvince, idMunicipie, it)
+                      PreferencesManager(context).setLastInfoCreateQueue(idProvince, idMunicipie, idStore)
+
                 }
-
-
             }
+
+            view.spn_municipie.hint = "Seleccione un municipio"
+            view.spn_store.hint = "Seleccione una tienda"
+
         }
 
 
@@ -232,11 +250,14 @@ class DialogCreateProvince(
 
 
     private fun getCharts(): List<jsonStrucItem> {
-
-        val readFromFile = JsonWrite(context).readFromFile()
+//        if (PreferencesManager(context).getLastInfoCreateQueue()!!.toInt() > 1) {
+//            //        val jsonString = context.assets.readFile("store.json")
+//
+//        }
         val jsonString = context.assets.open("stores.json").bufferedReader().use {
             it.readText()
         }
-        return readFromFile!!
+        return GsonBuilder().create()
+            .fromJson(jsonString, object : TypeToken<List<jsonStrucItem>>() {}.type)
     }
 }

@@ -9,6 +9,6 @@ class PorterHistruct(
     val last_name: String,
     val ci: String,
     val fv: String,
-    val store_version: Int,
-    val stores: List<jsonStrucItem>
+    val store_version: Int
+//    val stores: List<jsonStrucItem>
  )

@@ -21,20 +21,20 @@ class JsonWrite(val context: Context) {
         bufferedWriter.close()
     }
 
-     fun readFromFile(): List<jsonStrucItem>? {
-        val file = File(context.filesDir, "stores.json")
-        val fileReader = FileReader(file)
-        val bufferedReader = BufferedReader(fileReader)
-        val stringBuilder = StringBuilder()
-        var line = bufferedReader.readLine()
-        while (line != null) {
-            stringBuilder.append(line).append("\n")
-            line = bufferedReader.readLine()
-        }
-        bufferedReader.close() // This responce will have Json Format String
-         val gson: Gson = GsonBuilder().create()
-         val porterHistruct: PorterHistruct = gson.fromJson(stringBuilder.toString(), PorterHistruct::class.java)
-        val response =porterHistruct.stores
-        return response
-    }
+//     fun readFromFile(): List<jsonStrucItem>? {
+//        val file = File(context.filesDir, "stores.json")
+//        val fileReader = FileReader(file)
+//        val bufferedReader = BufferedReader(fileReader)
+//        val stringBuilder = StringBuilder()
+//        var line = bufferedReader.readLine()
+//        while (line != null) {
+//            stringBuilder.append(line).append("\n")
+//            line = bufferedReader.readLine()
+//        }
+//        bufferedReader.close() // This responce will have Json Format String
+//         val gson: Gson = GsonBuilder().create()
+//         val porterHistruct: PorterHistruct = gson.fromJson(stringBuilder.toString(), PorterHistruct::class.java)
+//        val response =porterHistruct.stores
+//        return response
+//    }
 }

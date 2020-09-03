@@ -15,7 +15,7 @@ class Queue(
     var uuid: String?,
     val province: String?,
     val municipality: String?,
-    var business: Int?,
+    var business: String,
     val created_date: Long?,
     val updated_date: Long?,
     var collaborators: ArrayList<String> = ArrayList(),
