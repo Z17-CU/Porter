@@ -225,6 +225,14 @@ dependencies {
     implementation ("com.download.library:Downloader:4.1.4")
     /**PrDownload*/
     implementation ("com.mindorks.android:prdownloader:0.6.0")
+
+    /**searchSpinner*/
+    implementation ("com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1")
+    implementation ("com.github.jrizani:JRSpinner:1.0.0")
+    implementation ("com.github.jrizani:JRSpinner:androidx-SNAPSHOT")
+
+
+
 }
 
 fun updateVersionCode() {

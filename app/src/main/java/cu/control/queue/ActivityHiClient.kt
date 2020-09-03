@@ -92,9 +92,9 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         val vibratorService = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        val client = Common.stringToPorterHistruct(result)
+        val client = Common.stringToPorterHistruct(result, this)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,it.store_version)
             goToMain()
             return
         }
@@ -125,15 +125,23 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         }
     }
 
-    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
+    private fun saveAndSendData(
+        name: String,
+        lastName: String,
+        ci: String,
+        fv: String = "00",
+        storeVersion: Int
+
+    ) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
 
             preferences.setName(name)
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
+            preferences.setStoreVersion(1)
 
-            val struct = PorterHistruct(name, lastName, ci, fv)
+            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion, listOf())
 
             val data = Common.porterHiToString(struct)
 

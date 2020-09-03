@@ -17,6 +17,7 @@ open class Param {
 
         const val KEY_QUEUE_NAME = "name"
         const val KEY_QUEUE_DESCRIPTION = "description"
+        const val KEY_STORE_VERSION = "store_version"
 
         const val KEY_MEMBER_COUNT = "count"
     }

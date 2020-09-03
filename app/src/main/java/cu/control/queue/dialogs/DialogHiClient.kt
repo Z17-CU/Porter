@@ -63,13 +63,14 @@ class DialogHiClient(
         }
     }
 
-    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
+    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00",storeVersion:Int) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
 
             preferences.setName(name)
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
+            preferences.setStoreVersion(storeVersion)
 
             val info = HashMap<String, Any>()
             info.put(Person.KEY_NAME, name)
@@ -82,7 +83,7 @@ class DialogHiClient(
 
             AppDataBase.getInstance(context).dao().insertCollaborator(person)
 
-            val struct = PorterHistruct(name, lastName, ci, fv)
+            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion, listOf())
 
             val data = Common.porterHiToString(struct)
 
@@ -146,9 +147,9 @@ class DialogHiClient(
         val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        val client = Common.stringToPorterHistruct(result)
+        val client = Common.stringToPorterHistruct(result, context)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,it.store_version )
 
             return
         }

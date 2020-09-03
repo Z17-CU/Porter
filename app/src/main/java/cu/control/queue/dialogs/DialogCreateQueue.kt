@@ -59,62 +59,21 @@ class DialogCreateQueue(
         }
 
         view._okButton.setOnClickListener {
+            DialogCreateProvince(
+                it.context,
+                compositeDisposable,
+                clientViewModel = clientViewModel,
 
-            compositeDisposable.add(Completable.create {
+                nameQueue = view._editTextName.text.toString(),
+                nameDescription = view._editTextDescription.text.toString()
 
-                val time = Calendar.getInstance().timeInMillis
+            ).create()
+                .show()
 
-                val thisqueue = if (queue == null) {
+            dialog.dismiss()
 
-                    Queue(
-                        time,
-                        view._editTextName.text.toString().trim(),
-                        Calendar.getInstance().timeInMillis,
-                        description = view._editTextDescription.text.toString().trim(),
-                        uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(
-                            context
-                        ).getFv() + "-" + time,
-                        created_date = time,
-                        updated_date = time,
-                        //Todo update this
-                        business = 1,
-                        province = "",
-                        municipality = "",
-                        collaborators = arrayListOf(PreferencesManager(context).getCi()),
-                        owner = PreferencesManager(context).getCi()
-                    )
-                } else {
-                    queue!!.name = view._editTextName.text.toString().trim()
-                    queue!!.description = view._editTextDescription.text.toString().trim()
-                    queue!!
-                }
-                dao.insertQueue(thisqueue)
 
-                var tag = ""
-                val map = mutableMapOf<String, String>()
-                map[Param.KEY_QUEUE_NAME] = thisqueue.name
-                map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
-                val param = if (queue == null) {
-                    tag = Param.TAG_CREATE_QUEUE
-                    ParamCreateQueue(thisqueue.business ?: 1, map, thisqueue.created_date ?: time)
-                } else {
-                    tag = Param.TAG_UPDATE_QUEUE
-                    ParamUpdateQueue(map, thisqueue.updated_date ?: time)
-                }
-
-                clientViewModel.onRegistreAction(thisqueue.uuid ?: "", param, tag, context)
-
-                it.onComplete()
-            }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    dialog.dismiss()
-                }, {
-                    it.printStackTrace()
-                    showError(context.getString(R.string.error))
-                }))
-        }
+         }
 
         view._editTextName.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {

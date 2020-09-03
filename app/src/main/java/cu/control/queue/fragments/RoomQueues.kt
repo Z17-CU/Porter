@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
@@ -368,22 +369,21 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        if (result.code() == 404) {
-                            showDialogQueueNoExist(queue)
-                        }
-                        if (result.code() == 401) {
-                            showDialogQueueNoExist(queue)
-                        } else if (result.code() == 403) {
-                            val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
-                            dialog.show()
-                        } else {
-                            showDialogWorkOffline(queue, openQueue)
-                            Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
+                        when (result.code()){
+                            401->{
+                                showDialogQueueNoExist(queue)
+                            }
+                            403->{
+                                val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
+                                dialog.show()
+                            }
+                            404->{
+                                showDialogQueueNoExist(queue)
+                            }
+
                         }
 
-                    } else {
-                        showDialogWorkOffline(queue, openQueue)
-                        Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
+
                     }
                 }
             }
@@ -796,7 +796,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv()
+                preferences.getFv(),
+                preferences.getStoreVersion(), listOf()
             )
 
             val data = Common.porterHiToString(struct)
@@ -817,7 +818,12 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val type = object : TypeToken<Map<String, Map<String, Any>>>() {
 
                     }.type
-
+                    val gson: Gson = GsonBuilder().create()
+                    val porterHistruct: PorterHistruct = gson.fromJson(body, PorterHistruct::class.java)
+                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
+                        JsonWrite(requireContext()).writeToFile(body)
+//                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
+                    }
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
                         if (dao.getQueueByUUID(entry.key) == null) {

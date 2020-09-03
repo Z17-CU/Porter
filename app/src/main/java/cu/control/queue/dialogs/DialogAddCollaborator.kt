@@ -151,7 +151,7 @@ class DialogAddCollaborator(
         val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        val client = Common.stringToPorterHistruct(result)
+        val client = Common.stringToPorterHistruct(result,context)
         client?.let {
             saveAndSendData(it.name, it.last_name, it.ci, it.fv)
             return

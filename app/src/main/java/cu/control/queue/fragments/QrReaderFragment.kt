@@ -211,11 +211,13 @@ class QrReaderFragment(
             queue = it
             menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
         })
+
+        resumeReader()
+
     }
 
     override fun onResume() {
         super.onResume()
-        resumeReader()
         progress.dismiss()
     }
 

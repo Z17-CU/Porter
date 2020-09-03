@@ -107,4 +107,16 @@
     <string name="error_conection">Error de red</string>
     <string name="update">Actualizar</string>
     <string name="queue_not_found">La cola no exite.</string>
+    <string name="next">Continuar</string>
+    <string name="province">Seleccione la provincia</string>
+    <string name="municipie">Seleccione un municipio</string>
+    <string name="store">Seleccione una tienda</string>
+
+
+    <array name="provinceArray">
+        <item>Habana</item>
+        <item>Villa Clara</item>
+        <item>Camaguey</item>
+        <item>La isla</item>
+    </array>
 </resources>

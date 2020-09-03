@@ -130,21 +130,8 @@ class Common {
 
                         progress.dismiss()
                         val test = context as Activity
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                            val permission = context.packageManager.canRequestPackageInstalls()
-//                            if (permission) {
-                        installPackage(context, path)
-//                            } else {
-//
-//                                Permissions.with(test)
-//                                    .request(Manifest.permission.REQUEST_INSTALL_PACKAGES)
-//                                    .ifNecessary()
-//                                    .onAllGranted {
-//                                        inntallPackage(context, value, path)
-//                                    }
-//                                    .execute()
-//                            }
 
+                        installPackage(context, path)
 
                     }
 
@@ -171,25 +158,25 @@ class Common {
                 file.deleteOnExit()
             }
 
-                        val toInstall =
-                            File(path.absolutePath,"/Porter@_v"+BuildConfig.VERSION_NAME+".apk")
-                        val intent: Intent
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            val apkUri = FileProvider.getUriForFile(
-                                context,
-                                BuildConfig.APPLICATION_ID + ".fileprovider",
-                                toInstall
-                            )
-                            intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                            intent.data = apkUri
-                            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        } else {
-                            val apkUri = Uri.fromFile(toInstall)
-                            intent = Intent(Intent.ACTION_VIEW)
-                            intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(intent)
+            val toInstall =
+                File(path.absolutePath, "/Porter@_v" + BuildConfig.VERSION_NAME + ".apk")
+            val intent: Intent
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val apkUri = FileProvider.getUriForFile(
+                    context,
+                    BuildConfig.APPLICATION_ID + ".fileprovider",
+                    toInstall
+                )
+                intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                intent.data = apkUri
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            } else {
+                val apkUri = Uri.fromFile(toInstall)
+                intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
 
         }
 
@@ -381,7 +368,10 @@ class Common {
         }
 
         @SuppressLint("LogNotTimber")
-        fun stringToPorterHistruct(rawResult: Result): PorterHistruct? {
+        fun stringToPorterHistruct(
+            rawResult: Result,
+            context: Context
+        ): PorterHistruct? {
 
             var porterHistruct: PorterHistruct? = null
 
@@ -393,7 +383,7 @@ class Common {
                 val lastName = Regex("A:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 val idString = Regex("CI:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 val fv = Regex("FV:(.+?)*").find(it)?.value?.split(':')?.get(1)
-
+//                val stores=Regex("stores:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 if (name != null && lastName != null && idString != null && fv != null) {
 
                     porterHistruct =
@@ -401,7 +391,8 @@ class Common {
                             name,
                             lastName,
                             idString,
-                            fv
+                            fv, 1,
+                            listOf()
                         )
                 }
             }
