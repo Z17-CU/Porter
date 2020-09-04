@@ -6,7 +6,7 @@ import cu.control.queue.repository.dataBase.entitys.Client.Companion.TABLE_NAME
 
 @Entity(tableName = TABLE_NAME)
 class Client(
-    var name: String,
+    var name: String?,
     @PrimaryKey
     var id: Long,
     var ci: String,

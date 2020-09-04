@@ -102,7 +102,7 @@ class DialogCreateProvince(
                             created_date = time,
                             updated_date = time,
                             //Todo update this
-                            business = "",
+                            business = null,
                             province = "",
                             municipality = "",
                             collaborators = arrayListOf(PreferencesManager(context).getCi()),

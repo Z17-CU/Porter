@@ -71,6 +71,7 @@ class DialogInsertColaborator(
                     ).show()
                 } else {
                     saveAndSendDataInsertColaborator(ci, fv)
+                    dialog.dismiss()
 
                 }
 
@@ -78,12 +79,18 @@ class DialogInsertColaborator(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    dialog.dismiss()
+
                 }, {
-                    it.printStackTrace()
-                    showError(context.getString(R.string.error))
+                    val isValid=Common.isValidFV(view._editTextFV.text.toString().toUpperCase())
+                    if(!isValid){
+                        showError("El campo FV no puede estar en blanco")
+                    }else{
+                        it.printStackTrace()
+                        showError(context.getString(R.string.error))
+                    }
+
                 }))
-            dialog.dismiss()
+//            dialog.dismiss()
 
         }
 

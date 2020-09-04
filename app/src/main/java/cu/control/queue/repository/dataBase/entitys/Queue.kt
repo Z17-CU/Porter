@@ -3,6 +3,7 @@ package cu.control.queue.repository.dataBase.entitys
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 
 @Entity
 class Queue(
@@ -15,7 +16,7 @@ class Queue(
     var uuid: String?,
     val province: String?,
     val municipality: String?,
-    var business: String,
+    var business: String?,
     val created_date: Long?,
     val updated_date: Long?,
     var collaborators: ArrayList<String> = ArrayList(),

@@ -642,7 +642,7 @@ class QrReaderFragment(
             val payload = dao.getPayload(queue.uuid!!)
             var param: ParamAddMember? = payload?.methods?.get(TAG_ADD_MEMBER) as ParamAddMember?
 
-            val nameArray = client.name.split(' ')
+            val nameArray = client.name!!.split(' ')
             val name: String
             var lastName = ""
             if (nameArray.size > 1) {
@@ -655,7 +655,7 @@ class QrReaderFragment(
                     pos++
                 }
             } else {
-                name = client.name
+                name = client.name!!
                 lastName = ""
             }
 

@@ -66,6 +66,7 @@ class Common {
 
             val dialog = AlertDialog.Builder(context)
                 .setTitle(hi403Message.title)
+                .setCancelable(false)
                 .setMessage(hi403Message.message)
 
             var count = 0
