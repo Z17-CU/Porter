@@ -70,8 +70,7 @@ class DialogCreateProvince(
         view._okButton.setOnClickListener {
 
             if (idProvince != PreferencesManager(context).getLastInfoCreateQueue()!!
-                    .split(",")[0].toInt()
-            ) {
+                    .split(",")[0].toInt()) {
                 idMunicipie = -1
                 idStore = -1
                 PreferencesManager(context).setLastInfoCreateQueue(idProvince, idMunicipie, idStore)
@@ -207,6 +206,7 @@ class DialogCreateProvince(
         view.spn_my_spinner.setOnItemClickListener { idPprovince ->
             idProvince = idPprovince
             view.spn_municipie.visibility = View.VISIBLE
+            view.spn_store.visibility = View.VISIBLE
 
             view.spn_municipie.setItems(genericList[idProvince].municipality.map {
                 it.name
@@ -215,11 +215,11 @@ class DialogCreateProvince(
             view.spn_municipie.setExpandTint(R.color.colorAccent)
             view.spn_municipie.setText(context.getString(R.string.select_municipe))
             view.spn_store.setText(context.getString(R.string.select_store))
+            view.spn_store.visibility = View.VISIBLE
 
             view.spn_municipie.setTitle("Seleccione un municipio")
                view.spn_municipie.setOnItemClickListener { idMunicipe ->
                 idMunicipie = idMunicipe
-                view.spn_store.visibility = View.VISIBLE
                  view.spn_store.setItems(genericList[idProvince].municipality[idMunicipe].store.map { store ->
                     store.name
                 }.toTypedArray())
