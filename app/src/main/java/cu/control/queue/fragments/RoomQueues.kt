@@ -34,6 +34,7 @@ import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterQueue
+import cu.control.queue.adapters.AdapterQueueFilterSearch
 import cu.control.queue.dialogs.DialogCreateQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
@@ -86,6 +87,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     private var queueToMerge: Queue? = null
 
     private lateinit var adapter: AdapterQueue
+    private lateinit var adapterSearchResult: AdapterQueueFilterSearch
 
     private var searchQuery = MutableLiveData<String>().default("")
 
@@ -130,12 +132,15 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
         adapter = AdapterQueue(this)
+        adapterSearchResult = AdapterQueueFilterSearch(this)
+
         _recyclerViewQueues.adapter = adapter
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
             refreshAdapter(it)
         })
+
 
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (it.isNullOrEmpty()) {
@@ -146,12 +151,11 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val list: List<Queue> =
                         dao.getQueuesByIds(dao.getQueuesIdsByClient(it.toLong()) ?: ArrayList())
                             ?: ArrayList()
-
                     emitter.onSuccess(list)
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { list ->
-                        refreshAdapter(list)
+                        refreshAdapterFilterSearch(list)
                     }.addTo(compositeDisposable)
             }
         })
@@ -167,6 +171,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {
             searchView.closeSearch()
+            refreshAdapter(viewModel.allQueues.value ?: ArrayList())
             true
         } else {
             super.onBackPressedSupport()
@@ -369,15 +374,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        when (result.code()){
-                            401->{
+                        when (result.code()) {
+                            401 -> {
                                 showDialogQueueNoExist(queue)
                             }
-                            403->{
+                            403 -> {
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
                                 dialog.show()
                             }
-                            404->{
+                            404 -> {
                                 showDialogQueueNoExist(queue)
                             }
 
@@ -618,7 +623,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     when (newText?.length) {
                         11 -> searchQuery.postValue(newText)
-                        else -> searchQuery.postValue("")
+                         0 -> searchQuery.postValue("")
                     }
                     return false
                 }
@@ -631,20 +636,36 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                 override fun onSearchViewClosed() {
                     searchQuery.postValue("")
+                    refreshAdapter(viewModel.allQueues.value ?: ArrayList())
                 }
             })
         }
     }
 
     private fun refreshAdapter(list: List<Queue>) {
+        _recyclerViewQueues.adapter = adapter
         adapter.contentList = list
         adapter.notifyDataSetChanged()
+
         if (list.isNotEmpty()) {
             goTo(list.size - 1)
             _imageViewEngranes.visibility = View.GONE
         } else {
             _imageViewEngranes.visibility = View.VISIBLE
         }
+    }
+
+    private fun refreshAdapterFilterSearch(list: List<Queue>) {
+        _recyclerViewQueues.adapter = adapterSearchResult
+        adapterSearchResult.contentList = list
+        adapterSearchResult.notifyDataSetChanged()
+        if (list.isNotEmpty()) {
+            goTo(list.size - 1)
+            _imageViewEngranes.visibility = View.GONE
+        } else {
+            _imageViewEngranes.visibility = View.VISIBLE
+        }
+
     }
 
     private fun goTo(pos: Int) {
@@ -796,7 +817,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(),1
+                preferences.getFv(), 1
 
             )
 
@@ -819,7 +840,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                     }.type
                     val gson: Gson = GsonBuilder().create()
-                    val porterHistruct: PorterHistruct = gson.fromJson(body, PorterHistruct::class.java)
+                    val porterHistruct: PorterHistruct =
+                        gson.fromJson(body, PorterHistruct::class.java)
 //                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
 //                        JsonWrite(requireContext()).writeToFile(body)
 ////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())

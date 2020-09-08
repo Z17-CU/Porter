@@ -216,7 +216,7 @@ class DialogCreateProvince(
             view.spn_municipie.setText(context.getString(R.string.select_municipe))
             view.spn_store.setText(context.getString(R.string.select_store))
 
-            view.spn_municipie.setTitle("Seleccione un municipio")
+            view.spn_municipie.setTitle(context.getString(R.string.select_municipe))
                view.spn_municipie.setOnItemClickListener { idMunicipe ->
                 idMunicipie = idMunicipe
                 view.spn_store.visibility = View.VISIBLE
@@ -224,7 +224,7 @@ class DialogCreateProvince(
                     store.name
                 }.toTypedArray())
                 view.spn_store.setExpandTint(R.color.colorAccent)
-                  view.spn_store.setTitle("Seleccione una tienda")
+                  view.spn_store.setTitle(context.getString(R.string.select_store))
                    view.spn_store.setText(context.getString(R.string.select_store))
                   view.spn_store.setOnItemClickListener {
                     idStore = it
