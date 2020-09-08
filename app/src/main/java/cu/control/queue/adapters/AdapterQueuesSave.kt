@@ -18,7 +18,7 @@ class AdapterQueuesSave(
     RecyclerView.Adapter<ViewHolderQueues>() {
 
     var contentList: List<Queue> = ArrayList()
-     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderQueues {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderQueues {
         return ViewHolderQueues(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.item_queues,
@@ -47,17 +47,17 @@ class AdapterQueuesSave(
             )
 
         holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
-         holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
+        holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
         holder.imageViewSaveOpened.visibility = if (!queue.isSaved) View.GONE else View.VISIBLE
         holder.textViewName.text = queue.name
         holder.textViewDate.text = formatDateBig.format(queue.startDate)
 
 
-        if(queue.isSaved){
+        if (queue.isSaved) {
 
-                holder.clientNumberOpenQueue.visibility = View.GONE
-                holder.clientNumberSaveQueue.visibility = View.VISIBLE
-                holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
+            holder.clientNumberOpenQueue.visibility = View.GONE
+            holder.clientNumberSaveQueue.visibility = View.VISIBLE
+            holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
 
         }
 

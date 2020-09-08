@@ -51,11 +51,10 @@ class AdapterQueueOpen(
         holder.imageViewSaveOpened.visibility = if (!queue.isSaved) View.GONE else View.VISIBLE
         holder.textViewName.text = queue.name
 
-        if (queue.isSaved) {
-
-            holder.clientNumberOpenQueue.visibility = View.GONE
-            holder.clientNumberSaveQueue.visibility = View.VISIBLE
-            holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
+        if (!queue.isSaved) {
+            holder.clientNumberOpenQueue.visibility = View.VISIBLE
+            holder.clientNumberSaveQueue.visibility = View.GONE
+            holder.clientNumberOpenQueue.text = queue.clientsNumber.toString()
 
         }
 
