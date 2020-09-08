@@ -21,7 +21,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.room_queues.*
 import me.yokeyword.fragmentation.SupportFragment
 
-class CollaboratorsFragment(private val queue: Queue) : SupportFragment(){
+class CollaboratorsFragment(private val queue: Queue) : SupportFragment() {
 
     private lateinit var dao: Dao
     private val adapter = AdapterPerson(queue)
@@ -68,7 +68,7 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(){
                 it.onSuccess(list)
             }.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe{ list, error ->
+                .subscribe { list, error ->
 
                     adapter.contentList = list
                     adapter.notifyDataSetChanged()

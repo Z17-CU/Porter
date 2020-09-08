@@ -33,8 +33,9 @@ import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
-import cu.control.queue.adapters.AdapterQueue
 import cu.control.queue.adapters.AdapterQueueFilterSearch
+import cu.control.queue.adapters.AdapterQueueOpen
+import cu.control.queue.adapters.AdapterQueuesSave
 import cu.control.queue.dialogs.DialogCreateQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
@@ -64,7 +65,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
+import kotlinx.android.synthetic.main.quees_open_saved.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.room_queues._fabAdd
+import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
+import kotlinx.android.synthetic.main.room_queues.searchView
+import kotlinx.android.synthetic.main.room_queues.swipeContainer
+import kotlinx.android.synthetic.main.room_queues.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
@@ -86,7 +93,8 @@ class RoomQueues : SupportFragment(), onClickListener {
     private var toMerge = false
     private var queueToMerge: Queue? = null
 
-    private lateinit var adapter: AdapterQueue
+    private lateinit var adapterOpen: AdapterQueueOpen
+    private lateinit var adapterSave: AdapterQueuesSave
     private lateinit var adapterSearchResult: AdapterQueueFilterSearch
 
     private var searchQuery = MutableLiveData<String>().default("")
@@ -96,12 +104,11 @@ class RoomQueues : SupportFragment(), onClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = View.inflate(context, R.layout.room_queues, null)
+        val view = View.inflate(context, R.layout.quees_open_saved, null)
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
         setHasOptionsMenu(true)
-
         progress = Progress(view.context)
 
         dao = AppDataBase.getInstance(view.context).dao()
@@ -130,21 +137,38 @@ class RoomQueues : SupportFragment(), onClickListener {
                 .show()
         }
 
-        _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
-        adapter = AdapterQueue(this)
+        _recyclerViewQueuesOpen.layoutManager = LinearLayoutManager(view.context)
+        _recyclerViewQueuesSaved.layoutManager = LinearLayoutManager(view.context)
+        adapterOpen = AdapterQueueOpen(this)
+        adapterSave = AdapterQueuesSave(this)
         adapterSearchResult = AdapterQueueFilterSearch(this)
 
-        _recyclerViewQueues.adapter = adapter
+        _recyclerViewQueuesOpen.adapter = adapterOpen
+        _recyclerViewQueuesSaved.adapter = adapterSave
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
-            refreshAdapter(it)
+            val listOpen = mutableListOf<Queue>()
+            val listSave = mutableListOf<Queue>()
+            it.map { queue ->
+                if (!queue.isSaved) {
+                    listSave.add(queue)
+                } else {
+                    listOpen.add(queue)
+                }
+
+            }
+
+            refreshAdapter(listSave, listOpen)
         })
 
 
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (it.isNullOrEmpty()) {
-                refreshAdapter(viewModel.allQueues.value ?: ArrayList())
+                refreshAdapter(
+                    viewModel.allQueues.value ?: ArrayList(),
+                    viewModel.allQueues.value ?: ArrayList()
+                )
             } else {
                 Single.create<List<Queue>> { emitter ->
 
@@ -171,7 +195,10 @@ class RoomQueues : SupportFragment(), onClickListener {
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {
             searchView.closeSearch()
-            refreshAdapter(viewModel.allQueues.value ?: ArrayList())
+            refreshAdapter(
+                viewModel.allQueues.value ?: ArrayList(),
+                viewModel.allQueues.value ?: ArrayList()
+            )
             true
         } else {
             super.onBackPressedSupport()
@@ -610,6 +637,9 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             title = requireContext().getString(R.string.app_name)
 
+
+
+
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
@@ -623,7 +653,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     when (newText?.length) {
                         11 -> searchQuery.postValue(newText)
-                         0 -> searchQuery.postValue("")
+                        0 -> searchQuery.postValue("")
                     }
                     return false
                 }
@@ -636,19 +666,34 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                 override fun onSearchViewClosed() {
                     searchQuery.postValue("")
-                    refreshAdapter(viewModel.allQueues.value ?: ArrayList())
+                    refreshAdapter(
+                        viewModel.allQueues.value ?: ArrayList(),
+                        viewModel.allQueues.value ?: ArrayList()
+                    )
                 }
             })
         }
     }
 
-    private fun refreshAdapter(list: List<Queue>) {
-        _recyclerViewQueues.adapter = adapter
-        adapter.contentList = list
-        adapter.notifyDataSetChanged()
+    private fun refreshAdapter(
+        listSave: List<Queue>,
+        listOpen: List<Queue>
+    ) {
+        _recyclerViewQueuesOpen.adapter = adapterOpen
+        _recyclerViewQueuesSaved.adapter = adapterSave
+        adapterOpen.contentList = listSave
+        adapterSave.contentList = listOpen
 
-        if (list.isNotEmpty()) {
-            goTo(list.size - 1)
+        adapterOpen.notifyDataSetChanged()
+        adapterSave.notifyDataSetChanged()
+
+        if (listSave.isNotEmpty() || listOpen.isNotEmpty()) {
+           if(listSave.isNotEmpty()){
+               goTo(listSave.size - 1)
+           }else{
+               goTo(listOpen.size - 1)
+           }
+
             _imageViewEngranes.visibility = View.GONE
         } else {
             _imageViewEngranes.visibility = View.VISIBLE
@@ -676,7 +721,8 @@ class RoomQueues : SupportFragment(), onClickListener {
             }
         }
         smoothScroller.targetPosition = pos
-        _recyclerViewQueues.layoutManager?.startSmoothScroll(smoothScroller)
+        _recyclerViewQueuesOpen.layoutManager?.startSmoothScroll(smoothScroller)
+        _recyclerViewQueuesSaved.layoutManager?.startSmoothScroll(smoothScroller)
     }
 
     private fun pickQueue() {

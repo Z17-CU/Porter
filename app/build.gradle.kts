@@ -162,9 +162,6 @@ dependencies {
 
     implementation("io.reactivex.rxjava3:rxjava:3.0.0")
 
-    /**circular imagenView*/
-    implementation("com.mikhaellopez:circularimageview:3.2.0")
-
     /**RX*/
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
