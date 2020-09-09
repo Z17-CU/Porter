@@ -95,8 +95,9 @@ class RoomQueues : SupportFragment(), onClickListener {
     private lateinit var adapterOpen: AdapterQueueOpen
     private lateinit var adapterSave: AdapterQueuesSave
     private lateinit var adapterSearchResult: AdapterQueueFilterSearch
-    private val listOpen = mutableListOf<Queue>()
-    private val listSave = mutableListOf<Queue>()
+
+    //    private val listOpen = mutableListOf<Queue>()
+//    private val listSave = mutableListOf<Queue>()
     private var searchQuery = MutableLiveData<String>().default("")
 
     override fun onCreateView(
@@ -148,7 +149,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
-
+            val listOpen = mutableListOf<Queue>()
+            val listSave = mutableListOf<Queue>()
             it.map { queue ->
                 if (!queue.isSaved) {
                     listSave.add(queue)
@@ -158,7 +160,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             }
 
-            refreshAdapter(listSave, listOpen)
+            refreshAdapter()
         })
 
 
@@ -166,8 +168,6 @@ class RoomQueues : SupportFragment(), onClickListener {
             if (it.isNullOrEmpty()) {
 
                 refreshAdapter(
-                    listSave,
-                    listOpen
                 )
             } else {
                 Single.create<List<Queue>> { emitter ->
@@ -195,10 +195,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {
             searchView.closeSearch()
-            refreshAdapter(
-                viewModel.allQueues.value ?: ArrayList(),
-                viewModel.allQueues.value ?: ArrayList()
-            )
+            refreshAdapter()
             true
         } else {
             super.onBackPressedSupport()
@@ -667,20 +664,30 @@ class RoomQueues : SupportFragment(), onClickListener {
                 override fun onSearchViewClosed() {
                     searchQuery.postValue("")
                     refreshAdapter(
-                        listSave,listOpen
+
                     )
                 }
             })
         }
     }
 
-    private fun refreshAdapter(
-        listSave: List<Queue>,
-        listOpen: List<Queue>
-    ) {
+    private fun refreshAdapter() {
         hideShowList(true)
         _recyclerViewQueuesOpen.adapter = adapterOpen
         _recyclerViewQueuesSaved.adapter = adapterSave
+
+        val listOpen = mutableListOf<Queue>()
+        val listSave = mutableListOf<Queue>()
+        val list = viewModel.allQueues.value ?: ArrayList()
+        list.map { queue ->
+            if (!queue.isSaved) {
+                listSave.add(queue)
+            } else {
+                listOpen.add(queue)
+            }
+
+        }
+
         adapterOpen.contentList = listSave
         adapterSave.contentList = listOpen
 
@@ -689,14 +696,25 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         if (listSave.isNotEmpty() || listOpen.isNotEmpty()) {
             if (listSave.isNotEmpty()) {
+                linear_recycler_queue_open.visibility = View.VISIBLE
+
                 goTo(listSave.size - 1)
             } else {
+                linear_recycler_queue_open.visibility = View.GONE
                 goTo(listOpen.size - 1)
             }
 
             _imageViewEngranes.visibility = View.GONE
         } else {
             _imageViewEngranes.visibility = View.VISIBLE
+        }
+
+        if (listOpen.isEmpty()) {
+            linear_recycler_queue_save.visibility = View.GONE
+
+        } else {
+            linear_recycler_queue_save.visibility = View.VISIBLE
+
         }
     }
 
