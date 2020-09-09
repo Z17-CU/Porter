@@ -5,15 +5,13 @@
     android:id="@+id/_layoutItemPersona"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/item_white_bg"
-    android:gravity="center_vertical"
+     android:gravity="center_vertical"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
-        android:baselineAligned="false"
+         android:baselineAligned="false"
         android:orientation="horizontal">
 
         <LinearLayout

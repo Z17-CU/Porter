@@ -45,7 +45,8 @@
     </style>
 
     <style name="MaterialSearchViewStyle">
-        <item name="searchBackground">@color/search_field_bg</item>
+        <item name="searchBackground">@drawable/bg_actionbar</item>
+
         <item name="searchCloseIcon">@drawable/ic_clear</item>
         <item name="searchBackIcon">@drawable/ic_arrow_back_accent</item>
         <item name="searchSuggestionBackground">@color/colorIconGrayScale</item>

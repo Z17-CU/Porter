@@ -38,15 +38,7 @@ class AdapterQueueFilterSearch(
     override fun onBindViewHolder(holder: ViewHolderFilterSearch, position: Int) {
         val queue = contentList[position]
 
-        holder.layoutBackground.background =
-            ContextCompat.getDrawable(
-                holder.layoutBackground.context,
-                when {
-                    queue.isOffline -> R.drawable.item_offline_bg
-                    position % 2 != 0 -> R.drawable.item_white_bg
-                    else -> R.drawable.bg_item_dark
-                }
-            )
+
 
         holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
         holder.imageOffline.visibility = if (queue.isOffline) View.VISIBLE else View.GONE

@@ -33,7 +33,7 @@
                 <cu.control.queue.utils.MaterialSearchView
                     android:id="@+id/searchView"
                     style="@style/MaterialSearchViewStyle"
-
+                    
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:elevation="4dp" />
@@ -59,7 +59,6 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                       android:id="@+id/linear_recycler_queue_open"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
@@ -84,8 +83,6 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:id="@+id/linear_recycler_queue_save"
-
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
@@ -112,13 +109,6 @@
 
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/_recyclerViewQueuesResul"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                tools:listitem="@layout/item_queues" />
 
             <ImageView
                 android:id="@+id/_imageViewEngranes"
