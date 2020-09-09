@@ -149,16 +149,6 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
-            val listOpen = mutableListOf<Queue>()
-            val listSave = mutableListOf<Queue>()
-            it.map { queue ->
-                if (!queue.isSaved) {
-                    listSave.add(queue)
-                } else {
-                    listOpen.add(queue)
-                }
-
-            }
 
             refreshAdapter()
         })
@@ -166,9 +156,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (it.isNullOrEmpty()) {
-
-                refreshAdapter(
-                )
+                refreshAdapter()
             } else {
                 Single.create<List<Queue>> { emitter ->
 
