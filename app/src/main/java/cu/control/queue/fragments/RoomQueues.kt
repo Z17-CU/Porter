@@ -13,6 +13,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -684,6 +685,11 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         if (listSave.isNotEmpty() || listOpen.isNotEmpty()) {
             if (listSave.isNotEmpty()) {
+                val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                linear_recycler_queue_open.layoutParams = lp
                 linear_recycler_queue_open.visibility = View.VISIBLE
 
                 goTo(listSave.size - 1)
@@ -699,8 +705,19 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         if (listOpen.isEmpty()) {
             linear_recycler_queue_save.visibility = View.GONE
+            val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            linear_recycler_queue_save.layoutParams = lp
 
         } else {
+            val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            linear_recycler_queue_save.layoutParams = lp
+
             linear_recycler_queue_save.visibility = View.VISIBLE
 
         }
