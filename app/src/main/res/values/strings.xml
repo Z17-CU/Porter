@@ -115,12 +115,6 @@
     <string name="select_store">Seleccione una tienda</string>
 
 
-    <array name="provinceArray">
-        <item>Habana</item>
-        <item>Villa Clara</item>
-        <item>Camaguey</item>
-        <item>La isla</item>
-    </array>
     <string name="title_activity_main2">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -134,4 +128,8 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="opened">Abiertas</string>
     <string name="saved">Guardadas</string>
+    <string name="new_queue">Nueva cola</string>
+    <string name="colaborators">Mis colaboradores</string>
+    <string name="export_queue">Exportar cola</string>
+    <string name="settings">Ajustes</string>
 </resources>

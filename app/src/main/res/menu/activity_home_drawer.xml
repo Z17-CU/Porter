@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/nav_group_account"/>
+            <item
+                android:id="@+id/nav_new_queue"
+                android:icon="@drawable/ic_new_queue"
+                android:title="@string/new_queue"
+                android:visible="true" />
+            <item
+                 android:id="@+id/nav_colaborators"
+                android:icon="@drawable/ic_colaborators"
+                android:title="@string/colaborators"
+
+                android:visible="true" />
+            <item
+
+                android:id="@+id/nav_export_queue"
+                android:icon="@drawable/ic_export_queue"
+                android:title="@string/export_queue"
+                android:visible="true" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_setting"
+                android:title="@string/settings"
+                android:visible="true" />
+
+
+</menu>

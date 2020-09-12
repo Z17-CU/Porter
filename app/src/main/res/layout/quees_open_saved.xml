@@ -1,152 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<cu.control.queue.utils.CustomDrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:id="@+id/drawer_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:insetForeground="@android:color/transparent"
+    tools:openDrawer="start">
 
-    <LinearLayout
+    <include
+        layout="@layout/app_bar_main"
         android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:background="@android:color/transparent"
-            app:elevation="0dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/bg_actionbar"
-                    android:elevation="4dp" />
-
-                <cu.control.queue.utils.MaterialSearchView
-                    android:id="@+id/searchView"
-                    style="@style/MaterialSearchViewStyle"
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp" />
-
-            </RelativeLayout>
-
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-
-                android:id="@+id/swipeContainer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:weightSum="1">
-
-                    <LinearLayout
-                        android:id="@+id/linear_recycler_queue_open"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="0.5"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="5dp"
-                            android:paddingStart="10dp"
-                            android:text="@string/opened"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:ignore="RtlSymmetry" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/_recyclerViewQueuesOpen"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:listitem="@layout/item_queues" />
-
-                    </LinearLayout>
+        android:layout_gravity="start"
+        android:visibility="visible"
+        app:itemTextColor="@color/blue_drawer"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_home_drawer" />
 
 
-                    <LinearLayout
-                        android:id="@+id/linear_recycler_queue_save"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="0.5"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="5dp"
-                            android:paddingStart="10dp"
-                            android:text="@string/saved"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:ignore="RtlSymmetry" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/_recyclerViewQueuesSaved"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:listitem="@layout/item_queues" />
-
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/_recyclerViewQueuesResul"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                tools:listitem="@layout/item_queues" />
-
-            <ImageView
-                android:id="@+id/_imageViewEngranes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="100dp"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_recurso_1" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="end|bottom">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/_fabAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
-            android:visibility="visible"
-            app:srcCompat="@drawable/ic_add" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</cu.control.queue.utils.CustomDrawerLayout>

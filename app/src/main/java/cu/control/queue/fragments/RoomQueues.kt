@@ -11,20 +11,24 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -66,12 +70,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
+import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.android.synthetic.main.quees_open_saved.*
-import kotlinx.android.synthetic.main.room_queues._fabAdd
+import kotlinx.android.synthetic.main.room_queues.*
 import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
-import kotlinx.android.synthetic.main.room_queues.searchView
 import kotlinx.android.synthetic.main.room_queues.swipeContainer
-import kotlinx.android.synthetic.main.room_queues.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
@@ -97,10 +101,8 @@ class RoomQueues : SupportFragment(), onClickListener {
     private lateinit var adapterSave: AdapterQueuesSave
     private lateinit var adapterSearchResult: AdapterQueueFilterSearch
 
-    //    private val listOpen = mutableListOf<Queue>()
-//    private val listSave = mutableListOf<Queue>()
     private var searchQuery = MutableLiveData<String>().default("")
-
+    private lateinit var appBarConfiguration: AppBarConfiguration
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -111,6 +113,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
         setHasOptionsMenu(true)
+
         progress = Progress(view.context)
 
         dao = AppDataBase.getInstance(view.context).dao()
@@ -118,6 +121,8 @@ class RoomQueues : SupportFragment(), onClickListener {
         val tempViewModel: ClientViewModel by viewModels(
             factoryProducer = { ClientViewModelFactory(view.context) }
         )
+
+
         viewModel = tempViewModel
 
         sendHi()
@@ -138,6 +143,18 @@ class RoomQueues : SupportFragment(), onClickListener {
             ).create()
                 .show()
         }
+
+
+        val toggle = ActionBarDrawerToggle(
+            this.activity, drawer_layout, toolbar, R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+
+        drawer_layout.addDrawerListener(toggle)
+        nav_view.itemIconTintList = null
+        toggle.syncState()
+
+
         _recyclerViewQueuesResul.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueuesOpen.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueuesSaved.layoutManager = LinearLayoutManager(view.context)
@@ -185,6 +202,9 @@ class RoomQueues : SupportFragment(), onClickListener {
         return if (searchView.isOpen) {
             searchView.closeSearch()
             refreshAdapter()
+            true
+        } else if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
             true
         } else {
             super.onBackPressedSupport()
@@ -622,10 +642,13 @@ class RoomQueues : SupportFragment(), onClickListener {
             //setNavigationIcon(R.drawable.ic_arrow_back)
 
             title = requireContext().getString(R.string.app_name)
-
-
-
-
+            val header = nav_view.getHeaderView(0)
+            val namePerson =
+                PreferencesManager(requireContext()).getName() + " " + PreferencesManager(
+                    requireContext()
+                ).getLastName()
+            header.name_creator_queue.text = namePerson
+            header.creator_queue_ci.text = "CI: " + PreferencesManager(requireContext()).getCi()
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
