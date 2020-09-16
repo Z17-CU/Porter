@@ -369,15 +369,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        when (result.code()){
-                            401->{
+                        when (result.code()) {
+                            401 -> {
                                 showDialogQueueNoExist(queue)
                             }
-                            403->{
+                            403 -> {
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
                                 dialog.show()
                             }
-                            404->{
+                            404 -> {
                                 showDialogQueueNoExist(queue)
                             }
 
@@ -796,7 +796,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(),1
+                preferences.getFv(), 2
 
             )
 
@@ -815,42 +815,54 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             if (result.code() == 200) {
                 result.body()?.let { body ->
-                    val type = object : TypeToken<Map<String, Map<String, Any>>>() {
+                    val type = object : TypeToken<Map<String, Any>>() {
 
                     }.type
                     val gson: Gson = GsonBuilder().create()
-                    val porterHistruct: PorterHistruct = gson.fromJson(body, PorterHistruct::class.java)
+                    val porterHistruct: PorterHistruct =
+                        gson.fromJson(body, PorterHistruct::class.java)
 //                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
 //                        JsonWrite(requireContext()).writeToFile(body)
 ////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
 //                    }
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
-                        if (dao.getQueueByUUID(entry.key) == null) {
-                            val name = entry.value["name"] as String
-                            val description = entry.value["description"] as String
-                            val createdDate = (entry.value["created_date"] as Double).toLong()
-                            val tags = entry.value["tags"] as String
+                        when (entry.key) {
+                            "store_version" -> {
 
-                            dao.insertQueue(
-                                Queue(
-                                    createdDate,
-                                    name,
-                                    createdDate,
-                                    0,
-                                    description,
-                                    entry.key,
-                                    null,
-                                    null,
-                                    "",
-                                    createdDate,
-                                    createdDate,
-                                    ArrayList(),
-                                    false,
-                                    isSaved = true,
-                                    owner = ""
-                                )
-                            )
+                            }
+                            "stores" -> {
+
+                            }
+                            else -> {
+                                if (dao.getQueueByUUID(entry.key) == null) {
+                                    val name = entry.value["name"] as String
+                                    val description = entry.value["description"] as String
+                                    val createdDate =
+                                        (entry.value["created_date"] as Double).toLong()
+                                    val tags = entry.value["tags"] as String
+
+                                    dao.insertQueue(
+                                        Queue(
+                                            createdDate,
+                                            name,
+                                            createdDate,
+                                            0,
+                                            description,
+                                            entry.key,
+                                            null,
+                                            null,
+                                            "",
+                                            createdDate,
+                                            createdDate,
+                                            ArrayList(),
+                                            false,
+                                            isSaved = true,
+                                            owner = ""
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                 }
