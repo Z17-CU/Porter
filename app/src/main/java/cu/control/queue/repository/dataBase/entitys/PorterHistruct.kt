@@ -1,7 +1,6 @@
 package cu.control.queue.repository.dataBase.entitys
 
 import androidx.annotation.Keep
-import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.Store
 import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucItem
 
 @Keep
@@ -11,5 +10,5 @@ class PorterHistruct(
     val ci: String,
     val fv: String,
     val store_version: Int,
-    val stores: List<jsonStrucItem>?=null
- )
+    val stores: List<jsonStrucItem>? = null
+)

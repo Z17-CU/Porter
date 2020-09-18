@@ -370,15 +370,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        when (result.code()){
-                            401->{
+                        when (result.code()) {
+                            401 -> {
                                 showDialogQueueNoExist(queue)
                             }
-                            403->{
+                            403 -> {
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
                                 dialog.show()
                             }
-                            404->{
+                            404 -> {
                                 showDialogQueueNoExist(queue)
                             }
 
@@ -822,23 +822,22 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val gson: Gson = GsonBuilder().create()
                     val porterHistruct: PorterHistruct =
                         gson.fromJson(body, PorterHistruct::class.java)
-//                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
-//                        JsonWrite(requireContext()).writeToFile(body)
-////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
-//                    }
+
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
                         when (entry.key) {
                             "store_version" -> {
                                 if (porterHistruct.store_version != PreferencesManager(this.requireContext()).getStoreVersion()) {
-                                    PreferencesManager(this.requireContext()).setStoreVersion(porterHistruct.store_version)
+                                    PreferencesManager(this.requireContext()).setStoreVersion(
+                                        porterHistruct.store_version
+                                    )
                                     PreferencesManager(this.requireContext()).setStoreVersionInit()
                                 }
                             }
                             "stores" -> {
                                 if (PreferencesManager(this.requireContext()).getStoreVersionInit()) {
                                     JsonWrite(requireContext()).writeToFile(body)
-                                 }
+                                }
 
                             }
                             else -> {

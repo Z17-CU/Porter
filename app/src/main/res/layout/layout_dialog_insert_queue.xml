@@ -84,6 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:text="@string/requerido"
+        android:visibility="gone"
         android:textColor="@color/google_red"
         android:textSize="12sp" />
 

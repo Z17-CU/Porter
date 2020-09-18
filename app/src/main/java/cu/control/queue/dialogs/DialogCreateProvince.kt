@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelBu
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_store.view.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 class DialogCreateProvince(
     private val context: Context,
@@ -44,6 +43,7 @@ class DialogCreateProvince(
 
 ) {
 
+    private var products: ArrayList<String> = arrayListOf()
     private lateinit var resultReadJson: List<jsonStrucItem>
     private lateinit var storeId: String
     private lateinit var dao: Dao
@@ -93,9 +93,13 @@ class DialogCreateProvince(
                 compositeDisposable.add(Completable.create {
 
                     val time = Calendar.getInstance().timeInMillis
+                    if (productsQueue.contains(",")) {
+                        products =
+                            productsQueue.split(',').map(String::trim).toList() as ArrayList<String>
 
-                    val products: ArrayList<String> =
-                        productsQueue.split(',').map(String::trim).toList() as ArrayList<String>
+                    } else {
+                        products = arrayListOf(productsQueue.trim())
+                    }
 
                     val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_PRODUCTS] = products
