@@ -681,6 +681,7 @@ class QrReaderFragment(
                 param = ParamAddMember(arrayListOf(person))
             }
 
+
             viewModel.onRegistreAction(queue.uuid!!, param, TAG_ADD_MEMBER, requireContext())
 
             it.onComplete()
