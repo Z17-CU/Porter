@@ -20,6 +20,7 @@ open class Person(
         const val KEY_NAME = "name"
         const val KEY_LAST_NAME = "last_name"
         const val KEY_AFFILIATION = "aff"
+        const val KEY_PRODUCTS = "products"
 
         const val KEY_MEMBER_UPDATED_DATE = "updated_date"
         const val KEY_CHECKED = "checked_date"

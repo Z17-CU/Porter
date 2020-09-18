@@ -668,6 +668,15 @@ class QrReaderFragment(
             map[KEY_NUMBER] = clientInQueue.number.toLong()
             map[KEY_NAME] = name.trim()
             map[KEY_LAST_NAME] = lastName.trim()
+            map[KEY_PRODUCTS] = if (queue.info != null){
+                if ((queue.info!![KEY_PRODUCTS] as ArrayList<*>?).isNullOrEmpty()){
+                    ArrayList<String>()
+                } else {
+                    queue.info!![KEY_PRODUCTS] as ArrayList<*>
+                }
+            } else {
+                ArrayList<String>()
+            }
 
             val type = object : TypeToken<Map<String, ParamGeneral>>() {
 

@@ -321,6 +321,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     savedQueue.owner = owner
                     savedQueue.isSaved = false
                     savedQueue.id = savedQueue.id ?: it.created_date
+                    savedQueue.info = it.info
 
                     dao.insertQueue(savedQueue)
 
@@ -369,15 +370,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        when (result.code()) {
-                            401 -> {
+                        when (result.code()){
+                            401->{
                                 showDialogQueueNoExist(queue)
                             }
-                            403 -> {
+                            403->{
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
                                 dialog.show()
                             }
-                            404 -> {
+                            404->{
                                 showDialogQueueNoExist(queue)
                             }
 
@@ -579,18 +580,18 @@ class RoomQueues : SupportFragment(), onClickListener {
                         pickQueue()
                         true
                     }
-//                    R.id.action_settings -> {
-//                        openSettings()
-//                        true
-//                    }
+                    R.id.action_settings -> {
+                        openSettings()
+                        true
+                    }
                     R.id.action_black_list -> {
                         start(BlackListFragment())
                         true
                     }
-//                    R.id.action_abaut -> {
-//                        showAboutAs()
-//                        true
-//                    }
+                    R.id.action_abaut -> {
+                        showAboutAs()
+                        true
+                    }
                     R.id.action_search -> {
                         searchView.openSearch()
                         true
@@ -731,7 +732,6 @@ class RoomQueues : SupportFragment(), onClickListener {
             val newQueue = Queue(
                 Calendar.getInstance().timeInMillis,
                 "${queue1.name} y ${queue2.name}",
-//                "${queue1.products} y ${queue2.products}",
                 startDate,
                 description = when {
                     queue1.description!!.isEmpty() && queue2.description!!.isEmpty() -> ""
@@ -822,7 +822,10 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val gson: Gson = GsonBuilder().create()
                     val porterHistruct: PorterHistruct =
                         gson.fromJson(body, PorterHistruct::class.java)
-
+//                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
+//                        JsonWrite(requireContext()).writeToFile(body)
+////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
+//                    }
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
                         when (entry.key) {
@@ -850,7 +853,6 @@ class RoomQueues : SupportFragment(), onClickListener {
                                         Queue(
                                             createdDate,
                                             name,
-//                                            products,
                                             createdDate,
                                             0,
                                             description,
