@@ -321,6 +321,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     savedQueue.owner = owner
                     savedQueue.isSaved = false
                     savedQueue.id = savedQueue.id ?: it.created_date
+                    savedQueue.info = it.info
 
                     dao.insertQueue(savedQueue)
 

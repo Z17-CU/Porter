@@ -53,6 +53,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_PRODUCTS
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_ADD_OWNER
@@ -665,6 +666,15 @@ class QrReaderFragment(
             map[KEY_NUMBER] = clientInQueue.number.toLong()
             map[KEY_NAME] = name.trim()
             map[KEY_LAST_NAME] = lastName.trim()
+            map[KEY_PRODUCTS] = if (queue.info != null){
+                if ((queue.info!![KEY_PRODUCTS] as ArrayList<*>?).isNullOrEmpty()){
+                    ArrayList<String>()
+                } else {
+                    queue.info!![KEY_PRODUCTS] as ArrayList<*>
+                }
+            } else {
+                ArrayList<String>()
+            }
 
             val person = Person(client.ci, client.fv ?: "", map)
 
