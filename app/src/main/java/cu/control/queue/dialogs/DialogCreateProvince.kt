@@ -97,10 +97,11 @@ class DialogCreateProvince(
                     val products: ArrayList<String> =
                         productsQueue.split(',').map(String::trim).toList() as ArrayList<String>
 
+                    val map = mutableMapOf<String, Any>()
+                    map[Param.KEY_QUEUE_PRODUCTS] = products
+
                     val thisqueue = if (queue == null) {
 
-                        val map = mutableMapOf<String, Any>()
-                        map[Param.KEY_QUEUE_PRODUCTS] = products
                         Queue(
                             time,
                             nameQueue.trim(),
@@ -123,15 +124,18 @@ class DialogCreateProvince(
                     } else {
                         queue!!.name = nameQueue.trim()
                         queue!!.description = nameDescription.trim()
+                        if (queue!!.info == null) {
+                            queue!!.info = map
+                        } else {
+                            (queue!!.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] = products
+                        }
                         queue!!
                     }
                     dao.insertQueue(thisqueue)
 
                     val tag: String
-                    val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_NAME] = thisqueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
-                    map[Param.KEY_QUEUE_PRODUCTS] = products
                     val param = if (queue == null) {
                         tag = Param.TAG_CREATE_QUEUE
                         ParamCreateQueue(storeId, map, thisqueue.created_date ?: time)
@@ -171,18 +175,13 @@ class DialogCreateProvince(
 
         searchSpinnerProvince(view, resultReadJson)
 
-//        view._okButton.isEnabled = view._editTextName.text.toString().trim().isNotEmpty()
-
         if (id != -1L) {
             Single.create<Queue> {
-                queue = dao.getQueue(id)
-                it.onSuccess(queue!!)
+                it.onSuccess(dao.getQueue(id))
             }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { _ ->
-//                    view._editTextName.setText(queue.name)
-//                    view._editTextDescription.setText(queue.description)
-//                    view._okButton.setText(context.getString(R.string.editar))
+                .subscribe { thisQueue ->
+                    queue = thisQueue
                 }.addTo(compositeDisposable)
         }
 
@@ -268,7 +267,7 @@ class DialogCreateProvince(
 
 
     private fun getCharts(): List<jsonStrucItem> {
-        var jsonString = ""
+        val jsonString: String
 
         val storeVersionInit = PreferencesManager(context).getStoreVersionInit()
         if (!storeVersionInit) {

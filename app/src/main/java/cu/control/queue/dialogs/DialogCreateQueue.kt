@@ -12,6 +12,7 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -59,7 +60,8 @@ class DialogCreateQueue(
                 clientViewModel = clientViewModel,
                 nameQueue = view._editTextName.text.toString(),
                 productsQueue = view._editTextProducts.text.toString(),
-                nameDescription = view._editTextDescription.text.toString()
+                nameDescription = view._editTextDescription.text.toString(),
+                id = id
             ).create()
                 .show()
 
@@ -99,6 +101,20 @@ class DialogCreateQueue(
                     view._editTextName.setText(queue.name)
                     view._editTextDescription.setText(queue.description)
                     view._okButton.setText(context.getString(R.string.editar))
+                    var textProducts = ""
+                    queue.info?.get(Person.KEY_PRODUCTS)?.let {
+                        it as ArrayList<*>
+                        var isFirst = true
+                        it.map { product ->
+                            if (isFirst) {
+                                isFirst = false
+                            } else {
+                                textProducts += ", "
+                            }
+                            textProducts += product as String
+                        }
+                    }
+                    view._editTextProducts.setText(textProducts)
                 }.addTo(compositeDisposable)
         }
 
