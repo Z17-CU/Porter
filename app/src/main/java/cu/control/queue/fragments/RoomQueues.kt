@@ -369,15 +369,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        when (result.code()){
-                            401->{
+                        when (result.code()) {
+                            401 -> {
                                 showDialogQueueNoExist(queue)
                             }
-                            403->{
+                            403 -> {
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
                                 dialog.show()
                             }
-                            404->{
+                            404 -> {
                                 showDialogQueueNoExist(queue)
                             }
 
@@ -579,18 +579,18 @@ class RoomQueues : SupportFragment(), onClickListener {
                         pickQueue()
                         true
                     }
-                    R.id.action_settings -> {
-                        openSettings()
-                        true
-                    }
+//                    R.id.action_settings -> {
+//                        openSettings()
+//                        true
+//                    }
                     R.id.action_black_list -> {
                         start(BlackListFragment())
                         true
                     }
-                    R.id.action_abaut -> {
-                        showAboutAs()
-                        true
-                    }
+//                    R.id.action_abaut -> {
+//                        showAboutAs()
+//                        true
+//                    }
                     R.id.action_search -> {
                         searchView.openSearch()
                         true
@@ -731,6 +731,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             val newQueue = Queue(
                 Calendar.getInstance().timeInMillis,
                 "${queue1.name} y ${queue2.name}",
+//                "${queue1.products} y ${queue2.products}",
                 startDate,
                 description = when {
                     queue1.description!!.isEmpty() && queue2.description!!.isEmpty() -> ""
@@ -796,7 +797,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(),1
+                preferences.getFv(), preferences.getStoreVersion()
 
             )
 
@@ -815,42 +816,58 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             if (result.code() == 200) {
                 result.body()?.let { body ->
-                    val type = object : TypeToken<Map<String, Map<String, Any>>>() {
+                    val type = object : TypeToken<Map<String, Any>>() {
 
                     }.type
                     val gson: Gson = GsonBuilder().create()
-                    val porterHistruct: PorterHistruct = gson.fromJson(body, PorterHistruct::class.java)
-//                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
-//                        JsonWrite(requireContext()).writeToFile(body)
-////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
-//                    }
+                    val porterHistruct: PorterHistruct =
+                        gson.fromJson(body, PorterHistruct::class.java)
+
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
-                        if (dao.getQueueByUUID(entry.key) == null) {
-                            val name = entry.value["name"] as String
-                            val description = entry.value["description"] as String
-                            val createdDate = (entry.value["created_date"] as Double).toLong()
-                            val tags = entry.value["tags"] as String
+                        when (entry.key) {
+                            "store_version" -> {
+                                if (porterHistruct.store_version != PreferencesManager(this.requireContext()).getStoreVersion()) {
+                                    PreferencesManager(this.requireContext()).setStoreVersion(porterHistruct.store_version)
+                                    PreferencesManager(this.requireContext()).setStoreVersionInit()
+                                }
+                            }
+                            "stores" -> {
+                                if (PreferencesManager(this.requireContext()).getStoreVersionInit()) {
+                                    JsonWrite(requireContext()).writeToFile(body)
+                                 }
 
-                            dao.insertQueue(
-                                Queue(
-                                    createdDate,
-                                    name,
-                                    createdDate,
-                                    0,
-                                    description,
-                                    entry.key,
-                                    null,
-                                    null,
-                                    "",
-                                    createdDate,
-                                    createdDate,
-                                    ArrayList(),
-                                    false,
-                                    isSaved = true,
-                                    owner = ""
-                                )
-                            )
+                            }
+                            else -> {
+                                if (dao.getQueueByUUID(entry.key) == null) {
+                                    val name = entry.value["name"] as String
+                                    val description = entry.value["description"] as String
+                                    val createdDate =
+                                        (entry.value["created_date"] as Double).toLong()
+                                    val tags = entry.value["tags"] as String
+
+                                    dao.insertQueue(
+                                        Queue(
+                                            createdDate,
+                                            name,
+//                                            products,
+                                            createdDate,
+                                            0,
+                                            description,
+                                            entry.key,
+                                            null,
+                                            null,
+                                            "",
+                                            createdDate,
+                                            createdDate,
+                                            ArrayList(),
+                                            false,
+                                            isSaved = true,
+                                            owner = ""
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -11,8 +11,8 @@ open class Person(
     val ci: String,
     val fv: String,
     val info: Map<String, Any>
-){
-    companion object{
+) {
+    companion object {
         const val KEY_ADD_DATE = "added_date"
         const val KEY_DELETE_DATE = "deleted_date"
         const val KEY_REINTENT_COUNT = "attempts"
@@ -24,11 +24,11 @@ open class Person(
         const val KEY_MEMBER_UPDATED_DATE = "updated_date"
         const val KEY_CHECKED = "checked_date"
         const val KEY_UNCHECKED = "unchecked_date"
+        const val KEY_PRODUCTS = "products"
         const val MODE_CHECK = "MODE_CHECK"
         const val MODE_UNCHECK = "MODE_UNCHECK"
         const val MODE_INCREMENT_REINTENT = "MODE_INCREMENT_REINTENT"
         const val MODE_ADD_OWNER = "MODE_ADD_OWNER"
-
         const val TABLE_NAME = "Person"
     }
 }

@@ -398,7 +398,7 @@ class Common {
                             name,
                             lastName,
                             idString,
-                            fv,1
+                            fv,PreferencesManager(context).getStoreVersion()
 
                         )
                 }

@@ -12,12 +12,7 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Queue
-import cu.control.queue.repository.dataBase.entitys.payload.params.Param
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
-import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -26,7 +21,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_queue.view.*
-import java.util.*
 
 class DialogCreateQueue(
     private val context: Context,
@@ -63,17 +57,16 @@ class DialogCreateQueue(
                 it.context,
                 compositeDisposable,
                 clientViewModel = clientViewModel,
-
                 nameQueue = view._editTextName.text.toString(),
+                productsQueue = view._editTextProducts.text.toString(),
                 nameDescription = view._editTextDescription.text.toString()
-
             ).create()
                 .show()
 
             dialog.dismiss()
 
 
-         }
+        }
 
         view._editTextName.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {

@@ -25,6 +25,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -53,18 +55,18 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_PRODUCTS
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_ADD_OWNER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_CHECK
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_INCREMENT_REINTENT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_UNCHECK
+import cu.control.queue.repository.dataBase.entitys.payload.params.*
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_ADD_MEMBER
+import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_CREATE_QUEUE
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_DELETE_MEMBER
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_UPDATE_MEMBER
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamAddMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateMember
 import cu.control.queue.utils.*
 import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
@@ -645,6 +647,7 @@ class QrReaderFragment(
             val nameArray = client.name!!.split(' ')
             val name: String
             var lastName = ""
+            val products=""
             if (nameArray.size > 1) {
                 name = nameArray[0]
                 var pos = 0
@@ -665,6 +668,10 @@ class QrReaderFragment(
             map[KEY_NUMBER] = clientInQueue.number.toLong()
             map[KEY_NAME] = name.trim()
             map[KEY_LAST_NAME] = lastName.trim()
+
+            val type = object : TypeToken<Map<String, ParamGeneral>>() {
+
+            }.type
 
             val person = Person(client.ci, client.fv ?: "", map)
 

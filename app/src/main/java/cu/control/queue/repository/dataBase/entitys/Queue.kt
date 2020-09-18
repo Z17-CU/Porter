@@ -10,6 +10,7 @@ class Queue(
     @PrimaryKey(autoGenerate = true)
     var id: Long?,
     var name: String,
+//    var products:String,
     var startDate: Long,
     var clientsNumber: Int = 0,
     var description: String = "",

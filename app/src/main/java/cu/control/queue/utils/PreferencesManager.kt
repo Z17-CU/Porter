@@ -28,8 +28,13 @@ class PreferencesManager(context: Context) {
     fun getId() = getCi() + "." + getFv()
 
     fun getStoreVersion() = preferences.getInt(STORE_VERSION, 1)
+    fun getStoreVersionInit() = preferences.getBoolean(STORE_VERSION_INIT, false)
     fun getLastInfoCreateQueue() = preferences.getString(LAST_INFO_CREATE_QUEUE, "")
     fun setLastName(lastName: String) = editor.putString(LATS_NAME, lastName).commit()
+    fun setStoreVersionInit() {
+        editor.putBoolean(STORE_VERSION_INIT, true).commit()
+        editor.commit()
+    }
 
     fun setCI(ci: String) = editor.putString(CI, ci).commit()
 
@@ -57,6 +62,7 @@ class PreferencesManager(context: Context) {
         private const val CI = "CI"
         private const val FV = "FV"
         private const val STORE_VERSION = "STORE_VERSION"
+        private const val STORE_VERSION_INIT = "STORE_VERSION_INIT"
         private const val STORE = "STORE"
         private const val LAST_INFO_CREATE_QUEUE = "LAST_INFO_CREATE_QUEUE"
     }
