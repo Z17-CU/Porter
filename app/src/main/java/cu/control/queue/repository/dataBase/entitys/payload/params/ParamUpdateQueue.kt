@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 class ParamUpdateQueue (
-    val info: Map<String, String>,
+    val info: Map<String, Any>,
     val updated_date: Long
 ): Param()

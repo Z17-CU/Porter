@@ -52,6 +52,7 @@
             android:id="@+id/_editTextProducts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:digits="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 ,"
             android:importantForAutofill="no"
             android:inputType="textCapSentences"
             tools:text="Pollo,Aceite,Picadillo" />

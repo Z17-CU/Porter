@@ -31,6 +31,7 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelBu
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_store.view.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DialogCreateProvince(
     private val context: Context,
@@ -93,8 +94,13 @@ class DialogCreateProvince(
 
                     val time = Calendar.getInstance().timeInMillis
 
+                    val products: ArrayList<String> =
+                        productsQueue.split(',').map(String::trim).toList() as ArrayList<String>
+
                     val thisqueue = if (queue == null) {
 
+                        val map = mutableMapOf<String, Any>()
+                        map[Param.KEY_QUEUE_PRODUCTS] = products
                         Queue(
                             time,
                             nameQueue.trim(),
@@ -111,7 +117,8 @@ class DialogCreateProvince(
                             province = "",
                             municipality = "",
                             collaborators = arrayListOf(PreferencesManager(context).getCi()),
-                            owner = PreferencesManager(context).getCi()
+                            owner = PreferencesManager(context).getCi(),
+                            info = map
                         )
                     } else {
                         queue!!.name = nameQueue.trim()
@@ -121,10 +128,10 @@ class DialogCreateProvince(
                     dao.insertQueue(thisqueue)
 
                     val tag: String
-                    val map = mutableMapOf<String, String>()
+                    val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_NAME] = thisqueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
-                    map[Param.KEY_QUEUE_PRODUCTS] = productsQueue
+                    map[Param.KEY_QUEUE_PRODUCTS] = products
                     val param = if (queue == null) {
                         tag = Param.TAG_CREATE_QUEUE
                         ParamCreateQueue(storeId, map, thisqueue.created_date ?: time)
@@ -162,7 +169,7 @@ class DialogCreateProvince(
 
         }
 
-        searchSpinnerProvince(view,resultReadJson)
+        searchSpinnerProvince(view, resultReadJson)
 
 //        view._okButton.isEnabled = view._editTextName.text.toString().trim().isNotEmpty()
 
@@ -184,10 +191,8 @@ class DialogCreateProvince(
 
     private fun searchSpinnerProvince(
         view: View,
-        resultReadJson: List<jsonStrucItem>) {
-
-
-
+        resultReadJson: List<jsonStrucItem>
+    ) {
 
 
         val lastInfoCreateQueue = PreferencesManager(context).getLastInfoCreateQueue()
