@@ -9,5 +9,5 @@ class Queue(
     val updated_date: Long,
     val finished_date: Long,
     val deleted_date: Long,
-    val info: Any?
+    val info: Map<String, Any>?
 )

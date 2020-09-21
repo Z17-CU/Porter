@@ -121,8 +121,6 @@ class RoomQueues : SupportFragment(), onClickListener {
         val tempViewModel: ClientViewModel by viewModels(
             factoryProducer = { ClientViewModelFactory(view.context) }
         )
-
-
         viewModel = tempViewModel
 
         sendHi()
@@ -181,6 +179,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val list: List<Queue> =
                         dao.getQueuesByIds(dao.getQueuesIdsByClient(it.toLong()) ?: ArrayList())
                             ?: ArrayList()
+
                     emitter.onSuccess(list)
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -359,6 +358,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     savedQueue.owner = owner
                     savedQueue.isSaved = false
                     savedQueue.id = savedQueue.id ?: it.created_date
+                    savedQueue.info = it.info
 
                     dao.insertQueue(savedQueue)
 
@@ -771,7 +771,6 @@ class RoomQueues : SupportFragment(), onClickListener {
         } else {
             _imageViewEngranes.visibility = View.VISIBLE
         }
-
     }
 
     private fun goTo(pos: Int) {
@@ -925,7 +924,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(), 1
+                preferences.getFv(), preferences.getStoreVersion()
 
             )
 
@@ -944,43 +943,59 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             if (result.code() == 200) {
                 result.body()?.let { body ->
-                    val type = object : TypeToken<Map<String, Map<String, Any>>>() {
+                    val type = object : TypeToken<Map<String, Any>>() {
 
                     }.type
                     val gson: Gson = GsonBuilder().create()
                     val porterHistruct: PorterHistruct =
                         gson.fromJson(body, PorterHistruct::class.java)
-//                    if(porterHistruct.store_version!=PreferencesManager(this.requireContext()).getStoreVersion()){
-//                        JsonWrite(requireContext()).writeToFile(body)
-////                        JsonWrite(requireContext()).writeToFile(porterHistruct.stores.toString())
-//                    }
+
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
-                        if (dao.getQueueByUUID(entry.key) == null) {
-                            val name = entry.value["name"] as String
-                            val description = entry.value["description"] as String
-                            val createdDate = (entry.value["created_date"] as Double).toLong()
-                            val tags = entry.value["tags"] as String
+                        when (entry.key) {
+                            "store_version" -> {
+                                if (porterHistruct.store_version != PreferencesManager(this.requireContext()).getStoreVersion()) {
+                                    PreferencesManager(this.requireContext()).setStoreVersion(
+                                        porterHistruct.store_version
+                                    )
+                                    PreferencesManager(this.requireContext()).setStoreVersionInit()
+                                }
+                            }
+                            "stores" -> {
+                                if (PreferencesManager(this.requireContext()).getStoreVersionInit()) {
+                                    JsonWrite(requireContext()).writeToFile(body)
+                                }
 
-                            dao.insertQueue(
-                                Queue(
-                                    createdDate,
-                                    name,
-                                    createdDate,
-                                    0,
-                                    description,
-                                    entry.key,
-                                    null,
-                                    null,
-                                    "",
-                                    createdDate,
-                                    createdDate,
-                                    ArrayList(),
-                                    false,
-                                    isSaved = true,
-                                    owner = ""
-                                )
-                            )
+                            }
+                            else -> {
+                                if (dao.getQueueByUUID(entry.key) == null) {
+                                    val name = entry.value["name"] as String
+                                    val description = entry.value["description"] as String
+                                    val createdDate =
+                                        (entry.value["created_date"] as Double).toLong()
+                                    val tags = entry.value["tags"] as String
+
+                                    dao.insertQueue(
+                                        Queue(
+                                            createdDate,
+                                            name,
+                                            createdDate,
+                                            0,
+                                            description,
+                                            entry.key,
+                                            null,
+                                            null,
+                                            "",
+                                            createdDate,
+                                            createdDate,
+                                            ArrayList(),
+                                            false,
+                                            isSaved = true,
+                                            owner = ""
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                 }

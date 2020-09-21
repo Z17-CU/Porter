@@ -10,6 +10,7 @@ class Queue(
     @PrimaryKey(autoGenerate = true)
     var id: Long?,
     var name: String,
+//    var products:String,
     var startDate: Long,
     var clientsNumber: Int = 0,
     var description: String = "",
@@ -23,12 +24,15 @@ class Queue(
     var downloaded: Boolean = true,
     var isSaved: Boolean = false,
     var owner: String,
-    var isOffline: Boolean = false
+    var isOffline: Boolean = false,
+    var info: Map<String, Any>? = null
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()
+
     @Ignore
     var clientInQueueList: List<ClientInQueue>? = ArrayList()
+
     companion object {
         const val TABLE_NAME = "Queue"
     }

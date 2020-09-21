@@ -106,13 +106,14 @@
     <string name="readWrong">Error al leer</string>
     <string name="error_conection">Error de red</string>
     <string name="update">Actualizar</string>
-    <string name="queue_not_found">La cola no exite.</string>
+    <string name="queue_not_found">La cola no existe.</string>
     <string name="next">Continuar</string>
     <string name="province">Seleccione la provincia</string>
     <string name="municipie">Seleccione un municipio</string>
     <string name="store">Seleccione una tienda</string>
     <string name="select_municipe">Seleccione un municipio</string>
     <string name="select_store">Seleccione una tienda</string>
+    <string name="products">Pollo, aceite, picadillo</string>
 
 
     <string name="title_activity_main2">MainActivity</string>

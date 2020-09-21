@@ -94,7 +94,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
 
         val client = Common.stringToPorterHistruct(result, this)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv,1)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,PreferencesManager(this@ActivityHiClient).getStoreVersion())
             goToMain()
             return
         }
@@ -130,7 +130,8 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         lastName: String,
         ci: String,
         fv: String = "00",
-        storeVersion: Int
+        storeVersion: Int,
+        store:String=""
 
     ) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
@@ -139,9 +140,9 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
-            preferences.setStoreVersion(1)
+            preferences.setStoreVersion(storeVersion)
 
-            val struct = PorterHistruct(name, lastName, ci, fv,1)
+            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion)
 
             val data = Common.porterHiToString(struct)
 
