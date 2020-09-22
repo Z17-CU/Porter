@@ -9,7 +9,6 @@
                  android:id="@+id/nav_colaborators"
                 android:icon="@drawable/ic_colaborators"
                 android:title="@string/colaborators"
-
                 android:visible="true" />
             <item
 

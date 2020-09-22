@@ -152,7 +152,9 @@ class RoomQueues : SupportFragment(), onClickListener {
         nav_view.itemIconTintList = null
         toggle.syncState()
 
-
+        nav_view.setNavigationItemSelectedListener {
+            processOnMenuItemSelect(it)
+        }
         _recyclerViewQueuesResul.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueuesOpen.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueuesSaved.layoutManager = LinearLayoutManager(view.context)
@@ -208,6 +210,27 @@ class RoomQueues : SupportFragment(), onClickListener {
         } else {
             super.onBackPressedSupport()
         }
+    }
+
+
+    private fun processOnMenuItemSelect(menuItem: MenuItem): Boolean {
+        drawer_layout.closeDrawers()
+        when (menuItem.itemId) {
+            R.id.nav_new_queue -> {
+
+            }
+            R.id.nav_colaborators -> {
+
+            }
+            R.id.nav_export_queue -> {
+
+            }
+            R.id.nav_settings -> {
+
+            }
+
+        }
+        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -613,22 +636,31 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.action_import -> {
-                        pickQueue()
+
+                    R.id.nav_new_queue -> {
+
                         true
                     }
-                    R.id.action_settings -> {
+                    R.id.nav_colaborators -> {
+                        true
+                    }
+
+//                    R.id.action_import -> {
+//                        pickQueue()
+//                        true
+//                    }
+                    R.id.nav_settings -> {
                         openSettings()
                         true
                     }
-                    R.id.action_black_list -> {
-                        start(BlackListFragment())
-                        true
-                    }
-                    R.id.action_abaut -> {
-                        showAboutAs()
-                        true
-                    }
+//                    R.id.action_black_list -> {
+//                        start(BlackListFragment())
+//                        true
+//                    }
+//                    R.id.action_abaut -> {
+//                        showAboutAs()
+//                        true
+//                    }
                     R.id.action_search -> {
                         searchView.openSearch()
                         true
@@ -714,6 +746,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 )
                 linear_recycler_queue_open.layoutParams = lp
                 linear_recycler_queue_open.visibility = View.VISIBLE
+                tv_openQueues.visibility = View.VISIBLE
 
                 goTo(listSave.size - 1)
             } else {
