@@ -220,7 +220,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             }
             R.id.nav_colaborators -> {
-
+                start(MyCollaboratorsFragment())
             }
             R.id.nav_export_queue -> {
 

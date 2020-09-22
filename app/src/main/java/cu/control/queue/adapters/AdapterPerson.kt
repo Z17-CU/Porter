@@ -77,7 +77,8 @@ class AdapterPerson(private val queue: Queue) :
         holder.clientNumber.text = "C"
         if (person.info[KEY_NAME] != null || person.info[KEY_LAST_NAME] != null) {
             holder.textViewName.text =
-                person.info[KEY_NAME] as String? ?: "" + " " + person.info[KEY_LAST_NAME]
+                ( person.info[KEY_NAME] as String +" " + person.info[KEY_LAST_NAME])
+                        as String? ?: ""
         } else {
             holder.textViewName.text = ""
         }
