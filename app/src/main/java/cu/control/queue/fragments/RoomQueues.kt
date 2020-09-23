@@ -38,6 +38,7 @@ import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterQueue
+import cu.control.queue.adapters.AdapterQueueFilterSearch
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
@@ -191,7 +192,6 @@ class RoomQueues : SupportFragment(), onClickListener {
             super.onBackPressedSupport()
         }
     }
-
 
     private fun processOnMenuItemSelect(menuItem: MenuItem): Boolean {
         drawer_layout.closeDrawers()
@@ -649,6 +649,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 //                    }
                     R.id.action_search -> {
                         searchView.openSearch()
+                        searchView.openSearch()
                         true
                     }
                     else -> {
@@ -693,15 +694,14 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                 override fun onSearchViewClosed() {
                     searchQuery.postValue("")
-                    refreshAdapter(
-
-                    )
+                    refreshAdapter()
                 }
             })
         }
     }
 
     private fun refreshAdapter() {
+        adapter = AdapterQueue(this)
         _recyclerViewQueues.adapter = adapter
 
         val listOpen = mutableListOf<Queue>()
@@ -747,6 +747,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     private fun refreshAdapterFilterSearch(list: List<Queue>) {
 
+        val adapter = AdapterQueueFilterSearch(this)
+        _recyclerViewQueues.adapter = adapter
         adapter.contentList = list
         adapter.notifyDataSetChanged()
         if (list.isNotEmpty()) {

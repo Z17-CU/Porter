@@ -31,27 +31,25 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
     OnDialogHiClientEvent {
 
-
     private lateinit var compositeDisposable: CompositeDisposable
     private lateinit var preferences: PreferencesManager
-    private lateinit var dialog: AlertDialog
-    private lateinit var view: View
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         preferences = PreferencesManager(this)
-        compositeDisposable = CompositeDisposable()
-        setContentView(R.layout.activity_hi_client)
-        dialogInfo(this)
-
-        val fab: View = findViewById(R.id.fab)
-        fab.setOnClickListener { _ ->
+        if (preferences.isFirstRun()) {
+            compositeDisposable = CompositeDisposable()
+            setContentView(R.layout.activity_hi_client)
             dialogInfo(this)
+
+            val fab: View = findViewById(R.id.fab)
+            fab.setOnClickListener {
+                dialogInfo(this)
+            }
+        } else {
+            goToMain()
         }
-
-
-
     }
 
     private fun dialogInfo(context: Context) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="cu.control.queue" >
+    package="cu.control.queue">
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -18,23 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m" >
+        tools:targetApi="m">
         <activity
-            android:name=".MainActivity2"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity android:name=".ActivityHiClient" >
-        </activity>
-        <activity android:name=".QrActivity" />
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".WelcomeActivity"
+            android:name=".ActivityHiClient"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme"
-            tools:ignore="LockedOrientationActivity" >
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,18 +31,18 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" /> <!-- <provider -->
-        <!-- android:name=".utils.GenericFileProvider" -->
-        <!-- android:authorities="${applicationId}.provider" -->
-        <!-- android:exported="false" -->
-        <!-- android:grantUriPermissions="true" > -->
+            tools:ignore="LockedOrientationActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="cu.control.queue.fileprovider"
             android:exported="false"
-            android:grantUriPermissions="true" >
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
