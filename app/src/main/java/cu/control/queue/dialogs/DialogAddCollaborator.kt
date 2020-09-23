@@ -10,10 +10,13 @@ import android.os.Vibrator
 import android.util.Base64
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
+import cu.control.queue.adapters.AdapterPerson
+import cu.control.queue.interfaces.OnColaboratorClickListener
 import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.Queue
@@ -22,20 +25,23 @@ import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.utils.permissions.Permissions
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
+import kotlinx.android.synthetic.main.recycler_view_layout.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class DialogAddCollaborator(
     private val context: Context,
-    private val queue: Queue
-) : ZXingScannerView.ResultHandler, OnDialogHiClientEvent {
+    private val queue: Queue? = null
+) : ZXingScannerView.ResultHandler, OnDialogHiClientEvent, OnColaboratorClickListener {
 
     private lateinit var dialog: AlertDialog
+    private lateinit var dialogFromList: AlertDialog
     private lateinit var view: View
 
     fun create(): AlertDialog {
@@ -53,15 +59,28 @@ class DialogAddCollaborator(
 
         view = View.inflate(context, R.layout.layout_dialog_hi_client, null)
 
+        if (queue == null) {
+            view._showAddClient.visibility = View.GONE
+        }
 
         view._showAddClient.setOnClickListener {
-            DialogInsertColaborator(
-                context,
-                queue,
-                compositeDisposable = CompositeDisposable()
-            ).create().show()
-            stopReader()
-            dialog.dismiss()
+            if (queue != null) {
+                DialogInsertColaborator(
+                    context,
+                    queue,
+                    compositeDisposable = CompositeDisposable()
+                ).create().show()
+                stopReader()
+                dialog.dismiss()
+            }
+        }
+
+        queue?.let {
+            view._showAddClientFromList.visibility = View.VISIBLE
+
+            view._showAddClientFromList.setOnClickListener {
+                showDialogSelectColaborator(view, queue)
+            }
         }
 
         return view
@@ -75,60 +94,81 @@ class DialogAddCollaborator(
     }
 
     private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
-        Single.create<Pair<Int, String?>> {
+        if (queue != null) {
+            Single.create<Pair<Int, String?>> {
 
-            val info = HashMap<String, Any>()
+                val info = HashMap<String, Any>()
 
-            info.put(Person.KEY_NAME, name)
-            info.put(Person.KEY_LAST_NAME, lastName)
+                info.put(Person.KEY_NAME, name)
+                info.put(Person.KEY_LAST_NAME, lastName)
 
-            val person = Person(ci, fv, info)
+                val person = Person(ci, fv, info)
 
-            val headerMap = mutableMapOf<String, String>().apply {
-                this["Content-Type"] = "application/json"
-                this["operator"] = PreferencesManager(context).getId()
-                this["queue"] = queue.uuid!!
-                this["Authorization"] = Base64.encodeToString(
-                    BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
-                ) ?: ""
+                val headerMap = mutableMapOf<String, String>().apply {
+                    this["Content-Type"] = "application/json"
+                    this["operator"] = PreferencesManager(context).getId()
+                    this["queue"] = queue.uuid!!
+                    this["Authorization"] = Base64.encodeToString(
+                        BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+                    ) ?: ""
+                }
+
+                val result = APIService.apiService.putCollaborator(
+                    headers = headerMap,
+                    data = Gson().toJson(person)
+                ).execute()
+
+                if (result.code() == 200) {
+                    val map = HashMap<String, Any>()
+                    map.put(Person.KEY_NAME, name)
+                    map.put(Person.KEY_LAST_NAME, lastName)
+                    val dao = AppDataBase.getInstance(context).dao()
+
+                    dao.insertCollaborator(Person(ci, fv, map))
+                    queue.collaborators.add(ci)
+                    dao.insertQueue(queue)
+                } else if (result.code() == 409) {
+                    showError("Ya $name es colaborador de ésta cola.")
+                }
+
+                it.onSuccess(
+                    Pair(result.code(), result.errorBody()?.string() ?: result.message())
+                )
             }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    if (it.first == 200) {
+                        stopReader()
+                        dialog.dismiss()
+                    } else {
+                        if (it.first != 409) {
+                            val message = it.second ?: "Error ${it.first}"
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        }
+                        startReader()
+                    }
+                }, {
+                    it.printStackTrace()
+                    showError(context.getString(R.string.conection_error))
+                    startReader()
+                }).addTo(CompositeDisposable())
+        } else {
+            val map = HashMap<String, Any>()
+            map.put(Person.KEY_NAME, name)
+            map.put(Person.KEY_LAST_NAME, lastName)
+            val dao = AppDataBase.getInstance(context).dao()
 
-            val result = APIService.apiService.putCollaborator(
-                headers = headerMap,
-                data = Gson().toJson(person)
-            ).execute()
-
-            if (result.code() == 200) {
-                val map = HashMap<String, Any>()
-                map.put(Person.KEY_NAME, name)
-                map.put(Person.KEY_LAST_NAME, lastName)
-                val dao = AppDataBase.getInstance(context).dao()
-
+            Completable.create {
                 dao.insertCollaborator(Person(ci, fv, map))
-                queue.collaborators.add(ci)
-                dao.insertQueue(queue)
-            }
-
-            it.onSuccess(
-                Pair(result.code(), result.errorBody()?.string() ?: result.message())
-            )
-        }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                if (it.first == 200) {
+                it.onComplete()
+            }.subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
                     stopReader()
                     dialog.dismiss()
-                } else {
-                    val message = it.second ?: "Error ${it.first}"
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                    startReader()
-                }
-            }, {
-                it.printStackTrace()
-                showError(context.getString(R.string.conection_error))
-                startReader()
-            }).addTo(CompositeDisposable())
+                }.addTo(CompositeDisposable())
+        }
     }
 
     private fun startReader() {
@@ -176,5 +216,54 @@ class DialogAddCollaborator(
 
     override fun onPause() {
         stopReader()
+    }
+
+    private fun showDialogSelectColaborator(mView: View, queue: Queue) {
+        val context = mView.context
+        val view = View.inflate(context, R.layout.recycler_view_layout, null)
+
+        val adapter = AdapterPerson(queue, this@DialogAddCollaborator)
+        Single.create<List<Person>> {
+            it.onSuccess(AppDataBase.getInstance(context).dao().getAllCollaboratorsList())
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { list, _ ->
+                adapter.contentList = list
+                adapter.notifyDataSetChanged()
+
+                if (list.isEmpty()) {
+                    view._imageViewEngranes.visibility = View.VISIBLE
+                } else {
+                    view._imageViewEngranes.visibility = View.GONE
+                }
+
+            }.addTo(compositeDisposable = CompositeDisposable())
+
+        view.recycler_view.layoutManager = LinearLayoutManager(context)
+        view.recycler_view.adapter = adapter
+
+        dialogFromList = AlertDialog.Builder(context)
+            .setView(view)
+            .create()
+
+        dialogFromList.show()
+    }
+
+    override fun onClick(colaborator: Person) {
+        dialogFromList.dismiss()
+        saveAndSendData(
+            colaborator.info[Person.KEY_NAME] as String,
+            colaborator.info[Person.KEY_LAST_NAME] as String,
+            colaborator.ci,
+            colaborator.fv
+        )
+    }
+
+    override fun onLongClick(view: View, colaborator: Person) {
+
+    }
+
+    override fun onSwipe(direction: Int, colaborator: Person) {
+
     }
 }

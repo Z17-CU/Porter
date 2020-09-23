@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderQueue
+import cu.control.queue.interfaces.OnColaboratorClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Person
@@ -29,7 +30,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 
-class AdapterPerson(private val queue: Queue) :
+class AdapterPerson(private val queue: Queue, private val onColaboratorClickListener: OnColaboratorClickListener) :
     RecyclerView.Adapter<ViewHolderQueue>() {
 
     var contentList: List<Person> = ArrayList()
@@ -92,67 +93,12 @@ class AdapterPerson(private val queue: Queue) :
 
         holder.layoutBackground.setOnLongClickListener {
             if (person.ci != queue.owner && person.ci != myCi)
-                showPopup(it, person)
+                onColaboratorClickListener.onLongClick(it, person)
             return@setOnLongClickListener true
         }
-    }
 
-    @SuppressLint("RestrictedApi")
-    private fun showPopup(view: View, person: Person) {
-        val context = view.context
-        val dao = AppDataBase.getInstance(context).dao()
-        val popupMenu = PopupMenu(context, view)
-        (context as Activity).menuInflater.inflate(R.menu.menu_only_delete, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_delete -> {
-                    android.app.AlertDialog.Builder(context)
-                        .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar a " + person.info[KEY_NAME] + " de la lista?")
-                        .setNegativeButton("Cancelar", null)
-                        .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-
-                                val headerMap = mutableMapOf<String, String>().apply {
-                                    this["Content-Type"] = "application/json"
-                                    this["operator"] = PreferencesManager(context).getId()
-                                    this["queue"] = queue.uuid!!
-                                    this["Authorization"] = Base64.encodeToString(
-                                        BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
-                                    ) ?: ""
-                                }
-
-                                val result = APIService.apiService.deleteCollaborator(
-                                    headers = headerMap,
-                                    data = Gson().toJson(person)
-                                ).execute()
-
-                                if (result.code() == 200) {
-                                    queue.collaborators.removeAll { ci -> ci == person.ci }
-                                    dao.insertQueue(queue)
-                                } else {
-                                    context.runOnUiThread {
-                                        Toast.makeText(context, result.message(), Toast.LENGTH_LONG)
-                                            .show()
-                                    }
-                                }
-
-                                it.onComplete()
-                            }
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe().addTo(CompositeDisposable())
-                        }
-                        .create()
-                        .show()
-                }
-            }
-            false
+        holder.layoutBackground.setOnClickListener {
+            onColaboratorClickListener.onClick(person)
         }
-        val wrapper = androidx.appcompat.view.ContextThemeWrapper(context, R.style.PopupWhite)
-        val menuPopupHelper =
-            MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
-        menuPopupHelper.setForceShowIcon(true)
-        menuPopupHelper.show()
     }
 }

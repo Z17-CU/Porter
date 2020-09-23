@@ -41,6 +41,26 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom">
+
+                <ImageView
+                    android:id="@+id/_showAddClientFromList"
+                    android:visibility="gone"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/round_accent_bg"
+                    android:contentDescription="@string/lantern"
+                    android:foreground="?selectableItemBackground"
+                    android:padding="16dp"
+                    app:srcCompat="@drawable/ic_list_white"
+                    tools:ignore="UnusedAttribute" />
+
+            </LinearLayout>
+
         </RelativeLayout>
 
 

@@ -23,7 +23,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_store.view.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.android.synthetic.main.toolbar.view.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 
 class CreateQueueSelectStoreFragment(

@@ -10,28 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@color/white"
-                    android:theme="@style/ActionBarTheme"
-                    app:popupTheme="@style/PopupMenuStyle" />
-
-
-
-            </RelativeLayout>
-
-        </com.google.android.material.appbar.AppBarLayout>
+        <include layout="@layout/toolbar" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -51,7 +30,6 @@
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
-
         </RelativeLayout>
 
     </LinearLayout>
@@ -62,14 +40,13 @@
         android:gravity="end">
 
         <ImageView
+            android:id="@+id/add_colaborator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/add_colaborator"
             android:layout_margin="10dp"
+            android:contentDescription="TODO"
             android:visibility="gone"
-            app:srcCompat="@drawable/ic_add_new_queue"
-            android:contentDescription="TODO" />
-
+            app:srcCompat="@drawable/ic_add_new_queue" />
 
 
     </LinearLayout>

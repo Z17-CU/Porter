@@ -31,7 +31,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.export_queue.*
-import kotlinx.android.synthetic.main.room_queues.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import timber.log.Timber
 import java.io.File

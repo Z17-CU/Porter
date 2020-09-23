@@ -28,7 +28,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_create_queue.view.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.android.synthetic.main.toolbar.view.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 import kotlin.collections.ArrayList

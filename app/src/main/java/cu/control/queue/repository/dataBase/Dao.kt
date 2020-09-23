@@ -148,6 +148,9 @@ interface Dao {
     @Query("SELECT * FROM ${Person.TABLE_NAME}")
     fun getAllCollaborators(): LiveData<List<Person>>
 
+    @Query("SELECT * FROM ${Person.TABLE_NAME}")
+    fun getAllCollaboratorsList(): List<Person>
+
     fun getCollaborators(idList: List<String>): List<Person> {
         var clientList: List<Person> = ArrayList()
 

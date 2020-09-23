@@ -71,9 +71,8 @@ import kotlinx.android.synthetic.main.quees_open_saved.*
 import kotlinx.android.synthetic.main.room_queues._fabAdd
 import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
 import kotlinx.android.synthetic.main.room_queues._recyclerViewQueues
-import kotlinx.android.synthetic.main.room_queues.searchView
 import kotlinx.android.synthetic.main.room_queues.swipeContainer
-import kotlinx.android.synthetic.main.room_queues.toolbar
+import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File

@@ -1,6 +1,5 @@
 package cu.control.queue.fragments
 
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Base64
 import android.view.LayoutInflater
@@ -8,8 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.adapters.AdapterMyColaborators
@@ -19,17 +19,16 @@ import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
+import cu.control.queue.utils.PreferencesManager
 import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.my_colaborators.*
-import kotlinx.android.synthetic.main.room_queues.toolbar
+import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 
-class MyCollaboratorsFragment() : SupportFragment() {
+class MyCollaboratorsFragment : SupportFragment() {
 
     private lateinit var dao: Dao
     private val adapter = AdapterMyColaborators()
@@ -58,9 +57,9 @@ class MyCollaboratorsFragment() : SupportFragment() {
         _recyclerViewMyColaborators.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewMyColaborators.adapter = adapter
 
-//        add_colaborator.setOnClickListener {
-//            DialogAddCollaborator(requireContext()).create().show()
-//        }
+        _okButton.setOnClickListener {
+            DialogAddCollaborator(requireContext()).create().show()
+        }
 
         initToolBar()
 
@@ -69,13 +68,16 @@ class MyCollaboratorsFragment() : SupportFragment() {
 
     private fun initObserver() {
 
+        dao.getAllCollaborators().observe(viewLifecycleOwner, Observer {
+            adapter.contentList = it
+            adapter.notifyDataSetChanged()
+        })
 
         Completable.create {
 
             val headerMap = mutableMapOf<String, String>().apply {
                 this["Content-Type"] = "application/json"
-//                this["operator"] =PreferencesManager(requireContext()).getCi()+"."+PreferencesManager(requireContext()).getFv()
-                this["operator"] = "93110904905.ACY493422"
+                this["operator"] = PreferencesManager(requireContext()).getCi()+"."+PreferencesManager(requireContext()).getFv()
                 this["Authorization"] = Base64.encodeToString(
                     BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
                 ) ?: ""
@@ -88,31 +90,13 @@ class MyCollaboratorsFragment() : SupportFragment() {
             if (result.code() == 200) {
                 val listPerson = result.body()
                 listPerson?.let { listperson ->
-
-                    Single.create<List<Person>> {
-
-
-                        it.onSuccess(listperson)
-                    }.observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe { list, error ->
-                            adapter.contentList = list
-                            adapter.notifyDataSetChanged()
-                        }.addTo(compositeDisposable = CompositeDisposable())
-
-
+                    dao.insertCollaborator(listPerson as ArrayList<Person>)
                 }
-
 
             } else {
                 requireActivity().runOnUiThread {
                     val errorBody = result.errorBody()?.string()
                     if (errorBody != null && result.code() == 405) {
-
-                        val type = object : TypeToken<Person>() {
-
-                        }.type
-
 
                     } else if (errorBody != null) {
                         when (result.code()) {
@@ -128,8 +112,6 @@ class MyCollaboratorsFragment() : SupportFragment() {
                             }
 
                         }
-
-
                     }
                 }
             }
@@ -164,7 +146,7 @@ class MyCollaboratorsFragment() : SupportFragment() {
             setNavigationIcon(R.drawable.ic_back_custom)
 
             title = "Mis Colaboradores"
-            setTitleTextColor(resources.getColor(R.color.blue_drawer))
+            setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 
             setNavigationOnClickListener {
                 requireActivity().title = requireContext().getString(R.string.app_name)

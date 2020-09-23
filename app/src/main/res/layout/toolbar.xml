@@ -25,6 +25,12 @@
                 app:popupTheme="@style/PopupMenuStyle"
                 tools:targetApi="lollipop" />
 
+            <cu.control.queue.utils.MaterialSearchView
+                android:id="@+id/searchView"
+                style="@style/MaterialSearchViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
