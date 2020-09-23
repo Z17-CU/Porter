@@ -130,6 +130,7 @@
     <string name="colaborators">Mis colaboradores</string>
     <string name="export_queue">Exportar cola</string>
     <string name="settings">Ajustes</string>
+    <string name="export_list">Debe tener al menos una cola para exportar.</string>
     <string name="nombre_de_la_cola">Nombre de la cola</string>
     <string name="sin_definir">Sin definir</string>
     <string name="descripci_n">Descripción</string>

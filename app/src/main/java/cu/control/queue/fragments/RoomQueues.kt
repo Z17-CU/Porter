@@ -219,11 +219,13 @@ class RoomQueues : SupportFragment(), onClickListener {
                 start(MyCollaboratorsFragment())
             }
             R.id.nav_export_queue -> {
+                start(ExportQueueFragment())
 
             }
             R.id.nav_settings -> {
 
             }
+
 
         }
         return true
@@ -516,6 +518,9 @@ class RoomQueues : SupportFragment(), onClickListener {
             showReaderOptions(queue)
         }
     }
+
+    override fun onClickExport(list: List<Queue>) {
+     }
 
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
         AlertDialog.Builder(requireContext())

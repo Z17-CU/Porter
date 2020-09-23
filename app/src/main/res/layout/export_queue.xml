@@ -44,10 +44,10 @@
                 android:layout_height="match_parent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/_recyclerViewMyColaborators"
+                    android:id="@+id/_recyclerViewExportQueue"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:listitem="@layout/item_my_colaborator" />
+                    tools:listitem="@layout/item_queues" />
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
@@ -64,10 +64,9 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/add_colaborator"
+            android:id="@+id/export_queue"
             android:layout_margin="10dp"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_add_new_queue"
+             app:srcCompat="@drawable/ic_export_queue"
             android:contentDescription="TODO" />
 
 

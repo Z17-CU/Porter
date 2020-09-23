@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.adapters.AdapterMyColaborators
+import cu.control.queue.dialogs.DialogAddCollaborator
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.payload.Person
@@ -57,9 +58,9 @@ class MyCollaboratorsFragment() : SupportFragment() {
         _recyclerViewMyColaborators.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewMyColaborators.adapter = adapter
 
-        add_colaborator.setOnClickListener {
-//            DialogAddCollaborator(requireContext(), queue).create().show()
-        }
+//        add_colaborator.setOnClickListener {
+//            DialogAddCollaborator(requireContext()).create().show()
+//        }
 
         initToolBar()
 

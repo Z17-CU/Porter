@@ -15,6 +15,7 @@ class Queue(
     var uuid: String?,
     val created_date: Long?,
     val updated_date: Long?,
+
     var collaborators: ArrayList<String> = ArrayList(),
     var downloaded: Boolean = true,
     var isSaved: Boolean = false,
