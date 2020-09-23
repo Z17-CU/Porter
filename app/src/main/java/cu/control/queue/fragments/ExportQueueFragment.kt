@@ -20,9 +20,11 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.CSVWriter
+import cu.control.queue.utils.Common
 import cu.control.queue.utils.Conts
 import cu.control.queue.viewModels.ClientViewModel
 import cu.control.queue.viewModels.ClientViewModelFactory
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -45,7 +47,6 @@ class ExportQueueFragment() : SupportFragment(), onClickListener {
     private lateinit var adapterSave: AdapterExportQueues
     private lateinit var viewModel: ClientViewModel
     var contentList: List<Client> = ArrayList()
-    lateinit var queue: Queue
 
     private var exportFrom = 0
     private var exportTo = 0
@@ -91,54 +92,30 @@ class ExportQueueFragment() : SupportFragment(), onClickListener {
             val exportList = adapterSave.exportList
             if (exportList.size > 0) {
                 Toast.makeText(context,"Exportando ${exportList.size} cola(s), por favor espere...",Toast.LENGTH_SHORT).show()
-                exportList.map { queue ->
-                    this.queue = queue
-                    Single.create<List<ClientInQueue>> {
-                        val clientsInQueue = dao.getClientsInQueueList(queue.id!!)
-                        it.onSuccess(clientsInQueue)
-                    }.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { clientsInQueue, _ ->
-                            clientsInQueue.map {
 
-                                Single.create<List<Client>> { singleEmitter ->
+                Completable.create {
 
-                                    var idList: List<Long> = ArrayList()
-                                    clientsInQueue.map {
-                                        idList = idList + it.clientId
-                                        Timber.d(it.clientId.toString())
-                                    }
-                                    var clientList: List<Client> = ArrayList()
-
-                                    clientList = dao.getClients(idList)
-
-
-                                    clientList.map { client ->
-                                        val thisClientInQueue =
-                                            clientsInQueue.find { it.clientId == client.id }!!
-                                        client.lastRegistry = thisClientInQueue.lastRegistry
-                                        client.reIntent = thisClientInQueue.reIntent
-                                        client.number = thisClientInQueue.number
-                                        client.isChecked = thisClientInQueue.isChecked
-                                        client.repeatedClient = thisClientInQueue.repeatedClient
-                                    }
-
-                                    clientList = clientList.sortedBy { it.number }
-
-                                    singleEmitter.onSuccess(clientList)
-                                }.subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { clients, _ ->
-                                        contentList = clients
-
-                                    }
+                    exportList.map {
+                        val list = ArrayList<Client>()
+                        dao.getClientsInQueueList(it.id!!).map { clientInQueue ->
+                            val client: Client? = dao.getClient(clientInQueue.clientId)
+                            client?.let {client ->
+                                client.isChecked = clientInQueue.isChecked
+                                client.lastRegistry = clientInQueue.lastRegistry
+                                client.number = clientInQueue.number
+                                client.reIntent = clientInQueue.reIntent
+                                list.add(client)
                             }
+                        }
+                        exportQueueCSV(list, it)
+                    }
+                    it.onComplete()
+                }.subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        Toast.makeText(requireContext(), "Colas exportadas", Toast.LENGTH_LONG).show()
+                    }.addTo(compositeDisposable)
 
-                        }.addTo(compositeDisposable)
-
-                }
-                exportQueueCSV(contentList)
-                Timber.e(exportList.size.toString())
             } else {
                 Toast.makeText(
                     context,
@@ -149,15 +126,13 @@ class ExportQueueFragment() : SupportFragment(), onClickListener {
         }
     }
 
-    private fun exportQueueCSV(it: List<Client>) {
-
-        if (it.isNotEmpty()) {
-            val list = it.subList(exportFrom, it.size)
+    private fun exportQueueCSV(list: List<Client>, queue: Queue) {
+        if (list.isNotEmpty()) {
             val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
             val dateFormat = SimpleDateFormat("d 'de' MMM 'del' yyyy", Locale("es", "CU"))
 
             val name =
-                this.queue.name + " " + Conts.formatDateBig.format(this.queue.startDate) + " " + Calendar.getInstance()
+                queue.name + " " + Conts.formatDateBig.format(queue.startDate) + " " + Calendar.getInstance()
                     .timeInMillis + ".csv"
 
             val exportDir = File(Conts.APP_DIRECTORY, "")
@@ -170,26 +145,37 @@ class ExportQueueFragment() : SupportFragment(), onClickListener {
                 file.createNewFile()
                 val csvWriter = CSVWriter(FileWriter(file))
                 csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
-                list.forEachIndexed { index, list ->
+                list.forEachIndexed { index, client ->
                     csvWriter.writeNext(
                         arrayOf(
                             "$index",
-                            list.name,
-                            list.ci,
-                            dateFormat.format(list.lastRegistry),
-                            timeFormat.format(list.lastRegistry)
+                            client.name,
+                            client.ci,
+                            dateFormat.format(client.lastRegistry),
+                            timeFormat.format(client.lastRegistry)
                         )
                     )
                 }
                 csvWriter.close()
-                // Common.shareQueue(requireContext(), file, "csv")
+                requireActivity().runOnUiThread {
+                    Toast.makeText(
+                        requireContext(),
+                        "${queue.name} ha sido exportada al almacenamiento del dispositivo",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            requireActivity().runOnUiThread {
                 Toast.makeText(
                     requireContext(),
-                    "La cola ${queue.name} ha sido exportada al almacenamiento del dispositivo",
+                    "${queue.name} no tiene clientes.",
                     Toast.LENGTH_LONG
                 ).show()
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
             }
         }
     }
