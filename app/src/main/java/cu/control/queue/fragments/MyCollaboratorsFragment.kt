@@ -77,7 +77,10 @@ class MyCollaboratorsFragment : SupportFragment() {
 
             val headerMap = mutableMapOf<String, String>().apply {
                 this["Content-Type"] = "application/json"
-                this["operator"] = PreferencesManager(requireContext()).getCi()+"."+PreferencesManager(requireContext()).getFv()
+                this["operator"] =
+                    PreferencesManager(requireContext()).getCi() + "." + PreferencesManager(
+                        requireContext()
+                    ).getFv()
                 this["Authorization"] = Base64.encodeToString(
                     BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
                 ) ?: ""
@@ -89,31 +92,33 @@ class MyCollaboratorsFragment : SupportFragment() {
 
             if (result.code() == 200) {
                 val listPerson = result.body()
-                listPerson?.let { listperson ->
+                listPerson?.let {
                     dao.insertCollaborator(listPerson as ArrayList<Person>)
                 }
 
             } else {
-                requireActivity().runOnUiThread {
-                    val errorBody = result.errorBody()?.string()
-                    if (errorBody != null && result.code() == 405) {
+                if (this@MyCollaboratorsFragment.isVisible)
+                    requireActivity().runOnUiThread {
+                        val errorBody = result.errorBody()?.string()
+                        if (errorBody != null && result.code() == 405) {
 
-                    } else if (errorBody != null) {
-                        when (result.code()) {
-                            401 -> {
+                        } else if (errorBody != null) {
+                            when (result.code()) {
+                                401 -> {
+
+                                }
+                                403 -> {
+                                    val dialog =
+                                        Common.showHiErrorMessage(requireContext(), errorBody)
+                                    dialog.show()
+                                }
+                                404 -> {
+
+                                }
 
                             }
-                            403 -> {
-                                val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
-                                dialog.show()
-                            }
-                            404 -> {
-
-                            }
-
                         }
                     }
-                }
             }
 
             it.onComplete()

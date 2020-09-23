@@ -34,7 +34,7 @@ class AdapterExportQueues :
 
         holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
         holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
-        holder.imageViewSaveOpened.visibility = View.GONE
+        holder.imageViewSaveOpened.visibility = if (queue.isSaved) View.VISIBLE else View.GONE
         holder.clientNumberOpenQueue.visibility = View.GONE
         holder.textViewName.text = queue.name
         holder.textViewDate.text = formatDateBig.format(queue.startDate)
@@ -46,20 +46,20 @@ class AdapterExportQueues :
         updateItem(holder, queue)
     }
 
-    private fun updateItem(holder: ViewHolderExportQueues, queue: Queue){
+    private fun updateItem(holder: ViewHolderExportQueues, queue: Queue) {
         if (queue.checked == true) {
             holder.check_export.visibility = View.VISIBLE
             holder.clientNumberOpenQueue.visibility = View.GONE
             holder.clientNumberSaveQueue.visibility = View.GONE
         } else {
             if (queue.isSaved) {
-                holder.clientNumberOpenQueue.visibility = View.GONE
-                holder.clientNumberSaveQueue.visibility = View.VISIBLE
-                holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
-            } else {
                 holder.clientNumberOpenQueue.visibility = View.VISIBLE
                 holder.clientNumberSaveQueue.visibility = View.GONE
                 holder.clientNumberOpenQueue.text = queue.clientsNumber.toString()
+            } else {
+                holder.clientNumberOpenQueue.visibility = View.GONE
+                holder.clientNumberSaveQueue.visibility = View.VISIBLE
+                holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
             }
             holder.check_export.visibility = View.GONE
         }

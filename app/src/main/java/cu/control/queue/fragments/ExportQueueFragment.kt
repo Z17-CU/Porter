@@ -188,7 +188,7 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
         val listOpen = mutableListOf<Queue>()
         val list = viewModel.allQueues.value ?: ArrayList()
         list.map { queue ->
-            if (queue.downloaded) {
+            if (queue.downloaded && queue.clientsNumber > 0) {
                 listOpen.add(queue)
             }
         }

@@ -24,10 +24,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/white"
+                    android:elevation="0dp"
                     android:theme="@style/ActionBarTheme"
                     app:popupTheme="@style/PopupMenuStyle" />
-
-
 
             </RelativeLayout>
 
@@ -51,7 +50,6 @@
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
-
         </RelativeLayout>
 
     </LinearLayout>
@@ -62,13 +60,12 @@
         android:gravity="end">
 
         <ImageView
+            android:id="@+id/export_queue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/export_queue"
             android:layout_margin="10dp"
-             app:srcCompat="@drawable/ic_export_queue"
-            android:contentDescription="TODO" />
-
+            android:contentDescription="TODO"
+            app:srcCompat="@drawable/ic_export_queue" />
 
 
     </LinearLayout>
