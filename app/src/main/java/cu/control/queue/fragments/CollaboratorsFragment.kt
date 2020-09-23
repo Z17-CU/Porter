@@ -63,6 +63,8 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(), OnCol
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueues.adapter = adapter
 
+        swipeContainer.isEnabled = false
+
         _fabAdd.setOnClickListener {
             DialogAddCollaborator(requireContext(), queue).create().show()
         }

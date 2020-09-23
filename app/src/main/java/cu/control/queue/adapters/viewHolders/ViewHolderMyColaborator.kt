@@ -10,7 +10,6 @@ class ViewHolderMyColaborator(itemView: View) : RecyclerView.ViewHolder(itemView
 
     val textViewNombreColaborator: TextView = itemView._textViewNombreColaborator
     val item_colaborator: LinearLayout = itemView._item_colaborator
-
     val textViewCIColaborator: TextView = itemView._textViewCIColaborator
 
 }

@@ -145,7 +145,9 @@ class MyCollaboratorsFragment : SupportFragment() {
                 true
             }
             .subscribe {
-                swipeContainer.isRefreshing = false
+                swipeContainer?.let {
+                    swipeContainer.isRefreshing = false
+                }
             }.addTo(compositeDisposable)
     }
 
