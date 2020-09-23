@@ -49,7 +49,7 @@ class AdapterQueueFilterSearch(
         holder.textViewDateUpdate.text = formatDateBigNatural.format(queue.updated_date)
         holder.imageView.setImageDrawable(
             ContextCompat.getDrawable(
-                holder.imageView.context, R.drawable.ic_recurso_3
+                holder.imageView.context, R.drawable.ic_launcher_foreground
             )
         )
 
