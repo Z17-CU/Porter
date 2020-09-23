@@ -115,7 +115,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
             contentList[element].number.toString()
     }
 
-    fun deleteItem(position: Int, direction: Int) {
+    fun swipeItem(position: Int, direction: Int) {
         onClientClickListener.onSwipe(direction, contentList[position])
     }
 }

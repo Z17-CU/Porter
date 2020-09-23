@@ -14,11 +14,12 @@
     <color name="white">#FFF</color>
 
     <color name="item_bg_color">#1FB8B8B8</color>
+    <color name="gray_deleter">#979797</color>
 
     <color name="google_blue">#4285F4</color>
-    <color name="google_red">#DB4437</color>
+    <color name="google_red">#D73F3F</color>
     <color name="google_yellow">#F4B400</color>
-    <color name="google_green">#0F9D58</color>
+    <color name="google_green">#65B832</color>
     <color name="background_queue_open_green">#D5FFCE</color>
 
     <color name="search_field_bg">#EFEBE9</color>

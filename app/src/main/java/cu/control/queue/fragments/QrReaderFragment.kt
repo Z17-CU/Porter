@@ -18,6 +18,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
@@ -185,7 +186,7 @@ class QrReaderFragment(
                             requireContext().getString(R.string.lista)
                         updateObserver(queue.id!!)
 
-                        R.drawable.ic_filter_list
+                        R.drawable.ic_list
                     }
                 )
             } catch (e: Exception) {
@@ -213,6 +214,10 @@ class QrReaderFragment(
         dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
             queue = it
             menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            toolbar.title = it.name
         })
 
         resumeReader()
@@ -310,6 +315,10 @@ class QrReaderFragment(
                         selectRangeToExport()
                         true
                     }
+                    R.id.action_settings -> {
+                        start(CreateQueueFragment(viewModel, queue.id!!))
+                        true
+                    }
                     R.id.action_save_online -> {
                         sendPayloads()
                         true
@@ -324,7 +333,7 @@ class QrReaderFragment(
                 }
             }
 
-            setNavigationIcon(R.drawable.ic_arrow_back)
+            setNavigationIcon(R.drawable.ic_back_custom_white)
 
             title = queue.name
 
@@ -982,6 +991,29 @@ class QrReaderFragment(
 
     }
 
+    private fun deleteItem(client: Client) {
+        requireActivity().runOnUiThread {
+            android.app.AlertDialog.Builder(context)
+                .setTitle("Eliminar")
+                .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Eliminar") { _, _ ->
+                    Completable.create {
+                        payloadDeleteMember(client)
+                        val size = adapter.contentList.size - 1
+                        dao.deleteClientFromQueue(client.id, adapter.queueId)
+                        dao.updateQueueSize(adapter.queueId, size)
+                        it.onComplete()
+                    }
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe().addTo(CompositeDisposable())
+                }
+                .create()
+                .show()
+        }
+    }
+
     @SuppressLint("RestrictedApi")
     override fun onLongClick(view: View, client: Client) {
         val context = view.context
@@ -991,24 +1023,7 @@ class QrReaderFragment(
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
-                    android.app.AlertDialog.Builder(context)
-                        .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
-                        .setNegativeButton("Cancelar", null)
-                        .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                payloadDeleteMember(client)
-                                val size = adapter.contentList.size - 1
-                                dao.deleteClientFromQueue(client.id, adapter.queueId)
-                                dao.updateQueueSize(adapter.queueId, size)
-                                it.onComplete()
-                            }
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe().addTo(CompositeDisposable())
-                        }
-                        .create()
-                        .show()
+                    deleteItem(client)
                 }
                 R.id.action_black_list -> {
                     Completable.create {
@@ -1070,14 +1085,14 @@ class QrReaderFragment(
                 dao.getClientFromQueue(client.id, adapter.queueId)
 
             if (direction == ItemTouchHelper.RIGHT) {
-                if (!clientInQueue!!.isChecked) {
-                    clientInQueue.isChecked = true
-                    payloadUpdateMember(clientInQueue, client, MODE_CHECK)
-                }
+                deleteItem(client)
             } else if (direction == ItemTouchHelper.LEFT) {
                 if (clientInQueue!!.isChecked) {
                     clientInQueue.isChecked = false
                     payloadUpdateMember(clientInQueue, client, MODE_UNCHECK)
+                } else {
+                    clientInQueue.isChecked = true
+                    payloadUpdateMember(clientInQueue, client, MODE_CHECK)
                 }
             }
             dao.insertClientInQueue(clientInQueue!!)

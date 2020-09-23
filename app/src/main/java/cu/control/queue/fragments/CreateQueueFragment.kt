@@ -110,6 +110,7 @@ class CreateQueueFragment(
         })
 
         view._okButton.setOnClickListener {
+            hideSoftInput()
             val thisqueue = createQueue(view)
             val time = Calendar.getInstance().timeInMillis
 

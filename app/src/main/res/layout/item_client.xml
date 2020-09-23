@@ -63,9 +63,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/round_green_bg"
-                            android:padding="4dp"
+                            android:scaleType="centerInside"
+                            android:padding="8dp"
                             android:visibility="gone"
-                            app:srcCompat="@drawable/ic_check_list_white" />
+                            app:srcCompat="@drawable/ic_check" />
 
                         <TextView
                             android:id="@+id/clientNumber"
@@ -113,7 +114,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:textColor="#494949"
+                                android:textColor="@color/gray_deleter"
                                 android:textSize="18sp"
                                 tools:text="Richard Anca Perurena" />
 
@@ -190,7 +191,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:textColor="#A3A3A3"
+                                android:textColor="#AEA3A3A3"
                                 android:textSize="16sp"
                                 tools:ignore="RtlSymmetry"
                                 tools:text="93070511004" />
@@ -202,7 +203,7 @@
                                 android:layout_marginEnd="8dp"
                                 android:layout_marginRight="8dp"
                                 android:maxLines="1"
-                                android:textColor="#A3A3A3"
+                                android:textColor="#AEA3A3A3"
                                 android:textSize="16sp"
                                 tools:ignore="RtlSymmetry"
                                 tools:text="3:45:32 pm" />
