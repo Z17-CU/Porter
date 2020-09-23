@@ -65,13 +65,11 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(), OnCol
 
         swipeContainer.isEnabled = false
 
-        _fabAdd.setOnClickListener {
-            DialogAddCollaborator(requireContext(), queue).create().show()
-        }
-
         initToolBar()
 
-        _okButton.visibility = View.GONE
+        _okButton.setOnClickListener {
+            DialogAddCollaborator(requireContext(), queue).create().show()
+        }
 
         initObserver()
     }

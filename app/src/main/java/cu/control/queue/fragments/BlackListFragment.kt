@@ -65,9 +65,9 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueues.adapter = adapter
 
-        _fabAdd.setOnClickListener {
-            DialogInsertClient(requireContext(), CompositeDisposable(), this).create().show()
-        }
+//        _fabAdd.setOnClickListener {
+//            DialogInsertClient(requireContext(), CompositeDisposable(), this).create().show()
+//        }
 
         initToolBar()
 

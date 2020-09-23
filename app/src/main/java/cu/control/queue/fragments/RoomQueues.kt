@@ -68,7 +68,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.android.synthetic.main.quees_open_saved.*
-import kotlinx.android.synthetic.main.room_queues._fabAdd
 import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
 import kotlinx.android.synthetic.main.room_queues._recyclerViewQueues
 import kotlinx.android.synthetic.main.room_queues.swipeContainer
@@ -127,19 +126,6 @@ class RoomQueues : SupportFragment(), onClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         initToolBar()
-
-        _fabAdd.setOnClickListener {
-
-            start(CreateQueueFragment(viewModel))
-
-//            DialogCreateQueue(
-//                it.context,
-//                compositeDisposable,
-//                clientViewModel = viewModel
-//            ).create()
-//                .show()
-        }
-
 
         val toggle = ActionBarDrawerToggle(
             this.activity, drawer_layout, toolbar, R.string.navigation_drawer_open,
