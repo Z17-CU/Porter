@@ -2,12 +2,16 @@ package cu.control.queue
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import cu.control.queue.utils.Conts
 import cu.control.queue.utils.IntEditTextPreference
+import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.settings_activity.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
@@ -23,6 +27,24 @@ class SettingsActivity : AppCompatActivity() {
             )
             .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        initToolBar()
+    }
+
+    private fun initToolBar() {
+        with(toolbar as androidx.appcompat.widget.Toolbar) {
+            setNavigationIcon(R.drawable.ic_back_custom)
+
+            title = "Ajustes "
+            setTitleTextColor(resources.getColor(R.color.blue_drawer))
+
+            setNavigationOnClickListener {
+                this@SettingsActivity.title = this@SettingsActivity.getString(R.string.app_name)
+                (this@SettingsActivity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
+                    false
+                )
+                onBackPressed()
+            }
+        }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

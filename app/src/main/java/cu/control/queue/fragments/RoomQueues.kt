@@ -211,7 +211,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         drawer_layout.closeDrawers()
         when (menuItem.itemId) {
             R.id.nav_new_queue -> {
-
+                start(CreateQueueFragment(viewModel))
             }
             R.id.nav_colaborators -> {
                 start(MyCollaboratorsFragment())
@@ -221,7 +221,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             }
             R.id.nav_settings -> {
-
+                startActivity(Intent(requireContext(),SettingsActivity::class.java))
             }
 
 
