@@ -7,17 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderExportQueues
-import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Conts.Companion.formatDateBig
 
-class AdapterExportQueues(
-    private val onClickListener: onClickListener
-) :
+class AdapterExportQueues :
     RecyclerView.Adapter<ViewHolderExportQueues>() {
 
     var contentList: List<Queue> = ArrayList()
-    val exportList = mutableListOf<Queue>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderExportQueues {
         return ViewHolderExportQueues(
             LayoutInflater.from(parent.context).inflate(
@@ -43,35 +39,29 @@ class AdapterExportQueues(
         holder.textViewName.text = queue.name
         holder.textViewDate.text = formatDateBig.format(queue.startDate)
 
-        var export = false
         holder.layoutBackground.setOnClickListener {
-            if (!export) {
-                holder.check_export.visibility = View.VISIBLE
-                holder.clientNumberSave.visibility = View.GONE
-                export = true
-                exportList.add(queue)
-            } else {
-                holder.check_export.visibility = View.GONE
-                holder.clientNumberSave.visibility = View.VISIBLE
-                export = false
-//todo ver funcionalidad
-                if (exportList.size > 0) {
-                    exportList.removeAt(position - 1)
-                } else {
-                    exportList.removeAt(0)
-                }
-
-            }
+            queue.checked = queue.checked != true
+            updateItem(holder, queue)
         }
+        updateItem(holder, queue)
+    }
 
-        onClickListener.onClickExport(exportList)
-        if (queue.isSaved) {
-
+    private fun updateItem(holder: ViewHolderExportQueues, queue: Queue){
+        if (queue.checked == true) {
+            holder.check_export.visibility = View.VISIBLE
             holder.clientNumberOpenQueue.visibility = View.GONE
-            holder.clientNumberSaveQueue.visibility = View.VISIBLE
-            holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
-
+            holder.clientNumberSaveQueue.visibility = View.GONE
+        } else {
+            if (queue.isSaved) {
+                holder.clientNumberOpenQueue.visibility = View.GONE
+                holder.clientNumberSaveQueue.visibility = View.VISIBLE
+                holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
+            } else {
+                holder.clientNumberOpenQueue.visibility = View.VISIBLE
+                holder.clientNumberSaveQueue.visibility = View.GONE
+                holder.clientNumberOpenQueue.text = queue.clientsNumber.toString()
+            }
+            holder.check_export.visibility = View.GONE
         }
-
     }
 }
