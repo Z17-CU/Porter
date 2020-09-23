@@ -98,7 +98,6 @@ class RoomQueues : SupportFragment(), onClickListener {
     private lateinit var adapter: AdapterQueue
 
     private var searchQuery = MutableLiveData<String>().default("")
-    private lateinit var appBarConfiguration: AppBarConfiguration
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
