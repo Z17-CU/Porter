@@ -141,4 +141,9 @@
     <string name="municipio">Municipio</string>
     <string name="colaboradores">Colaboradores</string>
     <string name="productos">Productos</string>
+    <string name="time_rotation">Tiempo de rotación</string>
+    <string name="multiple_queue">Alertas de  colas múltiples</string>
+    <string name="count_alert_queue">Cantidad de colas a alertar</string>
+    <string name="date_init">Fecha de inicio</string>
+    <string name="date_end">Fecha de fin</string>
 </resources>
