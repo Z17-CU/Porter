@@ -21,6 +21,7 @@ import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.PreferencesManager
 import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
@@ -64,6 +65,10 @@ class MyCollaboratorsFragment : SupportFragment() {
         initToolBar()
 
         initObserver()
+
+        swipeContainer.setOnRefreshListener {
+            updateColaborators()
+        }
     }
 
     private fun initObserver() {
@@ -73,6 +78,10 @@ class MyCollaboratorsFragment : SupportFragment() {
             adapter.notifyDataSetChanged()
         })
 
+        updateColaborators()
+    }
+
+    private fun updateColaborators() {
         Completable.create {
 
             val headerMap = mutableMapOf<String, String>().apply {
@@ -123,7 +132,7 @@ class MyCollaboratorsFragment : SupportFragment() {
 
             it.onComplete()
         }.subscribeOn(Schedulers.computation())
-            .observeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete {
                 requireActivity().runOnUiThread {
                     Toast.makeText(
@@ -136,14 +145,9 @@ class MyCollaboratorsFragment : SupportFragment() {
                 true
             }
             .subscribe {
-
-                requireActivity().runOnUiThread {
-
-                }
+                swipeContainer.isRefreshing = false
             }.addTo(compositeDisposable)
-
     }
-
 
     private fun initToolBar() {
         with(toolbar as androidx.appcompat.widget.Toolbar) {

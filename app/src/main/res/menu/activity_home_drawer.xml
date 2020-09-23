@@ -11,7 +11,6 @@
                 android:title="@string/colaborators"
                 android:visible="true" />
             <item
-
                 android:id="@+id/nav_export_queue"
                 android:icon="@drawable/ic_export_queue_drawer"
                 android:title="@string/export_queue"

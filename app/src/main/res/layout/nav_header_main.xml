@@ -2,20 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
-    android:gravity="bottom"
-    android:paddingLeft="16dp"
-    android:orientation="vertical"
-    android:paddingTop="36dp"
-    android:paddingRight="16dp"
-    android:paddingBottom="16dp">
-
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginStart="16dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -50,10 +44,11 @@
             tools:openDrawer="start"
             tools:text="CI:93071111344" />
     </LinearLayout>
+
     <View
         android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:layout_marginEnd="64dp"
+        android:background="@android:color/darker_gray" />
 </LinearLayout>
 
