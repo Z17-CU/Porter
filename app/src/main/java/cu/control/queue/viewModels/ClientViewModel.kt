@@ -39,6 +39,8 @@ class ClientViewModel @Inject constructor(
 
     var allClientsInQueue = clientRepository.getAllClientInQueue()
 
+    var creatingQueue = MutableLiveData<Queue?>().default(null)
+
     fun setAllClientsIDQueue(id: Long) {
         allClientsInQueue = clientRepository.getClientInQueue(id)
     }

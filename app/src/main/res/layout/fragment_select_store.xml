@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    app:ignore="NamespaceTypo">
+
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/provincia"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+
+        <jrizani.jrspinner.JRSpinner
+            android:id="@+id/spn_my_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/sin_definir"
+            android:padding="10dp"
+            android:textColor="@color/colorPrimary"
+            app:backgroundTint="@color/colorPrimary"
+            app:jrs_icon_tint="@color/colorPrimary"
+            app:jrs_multiple="true"
+            app:jrs_title="Provincia" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/municipio"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+
+        <jrizani.jrspinner.JRSpinner
+            android:id="@+id/spn_municipie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/sin_definir"
+            android:padding="10dp"
+            android:textColor="@color/colorPrimary"
+            app:backgroundTint="@color/colorPrimary"
+            app:jrs_icon_tint="@color/colorPrimary"
+            app:jrs_multiple="true"
+            app:jrs_title="Municipio" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/establecimiento"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+
+        <jrizani.jrspinner.JRSpinner
+            android:id="@+id/spn_store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/sin_definir"
+            android:padding="10dp"
+            android:textColor="@color/colorPrimary"
+            app:backgroundTint="@color/colorPrimary"
+            app:jrs_icon_tint="@color/colorPrimary"
+            app:jrs_multiple="true"
+            app:jrs_title="Tienda" />
+
+    </LinearLayout>
+
+</LinearLayout>

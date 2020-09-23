@@ -29,7 +29,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._cancelButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
-import kotlinx.android.synthetic.main.layout_dialog_insert_store.view.*
+import kotlinx.android.synthetic.main.fragment_select_store.view.*
 import java.util.*
 
 class DialogCreateProvince(
@@ -67,7 +67,7 @@ class DialogCreateProvince(
     @SuppressLint("LogNotTimber")
     private fun getView(): View {
 
-        val view = View.inflate(context, R.layout.layout_dialog_insert_store, null)
+        val view = View.inflate(context, R.layout.fragment_select_store, null)
 
         view._cancelButton.setOnClickListener {
             dialog.dismiss()
@@ -109,7 +109,6 @@ class DialogCreateProvince(
                         Queue(
                             time,
                             nameQueue.trim(),
-//                            productsQueue,
                             Calendar.getInstance().timeInMillis,
                             description = nameDescription.trim(),
                             uuid = PreferencesManager(context).getCi() + "-" + PreferencesManager(
@@ -117,10 +116,6 @@ class DialogCreateProvince(
                             ).getFv() + "-" + time,
                             created_date = time,
                             updated_date = time,
-                            //Todo update this
-                            business = null,
-                            province = "",
-                            municipality = "",
                             collaborators = arrayListOf(PreferencesManager(context).getCi()),
                             owner = PreferencesManager(context).getCi(),
                             info = map
@@ -293,7 +288,5 @@ class DialogCreateProvince(
 
             return response!!
         }
-
-
     }
 }

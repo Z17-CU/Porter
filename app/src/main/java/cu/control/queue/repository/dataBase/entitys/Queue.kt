@@ -3,21 +3,16 @@ package cu.control.queue.repository.dataBase.entitys
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import cu.control.queue.repository.dataBase.entitys.payload.Person
 
 @Entity
 class Queue(
     @PrimaryKey(autoGenerate = true)
     var id: Long?,
     var name: String,
-//    var products:String,
     var startDate: Long,
     var clientsNumber: Int = 0,
     var description: String = "",
     var uuid: String?,
-    val province: String?,
-    val municipality: String?,
-    var business: String?,
     val created_date: Long?,
     val updated_date: Long?,
     var collaborators: ArrayList<String> = ArrayList(),
@@ -25,7 +20,12 @@ class Queue(
     var isSaved: Boolean = false,
     var owner: String,
     var isOffline: Boolean = false,
-    var info: Map<String, Any>? = null
+    var info: Map<String, Any>? = null,
+    var store: String? = null,
+    var province: String? = null,
+    var municipality: String? = null,
+    var storeName: String? = null,
+    var alert: Boolean? = null
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()

@@ -32,6 +32,7 @@
     <color name="colorIntroBG">#D1D1D1</color>
 
     <color name="gray">#38000000</color>
+    <color name="darkGray">#72000000</color>
     <color name="blue_drawer">#2D9CDB</color>
 
 

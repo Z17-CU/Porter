@@ -521,7 +521,7 @@ class QrReaderFragment(
         }
 
         if (PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(ALERTS, false) && !checkList
+                .getBoolean(ALERTS, false) && !checkList && queue.alert != false
         ) {
 
             val queueCant = PreferenceManager.getDefaultSharedPreferences(context)

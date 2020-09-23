@@ -83,6 +83,7 @@ import java.io.FileReader
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class RoomQueues : SupportFragment(), onClickListener {
 
@@ -134,12 +135,15 @@ class RoomQueues : SupportFragment(), onClickListener {
         initToolBar()
 
         _fabAdd.setOnClickListener {
-            DialogCreateQueue(
-                it.context,
-                compositeDisposable,
-                clientViewModel = viewModel
-            ).create()
-                .show()
+
+            start(CreateQueueFragment(viewModel))
+
+//            DialogCreateQueue(
+//                it.context,
+//                compositeDisposable,
+//                clientViewModel = viewModel
+//            ).create()
+//                .show()
         }
 
 
@@ -375,7 +379,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         dao.insertCollaborator(it)
                     }
 
-                    savedQueue.business = it.store
+                    savedQueue.store = it.store
                     savedQueue.clientsNumber = it.members?.size ?: 0
                     savedQueue.downloaded = true
                     savedQueue.owner = owner
@@ -595,12 +599,13 @@ class RoomQueues : SupportFragment(), onClickListener {
                         .show()
                 }
                 R.id.action_edit -> {
-                    DialogCreateQueue(
-                        requireContext(),
-                        CompositeDisposable(),
-                        queue.id!!,
-                        viewModel
-                    ).create().show()
+                    start(CreateQueueFragment(viewModel, queue.id!!))
+//                    DialogCreateQueue(
+//                        requireContext(),
+//                        CompositeDisposable(),
+//                        queue.id!!,
+//                        viewModel
+//                    ).create().show()
                 }
                 R.id.action_merge -> {
                     AlertDialog.Builder(requireContext())
@@ -904,10 +909,6 @@ class RoomQueues : SupportFragment(), onClickListener {
                 ).getFv() + "-" + time,
                 created_date = time,
                 updated_date = time,
-                //Todo update this
-                business = "",
-                province = "",
-                municipality = "",
                 owner = PreferencesManager(requireContext()).getCi()
             )
 
@@ -1010,21 +1011,19 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                                     dao.insertQueue(
                                         Queue(
-                                            createdDate,
-                                            name,
-                                            createdDate,
-                                            0,
-                                            description,
-                                            entry.key,
-                                            null,
-                                            null,
-                                            "",
-                                            createdDate,
-                                            createdDate,
-                                            ArrayList(),
-                                            false,
+                                            id = createdDate,
+                                            name = name,
+                                            startDate = createdDate,
+                                            clientsNumber = 0,
+                                            description = description,
+                                            uuid = entry.key,
+                                            created_date = createdDate,
+                                            updated_date = createdDate,
+                                            collaborators = ArrayList(),
+                                            downloaded = false,
                                             isSaved = true,
-                                            owner = ""
+                                            owner = "",
+                                            info = HashMap()
                                         )
                                     )
                                 }

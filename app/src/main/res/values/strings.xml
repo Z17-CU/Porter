@@ -38,7 +38,6 @@
     <string name="app_intro_done_button">
          Hecho
     </string>
-    <string name="nombre_de_la_cola">Nombre de la cola</string>
     <string name="guardar_como_pdf">Guardar como PDF</string>
     <string name="guardar_como_csv">Guardar como CSV</string>
     <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
@@ -47,7 +46,6 @@
     <string name="modo_de_registro">Modo de registro.</string>
     <string name="modo_de_chequeo">Modo de chequeo.</string>
     <string name="acerca_de">Acerca de</string>
-    <string name="ajustes">Ajustes</string>
     <string name="uci_2020">UCI 2020</string>
     <string name="c_digo_fuente">Código fuente</string>
     <string name="https_github_com_richardanca_porter_by_richard">https://github.com/richardanca/Porter_By_Richard</string>
@@ -96,7 +94,6 @@
     <string name="Permissions_permission_required">Se requiere permiso</string>
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
     <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
-    <string name="colaboradores">Colaboradores</string>
     <string name="deschequiar">Deschequear</string>
     <string name="chequiar">Chequear</string>
     <string name="fv">Fv</string>
@@ -133,4 +130,14 @@
     <string name="colaborators">Mis colaboradores</string>
     <string name="export_queue">Exportar cola</string>
     <string name="settings">Ajustes</string>
+    <string name="nombre_de_la_cola">Nombre de la cola</string>
+    <string name="sin_definir">Sin definir</string>
+    <string name="descripci_n">Descripción</string>
+    <string name="emitir_alertas">Emitir alertas</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="establecimiento">Establecimiento</string>
+    <string name="provincia">Provincia</string>
+    <string name="municipio">Municipio</string>
+    <string name="colaboradores">Colaboradores</string>
+    <string name="productos">Productos</string>
 </resources>
