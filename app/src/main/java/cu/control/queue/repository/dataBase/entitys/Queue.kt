@@ -25,7 +25,8 @@ class Queue(
     var province: String? = null,
     var municipality: String? = null,
     var storeName: String? = null,
-    var alert: Boolean? = null
+    var alert: Boolean? = null,
+    var textSeparator: String? = null
 ) {
     @Ignore
     var clientList: List<Client>? = ArrayList()

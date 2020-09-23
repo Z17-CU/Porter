@@ -10,68 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/_recyclerViewQueues"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:weightSum="1">
-
-            <LinearLayout
-                android:id="@+id/linear_recycler_queue_open"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:id="@+id/tv_openQueues"
-                    android:paddingStart="10dp"
-                    android:text="@string/opened"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:ignore="RtlSymmetry" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/_recyclerViewQueuesOpen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/item_queues" />
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/linear_recycler_queue_save"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:paddingStart="10dp"
-                    android:text="@string/saved"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    tools:ignore="RtlSymmetry" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/_recyclerViewQueuesSaved"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/item_queues" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/item_queues" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

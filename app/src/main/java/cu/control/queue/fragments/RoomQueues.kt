@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -38,10 +37,7 @@ import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
-import cu.control.queue.adapters.AdapterQueueFilterSearch
-import cu.control.queue.adapters.AdapterQueueOpen
-import cu.control.queue.adapters.AdapterQueuesSave
-import cu.control.queue.dialogs.DialogCreateQueue
+import cu.control.queue.adapters.AdapterQueue
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
@@ -70,12 +66,14 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
-import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.android.synthetic.main.quees_open_saved.*
-import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.room_queues._fabAdd
 import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
+import kotlinx.android.synthetic.main.room_queues._recyclerViewQueues
+import kotlinx.android.synthetic.main.room_queues.searchView
 import kotlinx.android.synthetic.main.room_queues.swipeContainer
+import kotlinx.android.synthetic.main.room_queues.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
@@ -98,9 +96,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     private var toMerge = false
     private var queueToMerge: Queue? = null
 
-    private lateinit var adapterOpen: AdapterQueueOpen
-    private lateinit var adapterSave: AdapterQueuesSave
-    private lateinit var adapterSearchResult: AdapterQueueFilterSearch
+    private lateinit var adapter: AdapterQueue
 
     private var searchQuery = MutableLiveData<String>().default("")
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -159,15 +155,11 @@ class RoomQueues : SupportFragment(), onClickListener {
         nav_view.setNavigationItemSelectedListener {
             processOnMenuItemSelect(it)
         }
-        _recyclerViewQueuesResul.layoutManager = LinearLayoutManager(view.context)
-        _recyclerViewQueuesOpen.layoutManager = LinearLayoutManager(view.context)
-        _recyclerViewQueuesSaved.layoutManager = LinearLayoutManager(view.context)
-        adapterOpen = AdapterQueueOpen(this)
-        adapterSave = AdapterQueuesSave(this)
-        adapterSearchResult = AdapterQueueFilterSearch(this)
+        _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
 
-        _recyclerViewQueuesOpen.adapter = adapterOpen
-        _recyclerViewQueuesSaved.adapter = adapterSave
+        adapter = AdapterQueue(this)
+
+        _recyclerViewQueues.adapter = adapter
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
@@ -721,15 +713,13 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun refreshAdapter() {
-        hideShowList(true)
-        _recyclerViewQueuesOpen.adapter = adapterOpen
-        _recyclerViewQueuesSaved.adapter = adapterSave
+        _recyclerViewQueues.adapter = adapter
 
         val listOpen = mutableListOf<Queue>()
         val listSave = mutableListOf<Queue>()
         val list = viewModel.allQueues.value ?: ArrayList()
         list.map { queue ->
-            if (!queue.isSaved) {
+            if (queue.isSaved) {
                 listSave.add(queue)
             } else {
                 listOpen.add(queue)
@@ -737,72 +727,39 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         }
 
-        adapterOpen.contentList = listSave
-        adapterSave.contentList = listOpen
+        var separator = Queue(null, "", 0L, 0, "", null, null, null, owner = "", textSeparator = "")
 
-        adapterOpen.notifyDataSetChanged()
-        adapterSave.notifyDataSetChanged()
+        val listToShow = ArrayList<Queue>()
 
-        if (listSave.isNotEmpty() || listOpen.isNotEmpty()) {
-            if (listSave.isNotEmpty()) {
-                val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                linear_recycler_queue_open.layoutParams = lp
-                linear_recycler_queue_open.visibility = View.VISIBLE
-                tv_openQueues.visibility = View.VISIBLE
+        if(listOpen.isNotEmpty()) {
+            separator.textSeparator = "Abiertas"
+            listToShow.add(separator)
+            listToShow.addAll(listOpen)
+        }
 
-                goTo(listSave.size - 1)
-            } else {
-                linear_recycler_queue_open.visibility = View.GONE
-                goTo(listOpen.size - 1)
-            }
+        separator = Queue(null, "", 0L, 0, "", null, null, null, owner = "", textSeparator = "")
 
-            _imageViewEngranes.visibility = View.GONE
-        } else {
+        if(listSave.isNotEmpty()) {
+            separator.textSeparator = "Guardadas"
+            listToShow.add(separator)
+            listToShow.addAll(listSave)
+        }
+
+        adapter.contentList = listToShow
+
+        adapter.notifyDataSetChanged()
+
+        if(listToShow.isEmpty()){
             _imageViewEngranes.visibility = View.VISIBLE
-        }
-
-        if (listOpen.isEmpty()) {
-            linear_recycler_queue_save.visibility = View.GONE
-            val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            linear_recycler_queue_save.layoutParams = lp
-
         } else {
-            val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            linear_recycler_queue_save.layoutParams = lp
-
-            linear_recycler_queue_save.visibility = View.VISIBLE
-
-        }
-    }
-
-    private fun hideShowList(b: Boolean) {
-        if (b) {
-            _recyclerViewQueuesResul.visibility = View.GONE
-            _recyclerViewQueuesOpen.visibility = View.VISIBLE
-            _recyclerViewQueuesSaved.visibility = View.VISIBLE
-        } else {
-            _recyclerViewQueuesResul.visibility = View.VISIBLE
-            _recyclerViewQueuesOpen.visibility = View.GONE
-            _recyclerViewQueuesSaved.visibility = View.GONE
+            _imageViewEngranes.visibility = View.GONE
         }
     }
 
     private fun refreshAdapterFilterSearch(list: List<Queue>) {
 
-        hideShowList(false)
-
-        _recyclerViewQueuesResul.adapter = adapterSearchResult
-        adapterSearchResult.contentList = list
-        adapterSearchResult.notifyDataSetChanged()
+        adapter.contentList = list
+        adapter.notifyDataSetChanged()
         if (list.isNotEmpty()) {
             goTo(list.size - 1)
             _imageViewEngranes.visibility = View.GONE
@@ -819,9 +776,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             }
         }
         smoothScroller.targetPosition = pos
-        _recyclerViewQueuesResul.layoutManager?.startSmoothScroll(smoothScroller)
-        _recyclerViewQueuesOpen.layoutManager?.startSmoothScroll(smoothScroller)
-        _recyclerViewQueuesSaved.layoutManager?.startSmoothScroll(smoothScroller)
+        _recyclerViewQueues.layoutManager?.startSmoothScroll(smoothScroller)
     }
 
     private fun pickQueue() {

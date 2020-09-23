@@ -5,16 +5,17 @@
     android:id="@+id/_layoutItemPersona"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-     android:gravity="center_vertical"
+    android:gravity="center_vertical"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-         android:baselineAligned="false"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/viewItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -161,16 +162,24 @@
             </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/viewSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
-    <LinearLayout
-        android:id="@+id/_divider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="74dp"
-        tools:ignore="RtlSymmetry">
+            <TextView
+                android:id="@+id/textViewSeparator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="10dp"
+                android:text="@string/opened"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:ignore="RtlSymmetry" />
 
-        <include layout="@layout/divider_horizontal" />
+        </LinearLayout>
 
     </LinearLayout>
 

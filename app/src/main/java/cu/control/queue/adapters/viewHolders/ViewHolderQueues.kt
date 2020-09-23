@@ -5,15 +5,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mikhaellopez.circularimageview.CircularImageView
-import kotlinx.android.synthetic.main.item_client.view._circularImageView
-import kotlinx.android.synthetic.main.item_client.view._layoutItemPersona
-import kotlinx.android.synthetic.main.item_client.view._textViewDate
-import kotlinx.android.synthetic.main.item_client.view._textViewNombre
-import kotlinx.android.synthetic.main.item_client.view.clientNumber
-import kotlinx.android.synthetic.main.item_client.view.imageViewDownloadQueue
-import kotlinx.android.synthetic.main.item_client.view.imageViewSaveQueue
 import kotlinx.android.synthetic.main.item_queues.view.*
+import kotlinx.android.synthetic.main.item_queues.view._layoutItemPersona
+import kotlinx.android.synthetic.main.item_queues.view._textViewDate
+import kotlinx.android.synthetic.main.item_queues.view._textViewNombre
+import kotlinx.android.synthetic.main.item_queues.view.imageViewDownloadQueue
+import kotlinx.android.synthetic.main.item_queues.view.imageViewSaveQueue
 
 class ViewHolderQueues(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //    val imageView: CircularImageView = itemView._circularImageView
@@ -26,4 +23,7 @@ class ViewHolderQueues(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val imageSave: ImageView = itemView.imageViewSaveQueue
     val imageViewSaveOpened: ImageView = itemView.imageViewSaveOpened
 
+    val itemQueue: LinearLayout = itemView.viewItem
+    val itemSeparator: LinearLayout = itemView.viewSeparator
+    val textViewSeparator: TextView = itemView.textViewSeparator
 }
