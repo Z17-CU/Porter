@@ -2,12 +2,15 @@ package cu.control.queue.adapters
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
+
 
 class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -82,12 +85,17 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
         backgroundCheck.draw(c)
         backgroundUnCheck.draw(c)
 
+        val paint = Paint()
+
+        paint.color = Color.WHITE
+        paint.textSize = 28F
+
         when {
             dX > 0 -> { // Swiping to the right
 
                 val iconMargin = (itemView.height - mIconDelete.intrinsicHeight) / 2
                 val iconTop =
-                    itemView.top + (itemView.height - mIconDelete.intrinsicHeight) / 2
+                    itemView.top + (itemView.height - mIconDelete.intrinsicHeight) / 3
                 val iconBottom = iconTop + mIconDelete.intrinsicHeight
 
                 val iconLeft = itemView.left + iconMargin
@@ -99,8 +107,14 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
                     itemView.bottom
                 )
                 backgroundDelete.draw(c)
-
                 mIconDelete.draw(c)
+
+                c.drawText(
+                    recyclerView.context.getText(R.string.delete).toString(),
+                    (itemView.left + (iconMargin / 1.2)).toFloat(),
+                    (itemView.bottom - (iconMargin / 2)).toFloat(),
+                    paint
+                )
             }
             dX < 0 -> { // Swiping to the left
 
@@ -108,11 +122,11 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
 
                     val iconMargin = (itemView.height - mIconUnCheck.intrinsicHeight) / 2
                     val iconTop =
-                        itemView.top + (itemView.height - mIconUnCheck.intrinsicHeight) / 2
+                        itemView.top + (itemView.height - mIconUnCheck.intrinsicHeight) / 3
                     val iconBottom = iconTop + mIconUnCheck.intrinsicHeight
 
-                    val iconLeft = itemView.right - iconMargin - mIconUnCheck.intrinsicWidth
-                    val iconRight = itemView.right - iconMargin
+                    val iconLeft = itemView.right - iconMargin - mIconUnCheck.intrinsicWidth - 15
+                    val iconRight = itemView.right - iconMargin - 15
                     mIconUnCheck.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                     backgroundUnCheck.setBounds(
                         itemView.right + dX.toInt() - backgroundCornerOffset,
@@ -120,14 +134,21 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
                     )
                     backgroundUnCheck.draw(c)
                     mIconUnCheck.draw(c)
+
+                    c.drawText(
+                        recyclerView.context.getText(R.string.deschequiar).toString(),
+                        (itemView.right - (iconMargin * 4)).toFloat(),
+                        (itemView.bottom - (iconMargin / 2)).toFloat(),
+                        paint
+                    )
                 } else {
 
                     val iconMargin = (itemView.height - mIconCheck.intrinsicHeight) / 2
                     val iconTop =
-                        itemView.top + (itemView.height - mIconCheck.intrinsicHeight) / 2
+                        itemView.top + (itemView.height - mIconCheck.intrinsicHeight) / 3
                     val iconBottom = iconTop + mIconCheck.intrinsicHeight
 
-                    val iconLeft = itemView.right - iconMargin  - mIconCheck.intrinsicWidth
+                    val iconLeft = itemView.right - iconMargin - mIconCheck.intrinsicWidth
                     val iconRight = itemView.right - iconMargin
                     mIconCheck.setBounds(iconLeft, iconTop, iconRight, iconBottom)
                     backgroundCheck.setBounds(
@@ -136,6 +157,13 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
                     )
                     backgroundCheck.draw(c)
                     mIconCheck.draw(c)
+
+                    c.drawText(
+                        recyclerView.context.getText(R.string.chequiar).toString(),
+                        (itemView.right - (iconMargin * 2.8)).toFloat(),
+                        (itemView.bottom - (iconMargin / 2)).toFloat(),
+                        paint
+                    )
                 }
             }
             else -> { // view is unSwiped
