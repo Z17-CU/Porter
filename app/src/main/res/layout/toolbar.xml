@@ -44,6 +44,16 @@
                     android:foregroundGravity="center_vertical|right"
                     app:srcCompat="@drawable/ic_add_new_queue" />
 
+                <Button
+                    android:id="@+id/_okButtonText"
+                    style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:foregroundGravity="center_vertical|right"
+                    android:text="@string/guardar"
+                    android:visibility="gone" />
+
             </LinearLayout>
 
         </RelativeLayout>

@@ -38,8 +38,6 @@ class AdapterQueueFilterSearch(
     override fun onBindViewHolder(holder: ViewHolderFilterSearch, position: Int) {
         val queue = contentList[position]
 
-
-
         holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
         holder.imageOffline.visibility = if (queue.isOffline) View.VISIBLE else View.GONE
         holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE

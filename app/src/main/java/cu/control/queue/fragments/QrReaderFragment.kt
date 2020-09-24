@@ -18,7 +18,6 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
@@ -97,7 +96,7 @@ import kotlin.collections.ArrayList
 class QrReaderFragment(
     thisQueue: Queue,
     private val viewModel: ClientViewModel,
-    private val checkList: Boolean
+    private val checkList: Boolean = false
 ) :
     SupportFragment(),
     ZXingScannerView.ResultHandler,
@@ -221,11 +220,11 @@ class QrReaderFragment(
         })
 
         resumeReader()
-
     }
 
     override fun onResume() {
         super.onResume()
+        resumeReader()
         progress.dismiss()
     }
 

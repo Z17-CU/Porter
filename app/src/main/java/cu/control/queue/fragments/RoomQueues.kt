@@ -379,7 +379,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     )
                     requireActivity().runOnUiThread {
 
-                        showReaderOptions(queue)
+                        start(QrReaderFragment(queue, viewModel))
                     }
                 }
 
@@ -499,7 +499,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                     .create().show()
             }
         } else {
-            showReaderOptions(queue)
+            start(QrReaderFragment(queue, viewModel))
         }
     }
 

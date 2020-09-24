@@ -22,10 +22,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_select_store.view.*
-import kotlinx.android.synthetic.main.room_queues.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.android.synthetic.main.toolbar.view.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 
 class CreateQueueSelectStoreFragment(
@@ -58,7 +56,11 @@ class CreateQueueSelectStoreFragment(
         initToolBar()
 
         resultReadJson = getCharts()
-        view._okButton.setOnClickListener {
+
+        view._okButton.visibility = View.GONE
+        view._okButtonText.visibility = View.VISIBLE
+
+        view._okButtonText.setOnClickListener {
 
             val savedInfo = PreferencesManager(requireContext()).getLastInfoCreateQueue()!!
 

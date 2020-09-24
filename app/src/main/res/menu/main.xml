@@ -60,4 +60,12 @@
         android:title="@string/exportar"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_check"
+        android:icon="@drawable/ic_check_blue"
+        android:orderInCategory="100"
+        android:title="@string/modo_chequeo"
+        app:actionViewClass="android.widget.Switch"
+        app:showAsAction="ifRoom" />
+
 </menu>
