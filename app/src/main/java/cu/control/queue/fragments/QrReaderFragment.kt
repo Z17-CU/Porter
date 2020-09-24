@@ -96,7 +96,7 @@ import kotlin.collections.ArrayList
 class QrReaderFragment(
     thisQueue: Queue,
     private val viewModel: ClientViewModel,
-    private val checkList: Boolean = false
+    private var checkList: Boolean = false
 ) :
     SupportFragment(),
     ZXingScannerView.ResultHandler,
@@ -143,8 +143,6 @@ class QrReaderFragment(
 
         dao = AppDataBase.getInstance(view.context).dao()
 
-        adapter.checkMode = checkList
-
         return view
     }
 
@@ -154,72 +152,7 @@ class QrReaderFragment(
 
         initToolBar()
 
-        _showAddClient.setOnClickListener {
-            showDialogInsertClient()
-        }
-
-        _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
-        _recyclerViewClients.adapter = adapter
-        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(adapter, requireContext()))
-        itemTouchHelper.attachToRecyclerView(_recyclerViewClients)
-        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
-
-        updateObserver(queue.id!!)
-
-        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-
-            try {
-                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
-                    _recyclerViewClients.context, if (it == MODE_LIST) {
-                        pauseScanner()
-                        _qrReader.visibility = View.GONE
-                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
-                        menu.findItem(R.id.action_list).title =
-                            requireContext().getString(R.string.readQR)
-                        R.drawable.ic_qr_reader
-                    } else {
-                        _qrReader.visibility = View.VISIBLE
-                        resumeReader()
-                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
-                        menu.findItem(R.id.action_list).title =
-                            requireContext().getString(R.string.lista)
-                        updateObserver(queue.id!!)
-
-                        R.drawable.ic_list
-                    }
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        })
-
-        searchQuery.observe(viewLifecycleOwner, Observer {
-            if (!it.isNullOrEmpty()) {
-                val id = it.toLong()
-                val index = adapter.contentList.indexOfLast { client -> client.id == id }
-                adapter.contentList.map { client ->
-                    client.searched = false
-                }
-                if (index != -1) {
-                    adapter.contentList[index].searched = true
-                    goTo(index)
-                } else {
-                    showError("El cliente no está en la cola.")
-                }
-                adapter.notifyDataSetChanged()
-            }
-        })
-
-        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
-            queue = it
-            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
-        })
-
-        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
-            toolbar.title = it.name
-        })
-
-        resumeReader()
+        initAll(view)
     }
 
     override fun onResume() {
@@ -289,6 +222,82 @@ class QrReaderFragment(
             }))
     }
 
+    private fun initAll(view: View){
+        adapter.checkMode = checkList
+
+        toolbar.menu.findItem(R.id.action_check).title = if (checkList)
+            view.context.getText(R.string.modo_de_registro)
+        else
+            view.context.getText(R.string.modo_de_chequeo)
+
+        _showAddClient.setOnClickListener {
+            showDialogInsertClient()
+        }
+
+        _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
+        _recyclerViewClients.adapter = adapter
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(adapter, requireContext()))
+        itemTouchHelper.attachToRecyclerView(_recyclerViewClients)
+        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
+
+        updateObserver(queue.id!!)
+
+        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+
+            try {
+                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
+                    _recyclerViewClients.context, if (it == MODE_LIST) {
+                        pauseScanner()
+                        _qrReader.visibility = View.GONE
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.readQR)
+                        R.drawable.ic_qr_reader
+                    } else {
+                        _qrReader.visibility = View.VISIBLE
+                        resumeReader()
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.lista)
+                        updateObserver(queue.id!!)
+
+                        R.drawable.ic_list
+                    }
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+
+        searchQuery.observe(viewLifecycleOwner, Observer {
+            if (!it.isNullOrEmpty()) {
+                val id = it.toLong()
+                val index = adapter.contentList.indexOfLast { client -> client.id == id }
+                adapter.contentList.map { client ->
+                    client.searched = false
+                }
+                if (index != -1) {
+                    adapter.contentList[index].searched = true
+                    goTo(index)
+                } else {
+                    showError("El cliente no está en la cola.")
+                }
+                adapter.notifyDataSetChanged()
+            }
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            queue = it
+            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            toolbar.title = it.name
+        })
+
+        resumeReader()
+    }
+
     @SuppressLint("RestrictedApi")
     private fun initToolBar() {
         with(toolbar as androidx.appcompat.widget.Toolbar) {
@@ -297,8 +306,9 @@ class QrReaderFragment(
 
             val item = this.menu.findItem(R.id.action_search)
 
-            if (this.menu is MenuBuilder)
+            if (this.menu is MenuBuilder) {
                 (this.menu as MenuBuilder).setOptionalIconsVisible(true)
+            }
 
             setOnMenuItemClickListener {
                 when (it.itemId) {
@@ -324,6 +334,11 @@ class QrReaderFragment(
                     }
                     R.id.action_search -> {
                         searchView.openSearch()
+                        true
+                    }
+                    R.id.action_check -> {
+                        checkList = !checkList
+                        initAll(requireView())
                         true
                     }
                     else -> {
