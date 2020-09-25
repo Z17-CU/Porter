@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
@@ -170,11 +171,13 @@ class QrReaderFragment(
         _hightLight.setImageDrawable(
             ContextCompat.getDrawable(
                 _zXingScannerView.context,
-                if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+                if (checkList)
+                    if (_zXingScannerView.flash) R.drawable.ic_flash_on_red else R.drawable.ic_flash_off_red
+                else
+                    if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
             )
         )
     }
-
 
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {
@@ -193,6 +196,7 @@ class QrReaderFragment(
                         false
                     )
                     pop()
+                    restoreNotificationBarColor()
                 }.create().show()
             true
         } else {
@@ -201,7 +205,16 @@ class QrReaderFragment(
                 false
             )
             pop()
+            restoreNotificationBarColor()
             true
+        }
+    }
+
+    private fun restoreNotificationBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            requireActivity().window.statusBarColor = ContextCompat.getColor(
+                requireContext(), R.color.colorPrimaryDark
+            )
         }
     }
 
@@ -232,8 +245,42 @@ class QrReaderFragment(
             }))
     }
 
-    private fun initAll(view: View){
+    private fun initAll(view: View) {
         adapter.checkMode = checkList
+
+        toolbar.background = ContextCompat.getDrawable(
+            requireContext(), if (checkList) {
+                R.drawable.bg_action_bar_red
+            } else {
+                R.drawable.bg_action_bar_accent
+            }
+        )
+
+        _showAddClient.background = ContextCompat.getDrawable(
+            requireContext(),
+            if (checkList) R.drawable.item_save_count_queue else R.drawable.round_accent_bg
+        )
+
+        dragScrollBar.setHandleOffColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red else R.color.colorAccent
+            )
+        )
+
+        dragScrollBar.setHandleColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red else R.color.colorAccent
+            )
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            requireActivity().window.statusBarColor = ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red_dark else R.color.colorPrimaryDark
+            )
+        }
 
         toolbar.menu.findItem(R.id.action_check).title = if (checkList)
             view.context.getText(R.string.modo_de_registro)
@@ -309,8 +356,6 @@ class QrReaderFragment(
         dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
             toolbar.title = it.name
         })
-
-        resumeReader()
     }
 
     @SuppressLint("RestrictedApi")
@@ -353,6 +398,7 @@ class QrReaderFragment(
                     }
                     R.id.action_check -> {
                         checkList = !checkList
+                        pauseScanner()
                         initAll(requireView())
                         true
                     }
@@ -410,6 +456,7 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.computation())
             .subscribe {
                 progress.dismiss()
+                restoreNotificationBarColor()
                 pop()
             }.addTo(compositeDisposable)
     }

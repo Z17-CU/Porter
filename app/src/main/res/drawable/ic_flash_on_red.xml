@@ -4,10 +4,10 @@
     android:viewportWidth="2128"
     android:viewportHeight="2133">
     <path
-        android:fillColor="@color/colorAccent"
+        android:fillColor="@color/google_red"
         android:pathData="M1064,1067m-1064,0a1064,1064 0,1 1,2128 0a1064,1064 0,1 1,-2128 0" />
     <path
-        android:fillColor="@color/colorPrimaryDark"
+        android:fillColor="@color/google_red_dark"
         android:fillType="evenOdd"
         android:pathData="M1255.81,2113.74l-329.09,-347.72 55.14,-1008.91 -179.4,-176.11 34.56,-181.87L1094.6,655.89h35.38L1013.13,539.04 1116,367.87 1253.42,505.3l132.49,-66.66 737.34,729.35C2078.4,1644.33 1719.53,2029.32 1255.81,2113.74Z" />
     <path
@@ -54,7 +54,7 @@
         android:fillColor="#a3a3a3"
         android:pathData="M1066.63,1182.56m-41.97,0a41.97,41.97 0,1 1,83.93 0a41.97,41.97 0,1 1,-83.93 0" />
     <path
-        android:fillColor="@color/colorAccent"
+        android:fillColor="@color/google_red"
         android:pathData="M1064.16,1179.28m-41.97,0a41.97,41.97 0,1 1,83.94 0a41.97,41.97 0,1 1,-83.94 0" />
     <path
         android:fillColor="#EFEFEF"

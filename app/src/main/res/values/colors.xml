@@ -18,6 +18,7 @@
 
     <color name="google_blue">#4285F4</color>
     <color name="google_red">#D73F3F</color>
+    <color name="google_red_dark">#A63232</color>
     <color name="google_yellow">#F4B400</color>
     <color name="google_green">#65B832</color>
     <color name="background_queue_open_green">#D5FFCE</color>

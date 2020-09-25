@@ -55,12 +55,15 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
                     client.selected ?: false && !done -> {
                         R.drawable.item_red_bg
                     }
-                    checkMode && position % 2 != 0 -> R.drawable.item_blue_bg
-                    checkMode && position % 2 == 0 -> R.drawable.bg_item_dark_blue
                     position % 2 != 0 -> R.drawable.item_white_bg
                     else -> R.drawable.bg_item_dark
                 }
             )
+
+        holder.clientNumber.background = ContextCompat.getDrawable(
+            context,
+            if (checkMode) R.drawable.item_save_count_queue else R.drawable.round_accent_bg
+        )
 
         holder.layoutBackground.setOnLongClickListener {
             showPopup(it, client)
@@ -71,13 +74,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
             !client.isChecked -> {
                 holder.clientNumber.visibility = View.VISIBLE
                 holder.imageViewCheck.visibility = View.GONE
-                holder.imageView.visibility = View.VISIBLE
-                holder.imageView.background = ContextCompat.getDrawable(
-                    holder.imageView.context,
-                    R.drawable.round_accent_bg
-                )
-                holder.imageView.setImageDrawable(null)
-
+                holder.imageView.visibility = View.GONE
                 holder.clientNumber.text = client.number.toString()
             }
             client.isChecked -> {
