@@ -34,25 +34,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:layout_marginEnd="12dp"
+                android:orientation="horizontal"
                 android:gravity="end|center_vertical">
+
+                <ImageButton
+                    android:id="@+id/_okButtonSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:foregroundGravity="center_vertical|right"
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_save_red"
+                    android:visibility="gone"/>
 
                 <ImageButton
                     android:id="@+id/_okButton"
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
                     android:foregroundGravity="center_vertical|right"
                     app:srcCompat="@drawable/ic_add_new_queue" />
-
-                <ImageButton
-                    android:id="@+id/_okButtonSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:foregroundGravity="center_vertical|right"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_save_red"
-                    android:visibility="gone"/>
 
             </LinearLayout>
 

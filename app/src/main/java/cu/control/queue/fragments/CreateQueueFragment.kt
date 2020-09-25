@@ -1,5 +1,7 @@
 package cu.control.queue.fragments
 
+import android.R.drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.google.android.flexbox.FlexboxItemDecoration
 import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
@@ -16,6 +19,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQueue
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
+import cu.control.queue.utils.ColorGenerator
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -24,12 +28,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_create_queue.*
 import kotlinx.android.synthetic.main.fragment_create_queue.view.*
+import kotlinx.android.synthetic.main.item_product_add_list.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class CreateQueueFragment(
     private val clientViewModel: ClientViewModel,
@@ -38,6 +45,7 @@ class CreateQueueFragment(
 
     private lateinit var dao: Dao
     private var compositeDisposable = CompositeDisposable()
+    private var myProducst = ArrayList<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,20 +89,30 @@ class CreateQueueFragment(
                 view._editTextName.setText(queue.name)
                 view._editTextDescription.setText(queue.description)
 
-                var textProducts = ""
                 queue.info?.get(Person.KEY_PRODUCTS)?.let {
-                    it as ArrayList<*>
-                    var isFirst = true
-                    it.map { product ->
-                        if (isFirst) {
-                            isFirst = false
-                        } else {
-                            textProducts += ", "
+                    val products = (it as ArrayList<String>)
+                    flexBox_products.removeAllViews()
+                    myProducst = ArrayList()
+                    if (products.isEmpty()) {
+                        imageViewEmpty.visibility = View.VISIBLE
+                        flexBox_products.visibility = View.GONE
+                    } else {
+                        imageViewEmpty.visibility = View.GONE
+                        flexBox_products.visibility = View.VISIBLE
+                        products.map { product ->
+                            myProducst.add(product)
+                            val view = View.inflate(context, R.layout.item_product, null)
+                            view.textViewProduct.text = product
+                            val color = ColorGenerator.MATERIAL.getColor(product)
+                            val graColor =
+                                ContextCompat.getColor(requireContext(), R.color.gray_transparent)
+                            view.layoutProduct.background = drawProductBackground(color, graColor)
+                            view.textViewProduct.setTextColor(graColor)
+
+                            flexBox_products.addView(view)
                         }
-                        textProducts += product as String
                     }
                 }
-                view._editTextProducts.setText(textProducts)
 
                 view.selectStore.text =
                     if (queue.store.isNullOrEmpty()) {
@@ -107,13 +125,16 @@ class CreateQueueFragment(
             }
         })
 
-        view._okButton.setOnClickListener {
+        view._okButtonSave.visibility = View.VISIBLE
+        view._okButton.visibility = View.GONE
+
+        view._okButtonSave.setOnClickListener {
             hideSoftInput()
             val thisqueue = createQueue(view)
             val time = Calendar.getInstance().timeInMillis
 
             when {
-                thisqueue?.store == null -> {
+                thisqueue.store == null -> {
                     Toast.makeText(
                         it.context,
                         "Debe seleccionar un establecimiento.",
@@ -141,7 +162,7 @@ class CreateQueueFragment(
                         val tag: String
                         map[Param.KEY_QUEUE_NAME] = thisqueue.name
                         map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
-                        map[Param.KEY_QUEUE_ALERT]=thisqueue.alert as Boolean
+                        map[Param.KEY_QUEUE_ALERT] = thisqueue.alert as Boolean
                         val param = if (id == -1L) {
                             tag = Param.TAG_CREATE_QUEUE
                             ParamCreateQueue(thisqueue.store!!, map, thisqueue.created_date ?: time)
@@ -171,21 +192,24 @@ class CreateQueueFragment(
             createQueue(view)
             start(CreateQueueSelectStoreFragment(clientViewModel))
         }
+
+        flexBox_products.setOnClickListener {
+            createQueue(view)
+            start(SelectProductsFragment(clientViewModel))
+        }
+
+        imageViewEmpty.setOnClickListener {
+            createQueue(view)
+            start(SelectProductsFragment(clientViewModel))
+        }
     }
 
     private fun createQueue(view: View): Queue {
 
         val time = Calendar.getInstance().timeInMillis
-        val productsQueue = view._editTextProducts.text.trim().toString()
-        val products: ArrayList<String>
-        products = if (productsQueue.contains(",")) {
-            productsQueue.split(',').map(String::trim).toList() as java.util.ArrayList<String>
-        } else {
-            arrayListOf(productsQueue.trim())
-        }
 
         val map = mutableMapOf<String, Any>()
-        map[Param.KEY_QUEUE_PRODUCTS] = products
+        map[Param.KEY_QUEUE_PRODUCTS] = myProducst
 
         val queue = clientViewModel.creatingQueue.value
 
@@ -213,7 +237,7 @@ class CreateQueueFragment(
             if (queue.info == null) {
                 queue.info = map
             } else {
-                (queue.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] = products
+                (queue.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] = myProducst
             }
             queue
         }
@@ -230,7 +254,7 @@ class CreateQueueFragment(
 
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-            title = "Nueva Cola"
+            title = if (id == -1) "Nueva Cola" else "Editar Cola"
 
             setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 
@@ -244,5 +268,14 @@ class CreateQueueFragment(
                 pop()
             }
         }
+    }
+
+    private fun drawProductBackground(backgroundColor: Int, borderColor: Int): GradientDrawable {
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        shape.cornerRadius = 20F
+        shape.setColor(backgroundColor)
+        shape.setStroke(5, borderColor)
+        return shape
     }
 }

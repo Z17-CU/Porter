@@ -37,6 +37,7 @@
     <color name="darkGray">#72000000</color>
     <color name="blue_drawer">#2D9CDB</color>
 
+    <color name="gray_transparent">#8F000000</color>
 
     <array name="colorsArray">
         <item>@color/google_blue</item>

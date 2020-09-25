@@ -149,4 +149,6 @@
     <string name="date_init">Fecha de inicio</string>
     <string name="date_end">Fecha de fin</string>
     <string name="modo_chequeo">Modo chequeo</string>
+    <string name="producto">Producto</string>
+    <string name="nombre_del_producto">Nombre del producto</string>
 </resources>

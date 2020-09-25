@@ -229,8 +229,8 @@ dependencies {
     implementation ("com.github.jrizani:JRSpinner:1.0.0")
     implementation ("com.github.jrizani:JRSpinner:androidx-SNAPSHOT")
 
-
-
+    /** Flex Box */
+    implementation("com.google.android:flexbox:0.3.2")
 }
 
 fun updateVersionCode() {
