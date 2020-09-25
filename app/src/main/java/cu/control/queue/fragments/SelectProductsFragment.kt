@@ -18,7 +18,6 @@ import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
 import kotlinx.android.synthetic.main.fragment_select_products.*
-import kotlinx.android.synthetic.main.layout_add_product_dialog.*
 import kotlinx.android.synthetic.main.layout_add_product_dialog.view.*
 import kotlinx.android.synthetic.main.layout_add_product_dialog.view.productName
 import kotlinx.android.synthetic.main.toolbar.*
@@ -64,15 +63,17 @@ class SelectProductsFragment(
         var list = preferences.getProducts()
 
         clientViewModel.creatingQueue.value!!.info!![Param.KEY_QUEUE_PRODUCTS]?.let { arrayList ->
-            list = list.map {
-                it.ischeck = (arrayList as ArrayList<*>).contains(it.name)
-                it
-            }.toList() as ArrayList<Product>
+            if ((arrayList as ArrayList<*>).isNotEmpty()) {
+                list = list.map {
+                    it.ischeck = arrayList.contains(it.name)
+                    it
+                }.toList() as ArrayList<Product>
 
-            (arrayList as ArrayList<*>).map { productName ->
-                productName as String
-                if (list.find { it.name == productName } == null) {
-                    list.add(Product(productName, true))
+                arrayList.map { productName ->
+                    productName as String
+                    if (list.find { it.name == productName } == null) {
+                        list.add(Product(productName, true))
+                    }
                 }
             }
         }
@@ -109,10 +110,11 @@ class SelectProductsFragment(
         (queue.info as MutableMap)[Person.KEY_PRODUCTS] = list
 
         clientViewModel.creatingQueue.postValue(queue)
-        preferences.setProducts(adapter.contentList.map {
+        val listToSave = adapter.contentList.map {
             it.ischeck = false
             it
-        }.toList() as ArrayList<Product>)
+        }.toList()
+        preferences.setProducts(if (listToSave.isEmpty()) ArrayList() else listToSave as ArrayList<Product>)
     }
 
     override fun onBackPressedSupport(): Boolean {
