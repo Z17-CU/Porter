@@ -37,22 +37,22 @@
                 android:layout_marginEnd="12dp"
                 android:gravity="end|center_vertical">
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/_okButton"
+                    android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:foregroundGravity="center_vertical|right"
                     app:srcCompat="@drawable/ic_add_new_queue" />
 
-                <Button
-                    android:id="@+id/_okButtonText"
-                    style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                <ImageButton
+                    android:id="@+id/_okButtonSave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?selectableItemBackground"
                     android:foregroundGravity="center_vertical|right"
-                    android:text="@string/guardar"
-                    android:visibility="gone" />
+                    android:background="?selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_save_red"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

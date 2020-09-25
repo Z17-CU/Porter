@@ -65,11 +65,9 @@
                         android:layout_width="54dp"
                         android:layout_height="54dp"
                         android:layout_margin="16dp"
-
                         android:background="@drawable/round_accent_bg"
                         android:contentDescription="@string/lantern"
-                        android:foreground="?selectableItemBackground"
-                        android:padding="8dp"
+                        android:foreground="?selectableItemBackgroundBorderless"
                         app:srcCompat="@drawable/ic_flash_on"
                         tools:ignore="UnusedAttribute" />
 
@@ -79,8 +77,8 @@
                         android:layout_height="54dp"
                         android:layout_margin="16dp"
                         android:background="@drawable/round_accent_bg"
-                        android:contentDescription="@string/lantern"
-                        android:foreground="?selectableItemBackground"
+                        android:contentDescription="@string/teclado"
+                        android:foreground="?selectableItemBackgroundBorderless"
                         android:padding="8dp"
                         app:srcCompat="@drawable/ic_keyboard"
                         tools:ignore="UnusedAttribute" />

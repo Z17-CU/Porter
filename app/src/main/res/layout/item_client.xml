@@ -63,15 +63,16 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/round_green_bg"
-                            android:scaleType="centerInside"
                             android:padding="8dp"
+                            android:scaleType="centerInside"
                             android:visibility="gone"
                             app:srcCompat="@drawable/ic_check" />
 
                         <TextView
                             android:id="@+id/clientNumber"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/item_open_count_queue"
                             android:gravity="center"
                             android:textColor="@color/white"
                             android:textSize="@dimen/textSize"

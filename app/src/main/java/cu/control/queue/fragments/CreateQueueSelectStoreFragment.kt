@@ -58,9 +58,9 @@ class CreateQueueSelectStoreFragment(
         resultReadJson = getCharts()
 
         view._okButton.visibility = View.GONE
-        view._okButtonText.visibility = View.VISIBLE
+        view._okButtonSave.visibility = View.VISIBLE
 
-        view._okButtonText.setOnClickListener {
+        view._okButtonSave.setOnClickListener {
 
             val savedInfo = PreferencesManager(requireContext()).getLastInfoCreateQueue()!!
 
