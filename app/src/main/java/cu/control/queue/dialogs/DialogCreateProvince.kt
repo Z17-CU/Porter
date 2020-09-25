@@ -127,6 +127,7 @@ class DialogCreateProvince(
                             queue!!.info = map
                         } else {
                             (queue!!.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] = products
+                            (queue!!.info as MutableMap)[Param.KEY_QUEUE_ALERT] = queue!!.alert as Boolean
                         }
                         queue!!
                     }

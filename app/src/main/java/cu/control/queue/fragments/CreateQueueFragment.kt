@@ -1,11 +1,9 @@
 package cu.control.queue.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -27,10 +25,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_create_queue.view.*
-import kotlinx.android.synthetic.main.room_queues.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.android.synthetic.main.toolbar.view.toolbar
 import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 import kotlin.collections.ArrayList
@@ -141,9 +137,11 @@ class CreateQueueFragment(
                             map[Param.KEY_QUEUE_PRODUCTS] =
                                 it[Param.KEY_QUEUE_PRODUCTS] as ArrayList<*>? ?: ArrayList<String>()
                         }
+
                         val tag: String
                         map[Param.KEY_QUEUE_NAME] = thisqueue.name
                         map[Param.KEY_QUEUE_DESCRIPTION] = thisqueue.description
+                        map[Param.KEY_QUEUE_ALERT]=thisqueue.alert as Boolean
                         val param = if (id == -1L) {
                             tag = Param.TAG_CREATE_QUEUE
                             ParamCreateQueue(thisqueue.store!!, map, thisqueue.created_date ?: time)

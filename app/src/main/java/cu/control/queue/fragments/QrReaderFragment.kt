@@ -152,7 +152,75 @@ class QrReaderFragment(
 
         initToolBar()
 
-        initAll(view)
+        _showAddClient.setOnClickListener {
+            showDialogInsertClient()
+        }
+        _hightLight.setOnClickListener {
+            _zXingScannerView.flash = !_zXingScannerView.flash
+            turnFlash()
+        }
+        _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
+        _recyclerViewClients.adapter = adapter
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(adapter, requireContext()))
+        itemTouchHelper.attachToRecyclerView(_recyclerViewClients)
+        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
+
+        updateObserver(queue.id!!)
+
+        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+
+            try {
+                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
+                    _recyclerViewClients.context, if (it == MODE_LIST) {
+                        pauseScanner()
+                        _qrReader.visibility = View.GONE
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.readQR)
+                        R.drawable.ic_qr_reader
+                    } else {
+                        _qrReader.visibility = View.VISIBLE
+                        resumeReader()
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.lista)
+                        updateObserver(queue.id!!)
+
+                        R.drawable.ic_list
+                    }
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+
+        searchQuery.observe(viewLifecycleOwner, Observer {
+            if (!it.isNullOrEmpty()) {
+                val id = it.toLong()
+                val index = adapter.contentList.indexOfLast { client -> client.id == id }
+                adapter.contentList.map { client ->
+                    client.searched = false
+                }
+                if (index != -1) {
+                    adapter.contentList[index].searched = true
+                    goTo(index)
+                } else {
+                    showError("El cliente no está en la cola.")
+                }
+                adapter.notifyDataSetChanged()
+            }
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            queue = it
+            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            toolbar.title = it.name
+        })
+
+        resumeReader()
     }
 
     override fun onResume() {
@@ -165,6 +233,16 @@ class QrReaderFragment(
         super.onPause()
         pauseScanner()
     }
+
+    private fun turnFlash() {
+        _hightLight.setImageDrawable(
+            ContextCompat.getDrawable(
+                _zXingScannerView.context,
+                if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+            )
+        )
+    }
+
 
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {

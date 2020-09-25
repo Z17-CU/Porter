@@ -6,26 +6,27 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
+import kotlinx.android.synthetic.main.item_queues.view.*
 
 
 class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
     private var mIconCheck: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_check)!!
-    private var mIconUnCheck: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_uncheck)!!
-    private var mIconDelete: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_delete)!!
-    private var backgroundCheck: ColorDrawable =
+     private var mIconUnCheck: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_uncheck)!!
+     private var mIconDelete: Drawable = ContextCompat.getDrawable(context, R.drawable.ic_delete)!!
+     private var backgroundCheck: ColorDrawable =
         ColorDrawable(ContextCompat.getColor(context, R.color.google_green))
     private var backgroundUnCheck: ColorDrawable =
         ColorDrawable(ContextCompat.getColor(context, R.color.google_red))
     private var backgroundDelete: ColorDrawable =
         ColorDrawable(ContextCompat.getColor(context, R.color.gray_deleter))
-
-    override fun onMove(
+     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
@@ -69,7 +70,7 @@ class SwipeToDeleteCallback(private val mAdapter: AdapterClient, context: Contex
                         itemView.top, itemView.right, itemView.bottom
                     )
                 } else {
-                    backgroundCheck.setBounds(
+                     backgroundCheck.setBounds(
                         itemView.right + dX.toInt() - backgroundCornerOffset,
                         itemView.top, itemView.right, itemView.bottom
                     )
