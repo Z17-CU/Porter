@@ -46,7 +46,7 @@ class DialogAddCollaborator(
     private lateinit var view: View
 
     fun create(): AlertDialog {
-        dialog = AlertDialog.Builder(context)
+        dialog = AlertDialog.Builder(context,R.style.RationaleDialog)
             .setView(getView())
             .create()
 
@@ -243,7 +243,7 @@ class DialogAddCollaborator(
         view.recycler_view.layoutManager = LinearLayoutManager(context)
         view.recycler_view.adapter = adapter
 
-        dialogFromList = AlertDialog.Builder(context)
+        dialogFromList = AlertDialog.Builder(context,R.style.RationaleDialog)
             .setView(view)
             .create()
 

@@ -398,7 +398,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         val message =
                             "La cola está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
 
-                        AlertDialog.Builder(requireContext())
+                        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                             .setTitle("Cola en uso")
                             .setMessage(message)
                             .setPositiveButton(android.R.string.ok, null)
@@ -479,7 +479,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 } else {
                     queue.startDate
                 }
-                AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                     .setTitle(requireContext().getString(R.string.merge))
                     .setMessage(
                         "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${Conts.formatDateBig.format(
@@ -507,7 +507,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
             .setTitle("Descargar cola")
             .setMessage("Debe descargar la cola antes de continuar.")
             .setPositiveButton("Descargar") { _, _ ->
@@ -529,7 +529,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun saveDialog(queue: Queue) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
             .setTitle("Guardar")
             .setMessage("Debe guardar la cola antes de continuar.")
             .setPositiveButton("Guardar") { _, _ ->
@@ -548,7 +548,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
-                    AlertDialog.Builder(context)
+                    AlertDialog.Builder(context,R.style.RationaleDialog)
                         .setTitle("Eliminar")
                         .setMessage("¿Desea eliminar " + queue.name + " de la lista?")
                         .setNegativeButton("Cancelar", null)
@@ -589,7 +589,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 //                    ).create().show()
                 }
                 R.id.action_merge -> {
-                    AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                         .setTitle(requireContext().getString(R.string.merge))
                         .setMessage("Seleccione otra cola para mezclar con ${queue.name}.")
                         .setPositiveButton("Seleccionar") { _, _ ->
@@ -809,7 +809,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             )
         }
 
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
             .setView(view)
             .create().show()
 
@@ -1007,7 +1007,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     private fun showDialogQueueNoExist(queue: Queue) {
 
         requireActivity().runOnUiThread {
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                 .setTitle(requireContext().getString(R.string.error_conection))
                 .setMessage(requireContext().getString(R.string.queue_not_found))
                 .setPositiveButton(requireContext().getString(R.string.update)) { _, _ ->
@@ -1041,7 +1041,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         requireActivity().runOnUiThread {
             val message =
                 "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("Reintentar") { _, _ ->

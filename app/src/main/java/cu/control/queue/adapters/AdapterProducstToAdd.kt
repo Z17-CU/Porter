@@ -50,7 +50,7 @@ class AdapterProducstToAdd :
             notifyDataSetChanged()
         }
         holder.itemLayout.setOnLongClickListener {
-            AlertDialog.Builder(it.context)
+            AlertDialog.Builder(it.context,R.style.RationaleDialog)
                 .setTitle("Eliminar producto")
                 .setMessage("¿Desea eliminar ${product.name} la lista general?")
                 .setPositiveButton(it.context.getText(R.string.eliminar)) { _, _ ->

@@ -39,7 +39,7 @@ class DialogHiClient(
     private lateinit var view: View
 
     fun create(): AlertDialog {
-        dialog = AlertDialog.Builder(context)
+        dialog = AlertDialog.Builder(context,R.style.RationaleDialog)
             .setView(getView())
             .setCancelable(false)
             .create()

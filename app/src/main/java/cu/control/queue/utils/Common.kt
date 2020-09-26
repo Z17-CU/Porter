@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
+import cu.control.queue.R
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
@@ -66,7 +67,7 @@ class Common {
 
             val hi403Message = Gson().fromJson<Hi403Message>(message, type)
 
-            val dialog = AlertDialog.Builder(context)
+            val dialog = AlertDialog.Builder(context, R.style.RationaleDialog)
                 .setTitle(hi403Message.title)
                 .setCancelable(false)
                 .setMessage(hi403Message.message)

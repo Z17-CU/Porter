@@ -36,7 +36,7 @@ constructor(val context: Context) {
     }
 
     private fun init() {
-        builder = AlertDialog.Builder(view.context)
+        builder = AlertDialog.Builder(view.context,R.style.RationaleDialog)
     }
 
     fun show() {
