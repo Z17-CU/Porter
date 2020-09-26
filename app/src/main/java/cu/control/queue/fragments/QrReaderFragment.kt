@@ -74,7 +74,6 @@ import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.control.queue.utils.Conts.Companion.QUEUE_CANT
-import cu.control.queue.utils.Conts.Companion.QUEUE_TIME
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -707,15 +706,10 @@ class QrReaderFragment(
                     )
                 payloadAddMember(clientInQueue, client)
             } else {
-                if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) < (PreferenceManager.getDefaultSharedPreferences(
-                        context
-                    ).getInt(QUEUE_TIME, DEFAULT_QUEUE_TIME_HOURS)) * 60 * 60 * 1000
-                ) {
-                    clientInQueue.reIntent++
-                    queue.clientsNumber--
-                    done = false
-                    payloadUpdateMember(clientInQueue, client, MODE_INCREMENT_REINTENT)
-                }
+                clientInQueue.reIntent++
+                done = false
+                payloadUpdateMember(clientInQueue, client, MODE_INCREMENT_REINTENT)
+                queue.clientsNumber--
                 clientInQueue.lastRegistry = Calendar.getInstance().timeInMillis
             }
             dao.insertClientInQueue(clientInQueue)
