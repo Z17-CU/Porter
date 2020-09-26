@@ -131,7 +131,8 @@ class SelectProductsFragment(
     }
 
     private fun dialogAddProduct() {
-        dialog = AlertDialog.Builder(requireContext())
+        dialog = AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+
             .setView(getDialogView())
             .create()
 
@@ -140,8 +141,7 @@ class SelectProductsFragment(
 
     private fun getDialogView(): View {
         val view = View.inflate(context, R.layout.layout_add_product_dialog, null)
-
-        view.saveButton.setOnClickListener {
+           view.saveButton.setOnClickListener {
             val text = view.productName.text.trim().toString()
             if (text.isNotEmpty()) {
                 if (adapter.contentList.count { it.name == text } > 0) {
