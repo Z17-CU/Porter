@@ -51,6 +51,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_STORE_ID
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
@@ -206,7 +207,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             }
             R.id.nav_settings -> {
-                startActivity(Intent(requireContext(),SettingsActivity::class.java))
+                startActivity(Intent(requireContext(), SettingsActivity::class.java))
             }
 
 
@@ -503,7 +504,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     override fun onClickExport(list: List<Queue>) {
-     }
+    }
 
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
         AlertDialog.Builder(requireContext())
@@ -719,7 +720,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         val listToShow = ArrayList<Queue>()
 
-        if(listOpen.isNotEmpty()) {
+        if (listOpen.isNotEmpty()) {
             separator.textSeparator = "Abiertas"
             listToShow.add(separator)
             listToShow.addAll(listOpen)
@@ -727,7 +728,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         separator = Queue(null, "", 0L, 0, "", null, null, null, owner = "", textSeparator = "")
 
-        if(listSave.isNotEmpty()) {
+        if (listSave.isNotEmpty()) {
             separator.textSeparator = "Guardadas"
             listToShow.add(separator)
             listToShow.addAll(listSave)
@@ -737,7 +738,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         adapter.notifyDataSetChanged()
 
-        if(listToShow.isEmpty()){
+        if (listToShow.isEmpty()) {
             _imageViewEngranes.visibility = View.VISIBLE
         } else {
             _imageViewEngranes.visibility = View.GONE

@@ -13,7 +13,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import cu.control.queue.R
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
+import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucItem
+import cu.control.queue.utils.Common
 import cu.control.queue.utils.JsonWrite
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
@@ -55,7 +57,7 @@ class CreateQueueSelectStoreFragment(
 
         initToolBar()
 
-        resultReadJson = getCharts()
+        resultReadJson = Common.getCharts(requireContext())
 
         view._okButton.visibility = View.GONE
         view._okButtonSave.visibility = View.VISIBLE
@@ -88,11 +90,7 @@ class CreateQueueSelectStoreFragment(
 
                     queue!!.store = storeId
 
-                    queue.province = resultReadJson[idProvince].name
-
-                    queue.municipality = resultReadJson[idProvince].municipality[idMunicipie].name
-
-                    queue.storeName = resultReadJson[idProvince].municipality[idMunicipie].store[idStore].name
+                    (queue.info as MutableMap)[Person.KEY_STORE_ID] = storeId
 
                     clientViewModel.creatingQueue.postValue(queue)
 
@@ -144,31 +142,6 @@ class CreateQueueSelectStoreFragment(
                 )
                 pop()
             }
-        }
-    }
-
-    private fun getCharts(): List<jsonStrucItem> {
-        val jsonString: String
-
-        val storeVersionInit = PreferencesManager(requireContext()).getStoreVersionInit()
-        if (!storeVersionInit) {
-            jsonString = requireContext().assets.open("stores.json").bufferedReader().use {
-                it.readText()
-            }
-
-            return GsonBuilder().create()
-                .fromJson(jsonString, object : TypeToken<List<jsonStrucItem>>() {}.type)
-
-        } else {
-            jsonString = JsonWrite(requireContext()).readFromFile()!!
-            val gson: Gson = GsonBuilder().create()
-
-            val porterHistruct: PorterHistruct =
-                gson.fromJson(jsonString, PorterHistruct::class.java)
-
-            val response = porterHistruct.stores
-
-            return response!!
         }
     }
 

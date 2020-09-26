@@ -114,7 +114,15 @@ class SelectProductsFragment(
             it.ischeck = false
             it
         }.toList()
-        preferences.setProducts(if (listToSave.isEmpty()) ArrayList() else listToSave as ArrayList<Product>)
+        preferences.setProducts(
+            when {
+                listToSave.isEmpty() -> ArrayList()
+                listToSave.size == 1 -> arrayListOf(
+                    listToSave[0]
+                )
+                else -> listToSave as ArrayList<Product>
+            }
+        )
     }
 
     override fun onBackPressedSupport(): Boolean {

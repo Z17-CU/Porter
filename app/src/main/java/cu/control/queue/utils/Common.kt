@@ -20,6 +20,7 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.downloader.PRDownloaderConfig
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
@@ -28,6 +29,7 @@ import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
+import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucItem
 import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -405,6 +407,31 @@ class Common {
             }
 
             return porterHistruct
+        }
+
+        fun getCharts(context: Context): List<jsonStrucItem> {
+            val jsonString: String
+
+            val storeVersionInit = PreferencesManager(context).getStoreVersionInit()
+            if (!storeVersionInit) {
+                jsonString = context.assets.open("stores.json").bufferedReader().use {
+                    it.readText()
+                }
+
+                return GsonBuilder().create()
+                    .fromJson(jsonString, object : TypeToken<List<jsonStrucItem>>() {}.type)
+
+            } else {
+                jsonString = JsonWrite(context).readFromFile()!!
+                val gson: Gson = GsonBuilder().create()
+
+                val porterHistruct: PorterHistruct =
+                    gson.fromJson(jsonString, PorterHistruct::class.java)
+
+                val response = porterHistruct.stores
+
+                return response!!
+            }
         }
     }
 }

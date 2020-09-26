@@ -22,6 +22,8 @@ open class Person(
         const val KEY_AFFILIATION = "aff"
         const val KEY_PRODUCTS = "products"
 
+        const val KEY_STORE_ID = "store"
+
         const val KEY_MEMBER_UPDATED_DATE = "updated_date"
         const val KEY_CHECKED = "checked_date"
         const val KEY_UNCHECKED = "unchecked_date"
