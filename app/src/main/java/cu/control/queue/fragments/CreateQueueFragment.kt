@@ -1,6 +1,5 @@
 package cu.control.queue.fragments
 
-import android.R.drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import com.google.android.flexbox.FlexboxItemDecoration
 import cu.control.queue.R
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
@@ -30,7 +28,9 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_create_queue.*
 import kotlinx.android.synthetic.main.fragment_create_queue.view.*
-import kotlinx.android.synthetic.main.item_product_add_list.view.*
+import kotlinx.android.synthetic.main.item_product.view.*
+import kotlinx.android.synthetic.main.item_product_add_list.view.layoutProduct
+import kotlinx.android.synthetic.main.item_product_add_list.view.textViewProduct
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import me.yokeyword.fragmentation.SupportFragment
@@ -104,10 +104,10 @@ class CreateQueueFragment(
                             val view = View.inflate(context, R.layout.item_product, null)
                             view.textViewProduct.text = product
                             val color = ColorGenerator.MATERIAL.getColor(product)
-                            val graColor =
+                            val shadow =
                                 ContextCompat.getColor(requireContext(), R.color.gray_transparent)
-                            view.layoutProduct.background = drawProductBackground(color, graColor)
-                            view.textViewProduct.setTextColor(graColor)
+                            view.layoutProduct.background = drawProductBackground(color)
+                            view.layoutProductShadow.background = drawProductBackground(shadow)
 
                             flexBox_products.addView(view)
                         }
@@ -270,12 +270,12 @@ class CreateQueueFragment(
         }
     }
 
-    private fun drawProductBackground(backgroundColor: Int, borderColor: Int): GradientDrawable {
+    private fun drawProductBackground(backgroundColor: Int): GradientDrawable {
         val shape = GradientDrawable()
         shape.shape = GradientDrawable.RECTANGLE
         shape.cornerRadius = 20F
         shape.setColor(backgroundColor)
-        shape.setStroke(5, borderColor)
+        //shape.setStroke(5, borderColor)
         return shape
     }
 }
