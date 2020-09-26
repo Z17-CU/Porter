@@ -183,7 +183,7 @@ class QrReaderFragment(
             searchView.closeSearch()
             true
         } else if (!queue.isSaved) {
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                 .setTitle("Cambios sin guardar")
                 .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
                 .setPositiveButton("Guardar") { _, _ ->
@@ -598,7 +598,7 @@ class QrReaderFragment(
             MediaPlayer.create(context, R.raw.error_buzz).start()
 
             requireActivity().runOnUiThread {
-                AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                     .setTitle("Lista negra")
                     .setMessage("${client.name} está en lista negra.")
                     .setPositiveButton(requireContext().getString(android.R.string.ok), null)
@@ -631,7 +631,7 @@ class QrReaderFragment(
 
                 requireActivity().runOnUiThread {
 
-                    AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
                         .setTitle("Alerta")
                         .setMessage(
                             client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
@@ -1237,7 +1237,7 @@ class QrReaderFragment(
             }
         }
 
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
             .setView(view)
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->

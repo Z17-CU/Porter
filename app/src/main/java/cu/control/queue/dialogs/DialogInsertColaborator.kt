@@ -41,7 +41,7 @@ class DialogInsertColaborator(
 
     fun create(): AlertDialog {
         dao = AppDataBase.getInstance(context).dao()
-        dialog = AlertDialog.Builder(context)
+        dialog = AlertDialog.Builder(context,R.style.RationaleDialog)
             .setView(getView())
             .setCancelable(false)
             .create()
