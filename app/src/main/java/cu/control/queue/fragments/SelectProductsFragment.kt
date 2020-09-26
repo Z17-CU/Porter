@@ -64,10 +64,18 @@ class SelectProductsFragment(
 
         clientViewModel.creatingQueue.value!!.info!![Param.KEY_QUEUE_PRODUCTS]?.let { arrayList ->
             if ((arrayList as ArrayList<*>).isNotEmpty()) {
-                list = list.map {
-                    it.ischeck = arrayList.contains(it.name)
-                    it
-                }.toList() as ArrayList<Product>
+                if (list.isNotEmpty()) {
+                    val temList = list.map {
+                        it.ischeck = arrayList.contains(it.name)
+                        it
+                    }.toList()
+
+                    if (list.size > 1) {
+                        list = temList as ArrayList<Product>
+                    } else {
+                        list = arrayListOf(temList[0])
+                    }
+                }
 
                 arrayList.map { productName ->
                     productName as String
@@ -131,7 +139,7 @@ class SelectProductsFragment(
     }
 
     private fun dialogAddProduct() {
-        dialog = AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+        dialog = AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
 
             .setView(getDialogView())
             .create()
@@ -141,7 +149,7 @@ class SelectProductsFragment(
 
     private fun getDialogView(): View {
         val view = View.inflate(context, R.layout.layout_add_product_dialog, null)
-           view.saveButton.setOnClickListener {
+        view.saveButton.setOnClickListener {
             val text = view.productName.text.trim().toString()
             if (text.isNotEmpty()) {
                 if (adapter.contentList.count { it.name == text } > 0) {
