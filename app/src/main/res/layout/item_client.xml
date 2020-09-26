@@ -115,7 +115,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:textColor="@color/gray_deleter"
+                                android:textColor="@color/colorDarkGrayScale"
                                 android:textSize="18sp"
                                 tools:text="Richard Anca Perurena" />
 
@@ -192,7 +192,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:maxLines="1"
-                                android:textColor="#AEA3A3A3"
+                                android:textColor="@color/colorDarkGrayScale"
                                 android:textSize="16sp"
                                 tools:ignore="RtlSymmetry"
                                 tools:text="93070511004" />
@@ -204,7 +204,7 @@
                                 android:layout_marginEnd="8dp"
                                 android:layout_marginRight="8dp"
                                 android:maxLines="1"
-                                android:textColor="#AEA3A3A3"
+                                android:textColor="@color/colorDarkGrayScale"
                                 android:textSize="16sp"
                                 tools:ignore="RtlSymmetry"
                                 tools:text="3:45:32 pm" />

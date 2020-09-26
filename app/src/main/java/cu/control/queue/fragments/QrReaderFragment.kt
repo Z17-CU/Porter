@@ -276,10 +276,13 @@ class QrReaderFragment(
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+           val scale = requireContext().resources.displayMetrics.density;
+            val padd = (8 * scale + 0.5f).toInt()
             requireActivity().window.statusBarColor = ContextCompat.getColor(
                 requireContext(),
                 if (checkList) R.color.google_red_dark else R.color.colorPrimaryDark
             )
+            _showAddClient.setPadding(padd,padd,padd,padd)
         }
 
         toolbar.menu.findItem(R.id.action_check).title = if (checkList)

@@ -34,6 +34,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_dialog_hi_client.view.*
 import kotlinx.android.synthetic.main.recycler_view_layout.view.*
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import java.util.ArrayList
 
 class DialogAddCollaborator(
     private val context: Context,
@@ -124,7 +125,7 @@ class DialogAddCollaborator(
                     map.put(Person.KEY_LAST_NAME, lastName)
                     val dao = AppDataBase.getInstance(context).dao()
 
-                    dao.insertCollaborator(Person(ci, fv, map))
+                    dao.insertCollaborator(Person(ci, fv, map) )
                     queue.collaborators.add(ci)
                     dao.insertQueue(queue)
                 } else if (result.code() == 409) {
@@ -155,8 +156,8 @@ class DialogAddCollaborator(
                 }).addTo(CompositeDisposable())
         } else {
             val map = HashMap<String, Any>()
-            map.put(Person.KEY_NAME, name)
-            map.put(Person.KEY_LAST_NAME, lastName)
+            map[Person.KEY_NAME] = name
+            map[Person.KEY_LAST_NAME] = lastName
             val dao = AppDataBase.getInstance(context).dao()
 
             Completable.create {
