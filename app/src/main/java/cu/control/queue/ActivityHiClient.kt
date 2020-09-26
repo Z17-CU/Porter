@@ -92,7 +92,13 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
 
         val client = Common.stringToPorterHistruct(result, this)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv,PreferencesManager(this@ActivityHiClient).getStoreVersion())
+            saveAndSendData(
+                it.name,
+                it.last_name,
+                it.ci,
+                it.fv,
+                PreferencesManager(this@ActivityHiClient).getStoreVersion()
+            )
             goToMain()
             return
         }
@@ -129,7 +135,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         ci: String,
         fv: String = "00",
         storeVersion: Int,
-        store:String=""
+        store: String = ""
 
     ) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
@@ -140,7 +146,7 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
             preferences.setFV(fv)
             preferences.setStoreVersion(storeVersion)
 
-            val struct = PorterHistruct(name, lastName, ci, fv,storeVersion)
+            val struct = PorterHistruct(name, lastName, ci, fv, storeVersion)
 
             val data = Common.porterHiToString(struct)
 
@@ -170,13 +176,18 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
                         this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                     val view = inflater.inflate(R.layout.layout_server_message, null)
                     view._textViewMessage.text = message
-                    AlertDialog.Builder(this)
-                        .setView(view)
-                        .setOnDismissListener {
-                            startReader()
-                        }
-                        .setPositiveButton(android.R.string.ok, null)
-                        .create().show()
+
+                    try {
+                        AlertDialog.Builder(this)
+                            .setView(view)
+                            .setOnDismissListener {
+                                startReader()
+                            }
+                            .setPositiveButton(android.R.string.ok, null)
+                            .create().show()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }, {
                 it.printStackTrace()
