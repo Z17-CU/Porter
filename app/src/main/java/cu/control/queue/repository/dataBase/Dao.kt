@@ -91,7 +91,7 @@ interface Dao {
     @Query("UPDATE ${Queue.TABLE_NAME} SET clientsNumber = :size WHERE id = :queueId")
     fun updateQueueSize(queueId: Long, size: Int)
 
-    @Query("SELECT * FROM ${Queue.TABLE_NAME}")
+    @Query("SELECT * FROM ${Queue.TABLE_NAME} ORDER BY created_date DESC ")
     fun getAllQueues(): LiveData<List<Queue>>
 
     @Query("SELECT COUNT(*) from ${ClientInQueue.TABLE_NAME} WHERE queueId = :id")
