@@ -12,6 +12,7 @@ class Queue(
     var startDate: Long,
     var clientsNumber: Int = 0,
     var description: String = "",
+    var affiliation: String = "",
     var uuid: String?,
     val created_date: Long?,
     val updated_date: Long?,

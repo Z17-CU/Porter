@@ -37,22 +37,30 @@ class AdapterQueue(
     override fun onBindViewHolder(holder: ViewHolderQueues, position: Int) {
         val queue = contentList[position]
 
-        if(queue.textSeparator.isNullOrEmpty()) {
+        if (queue.textSeparator.isNullOrEmpty()) {
 
             holder.itemQueue.visibility = View.VISIBLE
             holder.itemSeparator.visibility = View.GONE
+            if (queue.affiliation == "collaborator") {
+                holder.layoutBackground.background =
+                    ContextCompat.getDrawable(holder.layoutBackground.context, R.color.backgraound_colaborator)
+            } else {
+                holder.layoutBackground.background =
+                    ContextCompat.getDrawable(holder.layoutBackground.context, R.color.white)
 
-            holder.layoutBackground.background =
-                ContextCompat.getDrawable(
-                    holder.layoutBackground.context,
-                    when {
-                        queue.isOffline -> R.drawable.item_offline_bg
-                        position % 2 != 0 -> R.drawable.item_white_bg
-                        else -> R.drawable.bg_item_dark
-                    }
-                )
+            }
 
-            if(queue.isSaved){
+//                holder.layoutBackground.background =
+//                ContextCompat.getDrawable(
+//                    holder.layoutBackground.context,
+//                    when {
+//                        queue.isOffline -> R.drawable.item_offline_bg
+//                        position % 2 != 0 -> R.drawable.item_white_bg
+//                        else -> R.drawable.bg_item_dark
+//                    }
+//                )
+
+            if (queue.isSaved) {
                 holder.clientNumberOpenQueue.visibility = View.VISIBLE
                 holder.clientNumberOpenQueue.text = queue.clientsNumber.toString()
                 holder.clientNumberSaveQueue.visibility = View.GONE
@@ -62,8 +70,11 @@ class AdapterQueue(
                 holder.clientNumberSaveQueue.text = queue.clientsNumber.toString()
             }
 
+
+
             holder.imageDownload.visibility = if (queue.downloaded) View.GONE else View.VISIBLE
-            holder.imageViewSaveOpened.visibility = if (queue.downloaded && queue.isSaved) View.VISIBLE else View.GONE
+            holder.imageViewSaveOpened.visibility =
+                if (queue.downloaded && queue.isSaved) View.VISIBLE else View.GONE
             holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
             holder.textViewName.text = queue.name
             holder.textViewDate.text = formatDateBig.format(queue.startDate)

@@ -29,6 +29,8 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._editText
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._editTextFV
 import kotlinx.android.synthetic.main.layout_dialog_insert_client.view._okButton
 import kotlinx.android.synthetic.main.layout_dialog_insert_manual_colaborator.view.*
+import java.util.*
+import kotlin.collections.HashMap
 
 class DialogInsertColaborator(
     private val context: Context,
@@ -62,18 +64,18 @@ class DialogInsertColaborator(
             compositeDisposable.add(Completable.create {
 
                 val ci: String = view._editTextCI.text.toString()
-                val fv: String = view._editTextFV.text.toString().toUpperCase()
-                if (!Common.isValidFV(fv)) {
-                    Toast.makeText(
-                        context,
-                        "El campo FV no puede estar en blanco",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
+                val fv: String = view._editTextFV.text.toString().toUpperCase(Locale.ROOT)
+//                if (!Common.isValidFV(fv)) {
+//                    Toast.makeText(
+//                        context,
+//                        "El campo FV no puede estar en blanco",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                } else {
                     saveAndSendDataInsertColaborator(ci, fv)
                     dialog.dismiss()
 
-                }
+//                }
 
             }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -179,12 +181,14 @@ class DialogInsertColaborator(
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.first == 200) {
-
                     dialog.dismiss()
                 } else {
                     val message = it.second ?: "Error ${it.first}"
                     Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 
+                }
+                if(it.first==409){
+                    Toast.makeText(context, R.string.error_colaborator, Toast.LENGTH_LONG).show()
                 }
             }, {
                 it.printStackTrace()

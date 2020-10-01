@@ -36,7 +36,8 @@ import kotlinx.android.synthetic.main.room_queues.*
 import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 
-class CollaboratorsFragment(private val queue: Queue) : SupportFragment(), OnColaboratorClickListener {
+class CollaboratorsFragment(private val queue: Queue) : SupportFragment(),
+    OnColaboratorClickListener {
 
     private lateinit var dao: Dao
     private val adapter = AdapterPerson(queue, this@CollaboratorsFragment)
@@ -136,11 +137,17 @@ class CollaboratorsFragment(private val queue: Queue) : SupportFragment(), OnCol
         val popupMenu = PopupMenu(context, view)
         (context as Activity).menuInflater.inflate(R.menu.menu_only_delete, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { item ->
+            var info = ""
+            info = if (person.info[Person.KEY_NAME] != null) {
+                person.info[Person.KEY_NAME].toString()
+            } else {
+                person.ci
+            }
             when (item.itemId) {
                 R.id.action_delete -> {
                     android.app.AlertDialog.Builder(context)
                         .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar a " + person.info[Person.KEY_NAME] + " de la lista?")
+                        .setMessage("¿Desea eliminar a $info de la lista?")
                         .setNegativeButton("Cancelar", null)
                         .setPositiveButton("Eliminar") { _, _ ->
                             Completable.create {

@@ -132,7 +132,7 @@ class ClientViewModel @Inject constructor(
                     map[paramTag] = param
                     payload = Payload(PreferencesManager(context).getId(), queueId, map)
                 } else {
-                    (payload.methods as HashMap).put(paramTag, param)
+                    (payload.methods as HashMap)[paramTag] = param
                 }
 
                 clientRepository.insertPayload(payload)

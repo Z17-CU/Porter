@@ -51,7 +51,6 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
-import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_STORE_ID
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteQueue
@@ -69,9 +68,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.android.synthetic.main.quees_open_saved.*
-import kotlinx.android.synthetic.main.room_queues._imageViewEngranes
-import kotlinx.android.synthetic.main.room_queues._recyclerViewQueues
-import kotlinx.android.synthetic.main.room_queues.swipeContainer
+import kotlinx.android.synthetic.main.room_queues.*
 import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
@@ -398,7 +395,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         val message =
                             "La cola está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
 
-                        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+                        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                             .setTitle("Cola en uso")
                             .setMessage(message)
                             .setPositiveButton(android.R.string.ok, null)
@@ -479,7 +476,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 } else {
                     queue.startDate
                 }
-                AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+                AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle(requireContext().getString(R.string.merge))
                     .setMessage(
                         "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${Conts.formatDateBig.format(
@@ -507,7 +504,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
-        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setTitle("Descargar cola")
             .setMessage("Debe descargar la cola antes de continuar.")
             .setPositiveButton("Descargar") { _, _ ->
@@ -529,7 +526,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun saveDialog(queue: Queue) {
-        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setTitle("Guardar")
             .setMessage("Debe guardar la cola antes de continuar.")
             .setPositiveButton("Guardar") { _, _ ->
@@ -548,7 +545,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
-                    AlertDialog.Builder(context,R.style.RationaleDialog)
+                    AlertDialog.Builder(context, R.style.RationaleDialog)
                         .setTitle("Eliminar")
                         .setMessage("¿Desea eliminar " + queue.name + " de la lista?")
                         .setNegativeButton("Cancelar", null)
@@ -589,7 +586,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 //                    ).create().show()
                 }
                 R.id.action_merge -> {
-                    AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+                    AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle(requireContext().getString(R.string.merge))
                         .setMessage("Seleccione otra cola para mezclar con ${queue.name}.")
                         .setPositiveButton("Seleccionar") { _, _ ->
@@ -716,7 +713,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         }
 
-        var separator = Queue(null, "", 0L, 0, "", null, null, null, owner = "", textSeparator = "")
+        var separator = Queue(null, "", 0L, 0, "", "",null, null, null, owner = "", textSeparator = "")
 
         val listToShow = ArrayList<Queue>()
 
@@ -726,7 +723,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             listToShow.addAll(listOpen)
         }
 
-        separator = Queue(null, "", 0L, 0, "", null, null, null, owner = "", textSeparator = "")
+        separator = Queue(null, "", 0L, 0, "", "",null, null, null, owner = "", textSeparator = "")
 
         if (listSave.isNotEmpty()) {
             separator.textSeparator = "Guardadas"
@@ -809,7 +806,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             )
         }
 
-        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setView(view)
             .create().show()
 
@@ -953,6 +950,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                                     val description = entry.value["description"] as String
                                     val createdDate =
                                         (entry.value["created_date"] as Double).toLong()
+                                    val affiliation = entry.value["affiliation"] as String
                                     val tags = entry.value["tags"] as String
 
                                     dao.insertQueue(
@@ -962,6 +960,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                                             startDate = createdDate,
                                             clientsNumber = 0,
                                             description = description,
+                                            affiliation=affiliation,
                                             uuid = entry.key,
                                             created_date = createdDate,
                                             updated_date = createdDate,
@@ -1007,7 +1006,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     private fun showDialogQueueNoExist(queue: Queue) {
 
         requireActivity().runOnUiThread {
-            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle(requireContext().getString(R.string.error_conection))
                 .setMessage(requireContext().getString(R.string.queue_not_found))
                 .setPositiveButton(requireContext().getString(R.string.update)) { _, _ ->
@@ -1041,7 +1040,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         requireActivity().runOnUiThread {
             val message =
                 "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
-            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("Reintentar") { _, _ ->
