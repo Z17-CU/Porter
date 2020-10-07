@@ -713,7 +713,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         }
 
-        var separator = Queue(null, "", 0L, 0, "", "",null, null, null, owner = "", textSeparator = "")
+        var separator =
+            Queue(null, "", 0L, 0, "", "", null, null, null, owner = "", textSeparator = "")
 
         val listToShow = ArrayList<Queue>()
 
@@ -723,7 +724,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             listToShow.addAll(listOpen)
         }
 
-        separator = Queue(null, "", 0L, 0, "", "",null, null, null, owner = "", textSeparator = "")
+        separator = Queue(null, "", 0L, 0, "", "", null, null, null, owner = "", textSeparator = "")
 
         if (listSave.isNotEmpty()) {
             separator.textSeparator = "Guardadas"
@@ -960,7 +961,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                                             startDate = createdDate,
                                             clientsNumber = 0,
                                             description = description,
-                                            affiliation=affiliation,
+                                            affiliation = affiliation,
                                             uuid = entry.key,
                                             created_date = createdDate,
                                             updated_date = createdDate,
@@ -990,12 +991,14 @@ class RoomQueues : SupportFragment(), onClickListener {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.first != 200) {
-                    val message = it.second ?: "Error ${it.first}"
-                    val dialog = Common.showHiErrorMessage(
-                        requireContext(),
-                        message
-                    )
-                    dialog?.show()
+                    val message = it.second
+                    if (message != null) {
+                        val dialog = Common.showHiErrorMessage(
+                            requireContext(),
+                            message
+                        )
+                        dialog?.show()
+                    }
                 }
                 progress.dismiss()
             }, {
