@@ -119,7 +119,7 @@ class MyCollaboratorsFragment : SupportFragment() {
                                 403 -> {
                                     val dialog =
                                         Common.showHiErrorMessage(requireContext(), errorBody)
-                                    dialog.show()
+                                    dialog?.show()
                                 }
                                 404 -> {
 

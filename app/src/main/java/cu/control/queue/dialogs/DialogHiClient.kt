@@ -110,10 +110,10 @@ class DialogHiClient(
                 } else {
                     val message = it.second ?: "Error ${it.first}"
                     val dialog = showHiErrorMessage(context, message )
-                    dialog.setOnDismissListener {
+                    dialog?.setOnDismissListener {
                         startReader()
                     }
-                    dialog.show()
+                    dialog?.show()
                 }
             }, {
                 it.printStackTrace()

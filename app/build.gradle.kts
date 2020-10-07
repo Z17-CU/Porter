@@ -209,9 +209,9 @@ dependencies {
     /**Preferences*/
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
-    /** Firebase */
-    implementation("com.google.firebase:firebase-analytics:17.4.4")
-    implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
+//    /** Firebase */
+//    implementation("com.google.firebase:firebase-analytics:17.4.4")
+//    implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
 
     /** ScrollView */
     implementation("com.github.turing-tech:MaterialScrollBar:13.3.2")
@@ -221,6 +221,7 @@ dependencies {
 
    /**download*/
     implementation ("com.download.library:Downloader:4.1.4")
+
     /**PrDownload*/
     implementation ("com.mindorks.android:prdownloader:0.6.0")
 

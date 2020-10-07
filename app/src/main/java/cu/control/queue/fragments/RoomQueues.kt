@@ -415,7 +415,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             403 -> {
                                 val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
-                                dialog.show()
+                                dialog?.show()
                             }
                             404 -> {
                                 showDialogQueueNoExist(queue)
@@ -901,8 +901,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv(), preferences.getStoreVersion()
-
+                preferences.getFv(),
+                preferences.getStoreVersion()
             )
 
             val data = Common.porterHiToString(struct)
@@ -995,7 +995,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         requireContext(),
                         message
                     )
-                    dialog.show()
+                    dialog?.show()
                 }
                 progress.dismiss()
             }, {

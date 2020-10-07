@@ -21,6 +21,7 @@ import com.downloader.PRDownloader
 import com.downloader.PRDownloaderConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
@@ -35,6 +36,7 @@ import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class Common {
@@ -59,13 +61,18 @@ class Common {
             context: Context,
             message: String
 
-        ): AlertDialog {
+        ): AlertDialog? {
 
             val type = object : TypeToken<Hi403Message>() {
 
             }.type
 
-            val hi403Message = Gson().fromJson<Hi403Message>(message, type)
+            val hi403Message = try {
+                Gson().fromJson<Hi403Message>(message, type)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
 
             val dialog = AlertDialog.Builder(context, R.style.RationaleDialog)
                 .setTitle(hi403Message.title)
@@ -335,9 +342,10 @@ class Common {
 
             return false
         }
-        fun isValidFV(fv:String ):Boolean{
-            if(!fv.isBlank()){
-                return  true
+
+        fun isValidFV(fv: String): Boolean {
+            if (!fv.isBlank()) {
+                return true
             }
             return false
         }
@@ -401,7 +409,7 @@ class Common {
                             name,
                             lastName,
                             idString,
-                            fv,PreferencesManager(context).getStoreVersion()
+                            fv, PreferencesManager(context).getStoreVersion()
 
                         )
                 }
