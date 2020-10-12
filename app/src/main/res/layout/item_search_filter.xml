@@ -80,6 +80,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:visibility="gone"
                             android:gravity="end|bottom">
 
                             <TextView
@@ -93,6 +94,18 @@
                                 tools:text="5" />
 
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/_clientNumberInQueue"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/item_open_count_queue"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/textSize"
+                            android:textStyle="bold"
+                            android:visibility="visible" />
 
                     </RelativeLayout>
 
@@ -193,24 +206,45 @@
                                     android:id="@+id/_textViewCreateDate"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
                                     android:layout_weight="1"
+                                    android:gravity="center_vertical"
                                     android:maxLines="1"
                                     android:text="Añadido"
                                     android:textColor="#A3A3A3"
                                     android:textSize="16sp"
                                     tools:ignore="RtlSymmetry" />
 
-                                <TextView
-                                    android:id="@+id/_textViewDateCreate"
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:layout_marginRight="8dp"
-                                    android:maxLines="1"
-                                    android:textColor="#A3A3A3"
-                                    android:textSize="16sp"
-                                    tools:ignore="RtlSymmetry"
-                                    tools:text="3:45:32 pm" />
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/_textTimeCreate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:layout_marginRight="8dp"
+                                        android:maxLines="1"
+                                        android:textColor="#A3A3A3"
+                                        android:textSize="16sp"
+                                        tools:ignore="RtlSymmetry"
+                                        tools:text="3:45:32 pm" />
+
+                                    <TextView
+                                        android:id="@+id/_textViewDateCreate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:layout_marginRight="8dp"
+                                        android:maxLines="1"
+                                        android:textColor="#A3A3A3"
+                                        android:textSize="16sp"
+                                        tools:ignore="RtlSymmetry"
+                                        tools:text="3:45:32 pm" />
+                                </LinearLayout>
+
 
                             </LinearLayout>
 
@@ -223,6 +257,7 @@
                                     android:id="@+id/_textViewUpdateDate"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
                                     android:layout_weight="1"
                                     android:maxLines="1"
                                     android:text="Chequeado "
@@ -230,17 +265,36 @@
                                     android:textSize="16sp"
                                     tools:ignore="RtlSymmetry" />
 
-                                <TextView
-                                    android:id="@+id/_textViewDateUpdate"
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:layout_marginRight="8dp"
-                                    android:maxLines="1"
-                                    android:textColor="#A3A3A3"
-                                    android:textSize="16sp"
-                                    tools:ignore="RtlSymmetry"
-                                    tools:text="3:45:32 pm" />
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/_textViewTimeUpdate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:layout_marginRight="8dp"
+                                        android:maxLines="1"
+                                        android:textColor="#A3A3A3"
+                                        android:textSize="16sp"
+                                        tools:ignore="RtlSymmetry"
+                                        tools:text="3:45:32 pm" />
+
+                                    <TextView
+                                        android:id="@+id/_textViewDateUpdate"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:layout_marginRight="8dp"
+                                        android:maxLines="1"
+                                        android:textColor="#A3A3A3"
+                                        android:textSize="16sp"
+                                        tools:ignore="RtlSymmetry"
+                                        tools:text="3:45:32 pm" />
+                                </LinearLayout>
+
 
                             </LinearLayout>
 

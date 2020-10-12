@@ -25,6 +25,9 @@ class ViewHolderFilterSearch(itemView: View) : RecyclerView.ViewHolder(itemView)
     val textViewUpdateDate: TextView = itemView._textViewUpdateDate
     val textViewDeleteDate: TextView = itemView._textViewDeleteDate
     val textViewDateCreate: TextView = itemView._textViewDateCreate
+    val clientNumberInQueue: TextView = itemView._clientNumberInQueue
+    val textTimeCreate: TextView = itemView._textTimeCreate
+    val textViewTimeUpdate: TextView = itemView._textViewTimeUpdate
     val textViewDateUpdate: TextView = itemView._textViewDateUpdate
     val textViewDateDelete: TextView = itemView._textViewDateDelete
     val layoutBackground: LinearLayout = itemView._layoutItemPersona
