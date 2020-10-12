@@ -952,7 +952,6 @@ class RoomQueues : SupportFragment(), onClickListener {
                                     val createdDate =
                                         (entry.value["created_date"] as Double).toLong()
                                     val affiliation = entry.value["affiliation"] as String
-                                    val tags = entry.value["tags"] as String
 
                                     dao.insertQueue(
                                         Queue(

@@ -23,6 +23,7 @@
     <color name="google_green">#65B832</color>
     <color name="background_queue_open_green">#D5FFCE</color>
 
+    <color name="orange">#FF7043</color>
     <color name="search_field_bg">#EFEBE9</color>
 
     <color name="colorTextGrayScale50">#ff999999</color>
