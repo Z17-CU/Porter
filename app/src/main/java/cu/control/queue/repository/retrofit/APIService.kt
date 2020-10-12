@@ -51,10 +51,9 @@ interface APIService {
     @POST
     fun validate(
         @Url url: String = VALIDATE_PORTER_URL,
-        @Body days_ago: Int,
+        @Body body: String = "{\"days_ago\": 400}",
         @HeaderMap headers: Map<String, String>
     ): Call<ArrayList<Person>?>
-
 
     companion object {
         private const val BASE_URL = BuildConfig.BASE_URL

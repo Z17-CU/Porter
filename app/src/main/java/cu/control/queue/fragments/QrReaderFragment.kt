@@ -1269,10 +1269,10 @@ class QrReaderFragment(
 
         progress.show()
 
-        Completable.create {
+        Single.create<Int> {
 
             val interesting =
-                APIService.apiService.validate(days_ago = 20, headers = headerMap).execute().body()
+                APIService.apiService.validate(headers = headerMap).execute().body()
 
             interesting?.let { persons ->
                 interestingList = persons
@@ -1283,11 +1283,13 @@ class QrReaderFragment(
                 }
             }
 
-            it.onComplete()
+            it.onSuccess(adapter.contentList.indexOfFirst { it.isInteresting ?: false })
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe { pos, _ ->
                 adapter.notifyDataSetChanged()
+                if (pos != -1)
+                    goTo(pos)
                 progress.dismiss()
             }.addTo(compositeDisposable)
     }

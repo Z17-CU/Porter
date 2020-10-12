@@ -361,12 +361,19 @@ class RoomQueues : SupportFragment(), onClickListener {
                     savedQueue.isSaved = false
                     savedQueue.id = savedQueue.id ?: it.created_date
                     savedQueue.info = it.info
-
-                    dao.insertQueue(savedQueue)
-
-                    val map = mutableMapOf<String, String>()
+                    val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_NAME] = savedQueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = savedQueue.description
+
+                    if (savedQueue.info != null)
+                        (savedQueue.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] =
+                            it.products ?: ArrayList<String>()
+                    else {
+                        map[Param.KEY_QUEUE_PRODUCTS] = it.products ?: ArrayList<String>()
+                        savedQueue.info = map
+                    }
+
+                    dao.insertQueue(savedQueue)
 
                     viewModel.onRegistreAction(
                         savedQueue.uuid!!,
