@@ -1071,7 +1071,11 @@ class QrReaderFragment(
     }
 
     override fun onClick(client: Client) {
-
+        if (client.isInteresting == true) {
+            interestingList.find { it.ci == client.ci }?.let {
+                start(InterestingFragment(it, client))
+            }
+        }
     }
 
     private fun deleteItem(client: Client) {

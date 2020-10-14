@@ -69,7 +69,7 @@
 
     <item
         android:id="@+id/action_validate"
-        android:icon="@drawable/ic_check_blue"
+        android:icon="@drawable/ic_verify"
         android:orderInCategory="100"
         android:title="@string/verificar_cola"
         app:showAsAction="never" />

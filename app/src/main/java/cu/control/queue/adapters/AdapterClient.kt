@@ -98,6 +98,10 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
         } else {
             View.GONE
         }
+
+        holder.layoutBackground.setOnClickListener {
+            onClientClickListener.onClick(client)
+        }
     }
 
     @SuppressLint("RestrictedApi")
