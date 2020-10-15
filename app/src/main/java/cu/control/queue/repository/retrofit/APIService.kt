@@ -48,6 +48,12 @@ interface APIService {
         @HeaderMap headers: Map<String, String>
     ): Call<String>
 
+    @POST
+    fun validate(
+        @Url url: String = VALIDATE_PORTER_URL,
+        @Body body: String = "{\"days_ago\": 400}",
+        @HeaderMap headers: Map<String, String>
+    ): Call<ArrayList<Person>?>
 
     companion object {
         private const val BASE_URL = BuildConfig.BASE_URL
@@ -55,6 +61,7 @@ interface APIService {
         private const val COLABORATOR_PORTER_URL = "collaborator"
         private const val COLABORATORS_PORTER_URL = "collaborators"
         private const val ACTIONS_PORTER_URL = "actions"
+        private const val VALIDATE_PORTER_URL = "validate"
         private const val GET_QUEUE_PORTER_URL = "queue"
         val apiService: APIService
             get() = RetrofitClient.get(BASE_URL)!!.create(APIService::class.java)

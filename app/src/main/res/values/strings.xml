@@ -153,4 +153,6 @@
     <string name="nombre_del_producto">Nombre del producto</string>
     <string name="optional">Opcional</string>
     <string name="error_colaborator">No se pudo agragar el colaborador.</string>
+    <string name="verificar_cola">Verificar cola</string>
+    <string name="cerrar">Cerrar</string>
 </resources>

@@ -14,9 +14,9 @@ buildscript {
         maven { url = uri("https://jitpack.io") }
 
         //firebase
-        maven {
-            url = uri("https://s3.amazonaws.com/fabric-artifacts/public")
-        }
+//        maven {
+//            url = uri("https://s3.amazonaws.com/fabric-artifacts/public")
+//        }
         //maven { url = uri("https://maven.fabric.io/public") }
     }
     dependencies {
@@ -24,8 +24,8 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
         //firebase
-        classpath("com.google.gms:google-services:4.3.3")
-        classpath("io.fabric.tools:gradle:1.31.2")
+//        classpath("com.google.gms:google-services:4.3.3")
+//        classpath("io.fabric.tools:gradle:1.31.2")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

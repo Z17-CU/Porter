@@ -1,5 +1,7 @@
 package cu.control.queue.repository.dataBase.entitys.payload
 
+import cu.control.queue.repository.dataBase.entitys.Product
+
 class Queue(
     val uuid: String,
     val store: String,
@@ -9,5 +11,6 @@ class Queue(
     val updated_date: Long,
     val finished_date: Long,
     val deleted_date: Long,
+    val products: ArrayList<String>?,
     val info: Map<String, Any>?
 )

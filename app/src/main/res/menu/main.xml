@@ -67,4 +67,11 @@
         android:title="@string/modo_chequeo"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_validate"
+        android:icon="@drawable/ic_verify"
+        android:orderInCategory="100"
+        android:title="@string/verificar_cola"
+        app:showAsAction="never" />
+
 </menu>

@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
+import android.util.Base64
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -34,6 +35,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.turingtechnologies.materialscrollbar.CustomIndicator
+import cu.control.queue.BuildConfig
 import cu.control.queue.MainActivity
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
@@ -69,6 +71,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.params.ParamAddMembe
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteMember
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamGeneral
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateMember
+import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
@@ -116,6 +119,8 @@ class QrReaderFragment(
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
     private val adapter = AdapterClient(this)
+
+    private var interestingList = ArrayList<Person>()
 
     private var searchQuery = MutableLiveData<String>().default("")
 
@@ -183,7 +188,7 @@ class QrReaderFragment(
             searchView.closeSearch()
             true
         } else if (!queue.isSaved) {
-            AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle("Cambios sin guardar")
                 .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
                 .setPositiveButton("Guardar") { _, _ ->
@@ -275,13 +280,13 @@ class QrReaderFragment(
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-           val scale = requireContext().resources.displayMetrics.density;
+            val scale = requireContext().resources.displayMetrics.density;
             val padd = (8 * scale + 0.5f).toInt()
             requireActivity().window.statusBarColor = ContextCompat.getColor(
                 requireContext(),
                 if (checkList) R.color.google_red_dark else R.color.colorPrimaryDark
             )
-            _showAddClient.setPadding(padd,padd,padd,padd)
+            _showAddClient.setPadding(padd, padd, padd, padd)
         }
 
         toolbar.menu.findItem(R.id.action_check).title = if (checkList)
@@ -396,6 +401,10 @@ class QrReaderFragment(
                     }
                     R.id.action_search -> {
                         searchView.openSearch()
+                        true
+                    }
+                    R.id.action_validate -> {
+                        validateQueue()
                         true
                     }
                     R.id.action_check -> {
@@ -598,7 +607,7 @@ class QrReaderFragment(
             MediaPlayer.create(context, R.raw.error_buzz).start()
 
             requireActivity().runOnUiThread {
-                AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+                AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle("Lista negra")
                     .setMessage("${client.name} está en lista negra.")
                     .setPositiveButton(requireContext().getString(android.R.string.ok), null)
@@ -631,7 +640,7 @@ class QrReaderFragment(
 
                 requireActivity().runOnUiThread {
 
-                    AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+                    AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle("Alerta")
                         .setMessage(
                             client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
@@ -1062,7 +1071,11 @@ class QrReaderFragment(
     }
 
     override fun onClick(client: Client) {
-
+        if (client.isInteresting == true) {
+            interestingList.find { it.ci == client.ci }?.let {
+                start(InterestingFragment(it, client))
+            }
+        }
     }
 
     private fun deleteItem(client: Client) {
@@ -1237,7 +1250,7 @@ class QrReaderFragment(
             }
         }
 
-        AlertDialog.Builder(requireContext(),R.style.RationaleDialog)
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setView(view)
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -1246,6 +1259,43 @@ class QrReaderFragment(
 
             }
             .create().show()
+    }
+
+    private fun validateQueue() {
+        val headerMap = mutableMapOf<String, String>().apply {
+            this["Content-Type"] = "application/json"
+            this["operator"] = PreferencesManager(requireContext()).getId()
+            this["queue"] = queue.uuid!!
+            this["Authorization"] = Base64.encodeToString(
+                BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+            ) ?: ""
+        }
+
+        progress.show()
+
+        Single.create<Int> {
+
+            val interesting =
+                APIService.apiService.validate(headers = headerMap).execute().body()
+
+            interesting?.let { persons ->
+                interestingList = persons
+                persons.map { person ->
+                    val pos = adapter.contentList.indexOfLast { it.ci == person.ci }
+                    if (pos != -1)
+                        adapter.contentList[pos].isInteresting = true
+                }
+            }
+
+            it.onSuccess(adapter.contentList.indexOfFirst { it.isInteresting ?: false })
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { pos, _ ->
+                adapter.notifyDataSetChanged()
+                if (pos != -1)
+                    goTo(pos)
+                progress.dismiss()
+            }.addTo(compositeDisposable)
     }
 
     private fun findPositionOfNumber(number: Int): Int {

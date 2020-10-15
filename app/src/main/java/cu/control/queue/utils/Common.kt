@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -441,6 +442,38 @@ class Common {
 
                 return response!!
             }
+        }
+
+        fun drawProductBackground(backgroundColor: Int): GradientDrawable {
+            val shape = GradientDrawable()
+            shape.shape = GradientDrawable.RECTANGLE
+            shape.cornerRadius = 20F
+            shape.setColor(backgroundColor)
+            //shape.setStroke(5, borderColor)
+            return shape
+        }
+
+        fun getStoreName(store: String?, context: Context): String {
+            val name = if (store.isNullOrEmpty()) {
+                context.getText(R.string.sin_definir)
+            } else {
+                val values = store.split(Regex("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)"))
+                if (values.size < 6) {
+                    context.getText(R.string.sin_definir)
+                } else {
+                    val idProvince = values[1].toInt() - 1
+                    val idMunicipie = values[3].toInt() - 1
+                    val idStore = values[5].toInt()
+
+                    val resultReadJson = Common.getCharts(context)
+                    val province = resultReadJson[idProvince].name
+                    val municipality = resultReadJson[idProvince].municipality[idMunicipie].name
+                    val storeName =
+                        resultReadJson[idProvince].municipality[idMunicipie].store[idStore].name
+                    "$province, $municipality, $storeName"
+                }
+            }
+            return name.toString()
         }
     }
 }

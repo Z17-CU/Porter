@@ -47,6 +47,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
+                    client.isInteresting ?: false -> R.drawable.item_orange_bg
                     client.repeatedClient ?: false -> R.drawable.item_llelow_bg
                     client.searched ?: false -> R.drawable.item_accent_bg
                     client.selected ?: false && done -> {
@@ -96,6 +97,10 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
             View.VISIBLE
         } else {
             View.GONE
+        }
+
+        holder.layoutBackground.setOnClickListener {
+            onClientClickListener.onClick(client)
         }
     }
 

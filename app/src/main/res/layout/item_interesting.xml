@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/_item_interesting"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:background="@drawable/item_white_bg"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:ignore="RtlSymmetry"
+    tools:leftEdgeSwipeOffSet="0dp"
+    tools:rigthEdgeSwipeOffSet="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            tools:ignore="UselessParent">
+
+            <RelativeLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="16dp">
+
+                <TextView
+                    android:id="@+id/clientNumber"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/item_open_count_queue"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/textSize"
+                    android:textStyle="bold"
+                    tools:text="23" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="RtlSymmetry">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/_queueName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:maxLines="1"
+                        android:textColor="#9A000000"
+                        android:textSize="18sp"
+                        tools:text="Pollo contra muslo" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/_store"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#9A000000"
+                    android:textSize="16sp"
+                    tools:ignore="RtlSymmetry"
+                    tools:text="Pedregal, La Lisa, Pedregal" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/_textViewDateDay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:maxLines="1"
+                        android:textColor="#9A000000"
+                        android:textSize="16sp"
+                        tools:ignore="RtlSymmetry"
+                        tools:text="Jueves 23 de julio" />
+
+                    <TextView
+                        android:id="@+id/_textViewDateHour"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:maxLines="1"
+                        android:textColor="#9A000000"
+                        android:textSize="16sp"
+                        tools:ignore="RtlSymmetry"
+                        tools:text="3:45:32 pm" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="74dp"
+        tools:ignore="RtlSymmetry">
+
+        <include layout="@layout/divider_horizontal" />
+
+    </LinearLayout>
+
+</LinearLayout>
