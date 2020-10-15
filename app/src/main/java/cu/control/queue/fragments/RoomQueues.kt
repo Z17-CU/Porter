@@ -164,6 +164,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { list ->
+
                         refreshAdapterFilterSearch(list)
                     }.addTo(compositeDisposable)
             }
@@ -752,7 +753,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     private fun refreshAdapterFilterSearch(list: List<Queue>) {
 
-        val adapter = AdapterQueueFilterSearch(this)
+        val adapter = AdapterQueueFilterSearch(this,dao)
         _recyclerViewQueues.adapter = adapter
         adapter.contentList = list
         adapter.notifyDataSetChanged()

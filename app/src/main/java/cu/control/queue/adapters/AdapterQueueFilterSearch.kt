@@ -10,11 +10,18 @@ import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderFilterSearch
 import cu.control.queue.interfaces.onClickListener
+import cu.control.queue.repository.dataBase.Dao
+import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.utils.Conts.Companion.formatDateBigNatural
+import cu.control.queue.utils.Conts.Companion.formatDateOnlyTimeNoSecond
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class AdapterQueueFilterSearch(
-    private val onClickListener: onClickListener
+    private val onClickListener: onClickListener,
+    private val dao: Dao
 ) :
     RecyclerView.Adapter<ViewHolderFilterSearch>() {
 
@@ -43,8 +50,39 @@ class AdapterQueueFilterSearch(
         holder.imageSave.visibility = if (queue.isSaved) View.GONE else View.VISIBLE
         holder.textViewNameQueue.text = queue.name
 
+        holder.textTimeCreate.text = formatDateOnlyTimeNoSecond.format(queue.startDate)
         holder.textViewDateCreate.text = formatDateBigNatural.format(queue.startDate)
-        holder.textViewDateUpdate.text = formatDateBigNatural.format(queue.updated_date)
+        val subscribe = Single.create<ClientInQueue> { emitter ->
+            queue.id?.let {
+                val clientInQueue = dao.getClientsInQueueList(it)
+
+                emitter.onSuccess(clientInQueue[0])
+            }
+
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { client ->
+                holder.clientNumberInQueue.text = client.number.toString()
+                holder.textTimeCreate.text = formatDateOnlyTimeNoSecond.format(client.id)
+                holder.textViewDateCreate.text = formatDateBigNatural.format(client.id)
+
+
+                if (client.isChecked) {
+                    holder.textViewTimeUpdate.text =
+                        formatDateOnlyTimeNoSecond.format(client.lastRegistry)
+                    holder.textViewDateUpdate.text =
+                        formatDateBigNatural.format(client.lastRegistry)
+
+                } else {
+                    holder.textViewDateUpdate.visibility = View.INVISIBLE
+                    holder.textViewTimeUpdate.visibility = View.INVISIBLE
+                    holder.textViewUpdateDate.visibility = View.INVISIBLE
+                }
+
+
+            }
+
+
         holder.imageView.setImageDrawable(
             ContextCompat.getDrawable(
                 holder.imageView.context, R.drawable.ic_launcher_foreground
