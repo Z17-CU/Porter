@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -69,6 +70,7 @@ import kotlinx.android.synthetic.main.about_as.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 import kotlinx.android.synthetic.main.quees_open_saved.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.search_view.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
@@ -79,7 +81,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class RoomQueues(var ci: String? = null) : SupportFragment(), onClickListener {
+class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickListener {
 
     private lateinit var viewModel: ClientViewModel
 
@@ -116,24 +118,6 @@ class RoomQueues(var ci: String? = null) : SupportFragment(), onClickListener {
         viewModel = tempViewModel
 
         sendHi()
-        if (ci != null) {
-
-            Single.create<List<Queue>> { emitter ->
-
-                val list: List<Queue> =
-                    dao.getQueuesByIds(dao.getQueuesIdsByClient(ci.toLong()) ?: ArrayList())
-                        ?: ArrayList()
-
-                emitter.onSuccess(list)
-            }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { list ->
-
-                    refreshAdapterFilterSearch(list)
-                }.addTo(compositeDisposable)
-        } else {
-
-        }
         return view
     }
 
@@ -719,6 +703,12 @@ class RoomQueues(var ci: String? = null) : SupportFragment(), onClickListener {
                     refreshAdapter()
                 }
             })
+
+            if (ci != null) {
+                searchView.openSearch()
+                searchView.setQuery(ci, false)
+                ci = null
+            }
         }
     }
 
@@ -770,7 +760,7 @@ class RoomQueues(var ci: String? = null) : SupportFragment(), onClickListener {
 
     private fun refreshAdapterFilterSearch(list: List<Queue>) {
 
-        val adapter = AdapterQueueFilterSearch(this,dao)
+        val adapter = AdapterQueueFilterSearch(this, dao)
         _recyclerViewQueues.adapter = adapter
         adapter.contentList = list
         adapter.notifyDataSetChanged()

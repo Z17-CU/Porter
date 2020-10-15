@@ -642,7 +642,7 @@ class QrReaderFragment(
                         .setMessage(
                             client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
                                 startDate
-                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count colas."
+                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count de las colas locales."
                         )
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {
