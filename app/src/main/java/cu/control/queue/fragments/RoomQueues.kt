@@ -79,7 +79,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class RoomQueues : SupportFragment(), onClickListener {
+class RoomQueues(var ci: String? = null) : SupportFragment(), onClickListener {
 
     private lateinit var viewModel: ClientViewModel
 
@@ -116,7 +116,24 @@ class RoomQueues : SupportFragment(), onClickListener {
         viewModel = tempViewModel
 
         sendHi()
+        if (ci != null) {
 
+            Single.create<List<Queue>> { emitter ->
+
+                val list: List<Queue> =
+                    dao.getQueuesByIds(dao.getQueuesIdsByClient(ci.toLong()) ?: ArrayList())
+                        ?: ArrayList()
+
+                emitter.onSuccess(list)
+            }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { list ->
+
+                    refreshAdapterFilterSearch(list)
+                }.addTo(compositeDisposable)
+        } else {
+
+        }
         return view
     }
 
