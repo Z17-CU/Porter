@@ -64,13 +64,10 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MOD
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_CHECK
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_INCREMENT_REINTENT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_UNCHECK
+import cu.control.queue.repository.dataBase.entitys.payload.params.*
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_ADD_MEMBER
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_DELETE_MEMBER
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_UPDATE_MEMBER
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamAddMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamGeneral
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateMember
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.utils.Conts.Companion.ALERTS
@@ -1275,6 +1272,19 @@ class QrReaderFragment(
 
         Single.create<Int> {
 
+            dao.getPayload(queue.uuid!!)?.let {
+                if (viewModel.sendSuspend(listOf(it))?.code() == 200) {
+                    viewModel.onRegistreAction(
+                        queue.uuid!!,
+                        ParamUpdateQueue(queue.info!!, Calendar.getInstance().timeInMillis),
+                        Param.TAG_UPDATE_QUEUE,
+                        requireContext()
+                    )
+                } else {
+                    showError("Error de Red")
+                }
+            }
+
             val interesting =
                 APIService.apiService.validate(headers = headerMap).execute().body()
 
@@ -1290,9 +1300,13 @@ class QrReaderFragment(
             it.onSuccess(adapter.contentList.indexOfFirst { it.isInteresting ?: false })
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .onErrorReturn {
+                showError("Error de Red")
+                return@onErrorReturn null
+            }
             .subscribe { pos, _ ->
                 adapter.notifyDataSetChanged()
-                if (pos != -1)
+                if (pos != -1 && pos != null)
                     goTo(pos)
                 progress.dismiss()
             }.addTo(compositeDisposable)

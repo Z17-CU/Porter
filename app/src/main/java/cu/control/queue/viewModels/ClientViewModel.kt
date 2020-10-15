@@ -152,35 +152,7 @@ class ClientViewModel @Inject constructor(
     fun sendPayloads(payloads: List<Payload>) {
         Single.create<Pair<Int, String>> {
 
-            val payloadToDelete: ArrayList<Payload> = ArrayList()
-
-            val headerMap = mutableMapOf<String, String>().apply {
-                this["Content-Type"] = "application/json"
-                this["Authorization"] = Base64.encodeToString(
-                    BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
-                ) ?: ""
-            }
-
-            var result: Response<String>? = null
-            payloads.map { payload ->
-                val tempResult = APIService.apiService.sendActions(
-                    headers = headerMap,
-                    payload = Common.payloadToString(payload)
-                ).execute()
-                if (result == null || tempResult.code() != 200) {
-                    result = tempResult
-                }
-                if (tempResult.code() == 200) {
-                    payloadToDelete.add(payload)
-                    clientRepository.getQueue(payload.queue_uuid)?.let { queue ->
-                        queue.isSaved = true
-                        clientRepository.saveQueue(queue)
-
-                    }
-                }
-            }
-
-            clientRepository.deletePayloads(payloadToDelete)
+            val result = sendSuspend(payloads)
 
             it.onSuccess(Pair(result?.code() ?: -1, result?.message() ?: ""))
         }.subscribeOn(Schedulers.computation())
@@ -198,6 +170,36 @@ class ClientViewModel @Inject constructor(
         (context as Activity).runOnUiThread {
             Toast.makeText(context, text, Toast.LENGTH_LONG).show()
         }
+    }
+
+    fun sendSuspend(payloads: List<Payload>): Response<String>?{
+        val headerMap = mutableMapOf<String, String>().apply {
+            this["Content-Type"] = "application/json"
+            this["Authorization"] = Base64.encodeToString(
+                BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+            ) ?: ""
+        }
+        val payloadToDelete: ArrayList<Payload> = ArrayList()
+        var result: Response<String>? = null
+        payloads.map { payload ->
+            val tempResult = APIService.apiService.sendActions(
+                headers = headerMap,
+                payload = Common.payloadToString(payload)
+            ).execute()
+            if (result == null || tempResult.code() != 200) {
+                result = tempResult
+            }
+            if (tempResult.code() == 200) {
+                payloadToDelete.add(payload)
+                clientRepository.getQueue(payload.queue_uuid)?.let { queue ->
+                    queue.isSaved = true
+                    clientRepository.saveQueue(queue)
+
+                }
+            }
+        }
+        clientRepository.deletePayloads(payloadToDelete)
+        return result
     }
 
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
