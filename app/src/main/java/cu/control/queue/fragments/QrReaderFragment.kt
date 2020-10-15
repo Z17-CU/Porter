@@ -656,6 +656,9 @@ class QrReaderFragment(
                                 .subscribe()
                                 .addTo(compositeDisposable)
                         }
+                        .setNeutralButton("Ver Detalles") { _, _ ->
+                            start(RoomQueues(client.ci))
+                        }
                         .setNegativeButton("Cancelar", null)
                         .create().show()
                 }
