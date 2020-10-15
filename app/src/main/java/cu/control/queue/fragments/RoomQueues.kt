@@ -180,15 +180,25 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
     }
 
     override fun onBackPressedSupport(): Boolean {
-        return if (searchView.isOpen) {
-            searchView.closeSearch()
-            refreshAdapter()
-            true
-        } else if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-            true
-        } else {
-            super.onBackPressedSupport()
+        return when {
+            searchView.isOpen -> {
+                searchView.closeSearch()
+                refreshAdapter()
+                true
+            }
+            drawer_layout.isDrawerOpen(GravityCompat.START) -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                true
+            }
+            ci != null -> {
+                ci = null
+                searchQuery.postValue("")
+                true
+            }
+            else -> {
+                requireActivity().finish()
+                true
+            }
         }
     }
 
@@ -707,7 +717,6 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
             if (ci != null) {
                 searchView.openSearch()
                 searchView.setQuery(ci, false)
-                ci = null
             }
         }
     }
