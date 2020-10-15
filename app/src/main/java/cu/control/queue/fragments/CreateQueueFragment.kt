@@ -19,6 +19,8 @@ import cu.control.queue.repository.dataBase.entitys.payload.params.ParamCreateQu
 import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateQueue
 import cu.control.queue.utils.ColorGenerator
 import cu.control.queue.utils.Common
+import cu.control.queue.utils.Common.Companion.drawProductBackground
+import cu.control.queue.utils.Common.Companion.getStoreName
 import cu.control.queue.utils.PreferencesManager
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
@@ -115,25 +117,7 @@ class CreateQueueFragment(
                     }
                 }
 
-                view.selectStore.text =
-                    if (queue.store.isNullOrEmpty()) {
-                        requireContext().getText(R.string.sin_definir)
-                    } else {
-                        val values = queue.store!!.split(Regex("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)"))
-                        if (values.size < 6) {
-                            requireContext().getText(R.string.sin_definir)
-                        } else {
-                            val idProvince = values[1].toInt() - 1
-                            val idMunicipie = values[3].toInt() - 1
-                            val idStore = values[5].toInt()
-
-                            val resultReadJson = Common.getCharts(requireContext())
-                            val province = resultReadJson[idProvince].name
-                            val municipality = resultReadJson[idProvince].municipality[idMunicipie].name
-                            val storeName = resultReadJson[idProvince].municipality[idMunicipie].store[idStore].name
-                            "$province, $municipality, $storeName"
-                        }
-                    }
+                view.selectStore.text = getStoreName(queue.store, requireContext())
 
                 view.alertSwitch.isChecked = queue.alert ?: true
             }
@@ -282,14 +266,5 @@ class CreateQueueFragment(
                 pop()
             }
         }
-    }
-
-    private fun drawProductBackground(backgroundColor: Int): GradientDrawable {
-        val shape = GradientDrawable()
-        shape.shape = GradientDrawable.RECTANGLE
-        shape.cornerRadius = 20F
-        shape.setColor(backgroundColor)
-        //shape.setStroke(5, borderColor)
-        return shape
     }
 }

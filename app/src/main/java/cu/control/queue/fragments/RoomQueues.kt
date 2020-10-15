@@ -364,12 +364,12 @@ class RoomQueues : SupportFragment(), onClickListener {
                     val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_NAME] = savedQueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = savedQueue.description
+                    map[Param.KEY_QUEUE_PRODUCTS] = it.products ?: ArrayList<String>()
 
                     if (savedQueue.info != null)
                         (savedQueue.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] =
                             it.products ?: ArrayList<String>()
                     else {
-                        map[Param.KEY_QUEUE_PRODUCTS] = it.products ?: ArrayList<String>()
                         savedQueue.info = map
                     }
 

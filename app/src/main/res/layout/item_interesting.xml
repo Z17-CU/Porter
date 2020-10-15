@@ -65,11 +65,21 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:maxLines="1"
-                        android:textColor="@color/colorDarkGrayScale"
+                        android:textColor="#9A000000"
                         android:textSize="18sp"
                         tools:text="Pollo contra muslo" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/_store"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#9A000000"
+                    android:textSize="16sp"
+                    tools:ignore="RtlSymmetry"
+                    tools:text="Pedregal, La Lisa, Pedregal" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -77,23 +87,23 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/_store"
+                        android:id="@+id/_textViewDateDay"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:maxLines="1"
-                        android:textColor="@color/colorDarkGrayScale"
+                        android:textColor="#9A000000"
                         android:textSize="16sp"
                         tools:ignore="RtlSymmetry"
-                        tools:text="Pedregal, La Lisa, Pedregal" />
+                        tools:text="Jueves 23 de julio" />
 
                     <TextView
-                        android:id="@+id/_textViewDate"
+                        android:id="@+id/_textViewDateHour"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:maxLines="1"
-                        android:textColor="@color/colorDarkGrayScale"
+                        android:textColor="#9A000000"
                         android:textSize="16sp"
                         tools:ignore="RtlSymmetry"
                         tools:text="3:45:32 pm" />

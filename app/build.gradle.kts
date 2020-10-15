@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.konan.properties.Properties
 plugins {
 
     id("com.android.application")
-    id("io.fabric")
-    id("com.google.gms.google-services")
+//    id("io.fabric")
+//    id("com.google.gms.google-services")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")

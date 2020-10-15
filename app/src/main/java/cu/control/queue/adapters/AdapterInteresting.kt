@@ -7,13 +7,14 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import cu.control.queue.R
 import cu.control.queue.adapters.viewHolders.ViewHolderInteresting
-import cu.control.queue.repository.dataBase.entitys.Client
+import cu.control.queue.interfaces.OnInterestingClickListener
+import cu.control.queue.repository.dataBase.entitys.InterestingClient
 
 
-class AdapterInteresting :
+class AdapterInteresting(private val onClickListener: OnInterestingClickListener) :
     RecyclerView.Adapter<ViewHolderInteresting>() {
 
-    var contentList: List<Client> = ArrayList()
+    var contentList: List<InterestingClient> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderInteresting {
         return ViewHolderInteresting(
@@ -42,9 +43,14 @@ class AdapterInteresting :
                 }
             )
 
-        holder.clientNumber.text = "23"
-        holder.queuename.text = "queuename"
-        holder.store.text = "store"
-        holder.date.text = "date"
+        holder.item.setOnClickListener {
+            onClickListener.onClick(client)
+        }
+
+        holder.clientNumber.text = client.number
+        holder.queuename.text = client.queueName
+        holder.store.text = client.storeName
+        holder.date.text = client.day
+        holder.hour.text = client.hour
     }
 }
