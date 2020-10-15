@@ -14,7 +14,9 @@ import cu.control.queue.interfaces.OnClientClickListener
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Conts.Companion.formatDateOnlyTime
 
-class AdapterClient(private val onClientClickListener: OnClientClickListener) : RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
+
+class AdapterClient(private val onClientClickListener: OnClientClickListener) :
+    RecyclerView.Adapter<ViewHolderClient>(), ICustomAdapter {
 
     var contentList: List<Client> = ArrayList()
     var checkMode = true
@@ -45,6 +47,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
             ContextCompat.getDrawable(
                 holder.layoutBackground.context,
                 when {
+                    client.isInteresting ?: false -> R.drawable.item_orange_bg
                     client.repeatedClient ?: false -> R.drawable.item_llelow_bg
                     client.searched ?: false -> R.drawable.item_accent_bg
                     client.selected ?: false && done -> {
@@ -53,25 +56,26 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
                     client.selected ?: false && !done -> {
                         R.drawable.item_red_bg
                     }
-                    checkMode && position % 2 != 0 -> R.drawable.item_blue_bg
-                    checkMode && position % 2 == 0 -> R.drawable.bg_item_dark_blue
                     position % 2 != 0 -> R.drawable.item_white_bg
                     else -> R.drawable.bg_item_dark
                 }
             )
 
+        holder.clientNumber.background = ContextCompat.getDrawable(
+            context,
+            if (checkMode) R.drawable.item_save_count_queue else R.drawable.round_accent_bg
+        )
+
+        holder.layoutBackground.setOnLongClickListener {
+            showPopup(it, client)
+            true
+        }
 
         when {
             !client.isChecked -> {
                 holder.clientNumber.visibility = View.VISIBLE
                 holder.imageViewCheck.visibility = View.GONE
-                holder.imageView.visibility = View.VISIBLE
-                holder.imageView.background = ContextCompat.getDrawable(
-                    holder.imageView.context,
-                    R.drawable.round_accent_bg
-                )
-                holder.imageView.setImageDrawable(null)
-
+                holder.imageView.visibility = View.GONE
                 holder.clientNumber.text = client.number.toString()
             }
             client.isChecked -> {
@@ -82,7 +86,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
         }
 
         holder.textViewName.text = client.name
-        holder.textViewID.text = client.ci
+        holder.textViewID.text = "CI: ${client.ci}"
         holder.textViewDate.text = formatDateOnlyTime.format(client.lastRegistry)
         holder.textViewReIntents.visibility = if (client.reIntent > 0) {
             holder.textViewReIntents.text = if (client.reIntent > 9) {
@@ -95,9 +99,8 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
             View.GONE
         }
 
-        holder.layoutBackground.setOnLongClickListener {
-            showPopup(it, client)
-            return@setOnLongClickListener true
+        holder.layoutBackground.setOnClickListener {
+            onClientClickListener.onClick(client)
         }
     }
 
@@ -112,5 +115,9 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) : 
             ""
         else
             contentList[element].number.toString()
+    }
+
+    fun swipeItem(position: Int, direction: Int) {
+        onClientClickListener.onSwipe(direction, contentList[position])
     }
 }

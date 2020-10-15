@@ -54,7 +54,7 @@ class MainActivity : SupportActivity() {
                 if (top == null) {
                     this@MainActivity.loadRootFragment(
                         R.id._mainLayout,
-                        RoomQueues()
+                        RoomQueues(null)
                     )  //load root Fragment
                 }
             }

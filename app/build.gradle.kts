@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.konan.properties.Properties
 plugins {
 
     id("com.android.application")
-    id("io.fabric")
-    id("com.google.gms.google-services")
+//    id("io.fabric")
+//    id("com.google.gms.google-services")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
@@ -125,6 +125,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.3.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.preference:preference:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
     testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test.ext:junit:1.1.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
@@ -161,9 +162,6 @@ dependencies {
     implementation("org.ocpsoft.prettytime:prettytime:4.0.3.Final")
 
     implementation("io.reactivex.rxjava3:rxjava:3.0.0")
-
-    /**circular imagenView*/
-    implementation("com.mikhaellopez:circularimageview:3.2.0")
 
     /**RX*/
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
@@ -211,20 +209,29 @@ dependencies {
     /**Preferences*/
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
-    /** Firebase */
-    implementation("com.google.firebase:firebase-analytics:17.4.4")
-    implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
+//    /** Firebase */
+//    implementation("com.google.firebase:firebase-analytics:17.4.4")
+//    implementation("com.crashlytics.sdk.android:crashlytics:2.10.1")
 
     /** ScrollView */
     implementation("com.github.turing-tech:MaterialScrollBar:13.3.2")
 
     /** Range Bar */
     implementation("me.bendik.simplerangeview:simplerangeview:0.2.0")
-    /**swipe refresh*/
-    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    /**download file*/
-    implementation ("com.yuan.library.dmanager:downloadmanager-okhttp-release:1.1.8")
 
+   /**download*/
+    implementation ("com.download.library:Downloader:4.1.4")
+
+    /**PrDownload*/
+    implementation ("com.mindorks.android:prdownloader:0.6.0")
+
+    /**searchSpinner*/
+    implementation ("com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1")
+    implementation ("com.github.jrizani:JRSpinner:1.0.0")
+    implementation ("com.github.jrizani:JRSpinner:androidx-SNAPSHOT")
+
+    /** Flex Box */
+    implementation("com.google.android:flexbox:0.3.2")
 }
 
 fun updateVersionCode() {

@@ -31,27 +31,25 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
     OnDialogHiClientEvent {
 
-
     private lateinit var compositeDisposable: CompositeDisposable
     private lateinit var preferences: PreferencesManager
-    private lateinit var dialog: AlertDialog
-    private lateinit var view: View
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         preferences = PreferencesManager(this)
-        compositeDisposable = CompositeDisposable()
-        setContentView(R.layout.activity_hi_client)
-        dialogInfo(this)
-
-        val fab: View = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
+        if (preferences.isFirstRun()) {
+            compositeDisposable = CompositeDisposable()
+            setContentView(R.layout.activity_hi_client)
             dialogInfo(this)
+
+            val fab: View = findViewById(R.id.fab)
+            fab.setOnClickListener {
+                dialogInfo(this)
+            }
+        } else {
+            goToMain()
         }
-
-
-
     }
 
     private fun dialogInfo(context: Context) {
@@ -92,9 +90,15 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         val vibratorService = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        val client = Common.stringToPorterHistruct(result)
+        val client = Common.stringToPorterHistruct(result, this)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv)
+            saveAndSendData(
+                it.name,
+                it.last_name,
+                it.ci,
+                it.fv,
+                PreferencesManager(this@ActivityHiClient).getStoreVersion()
+            )
             goToMain()
             return
         }
@@ -125,15 +129,24 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
         }
     }
 
-    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
+    private fun saveAndSendData(
+        name: String,
+        lastName: String,
+        ci: String,
+        fv: String = "00",
+        storeVersion: Int,
+        store: String = ""
+
+    ) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
 
             preferences.setName(name)
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
+            preferences.setStoreVersion(storeVersion)
 
-            val struct = PorterHistruct(name, lastName, ci, fv)
+            val struct = PorterHistruct(name, lastName, ci, fv, storeVersion)
 
             val data = Common.porterHiToString(struct)
 
@@ -163,13 +176,18 @@ class ActivityHiClient : AppCompatActivity(), ZXingScannerView.ResultHandler,
                         this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                     val view = inflater.inflate(R.layout.layout_server_message, null)
                     view._textViewMessage.text = message
-                    AlertDialog.Builder(this)
-                        .setView(view)
-                        .setOnDismissListener {
-                            startReader()
-                        }
-                        .setPositiveButton(android.R.string.ok, null)
-                        .create().show()
+
+                    try {
+                        AlertDialog.Builder(this)
+                            .setView(view)
+                            .setOnDismissListener {
+                                startReader()
+                            }
+                            .setPositiveButton(android.R.string.ok, null)
+                            .create().show()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }, {
                 it.printStackTrace()

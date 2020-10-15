@@ -5,22 +5,17 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Vibrator
 import android.util.Base64
 import android.view.View
 import android.widget.Toast
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.interfaces.OnDialogHiClientEvent
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
-import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Person
 import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.Common
@@ -44,7 +39,7 @@ class DialogHiClient(
     private lateinit var view: View
 
     fun create(): AlertDialog {
-        dialog = AlertDialog.Builder(context)
+        dialog = AlertDialog.Builder(context,R.style.RationaleDialog)
             .setView(getView())
             .setCancelable(false)
             .create()
@@ -68,13 +63,14 @@ class DialogHiClient(
         }
     }
 
-    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00") {
+    private fun saveAndSendData(name: String, lastName: String, ci: String, fv: String = "00",storeVersion:Int) {
         compositeDisposable.add(Single.create<Pair<Int, String?>> {
 
             preferences.setName(name)
             preferences.setLastName(lastName)
             preferences.setCI(ci)
             preferences.setFV(fv)
+            preferences.setStoreVersion(storeVersion)
 
             val info = HashMap<String, Any>()
             info.put(Person.KEY_NAME, name)
@@ -87,7 +83,7 @@ class DialogHiClient(
 
             AppDataBase.getInstance(context).dao().insertCollaborator(person)
 
-            val struct = PorterHistruct(name, lastName, ci, fv)
+            val struct = PorterHistruct(name, lastName, ci, fv,PreferencesManager(context).getStoreVersion() )
 
             val data = Common.porterHiToString(struct)
 
@@ -112,12 +108,14 @@ class DialogHiClient(
                     stopReader()
                     dialog.dismiss()
                 } else {
-                    val message = it.second ?: "Error ${it.first}"
-                    val dialog = showHiErrorMessage(context, message)
-                    dialog.setOnDismissListener {
-                        startReader()
+                    val message = it.second
+                    if(message != null) {
+                        val dialog = showHiErrorMessage(context, message)
+                        dialog?.setOnDismissListener {
+                            startReader()
+                        }
+                        dialog?.show()
                     }
-                    dialog.show()
                 }
             }, {
                 it.printStackTrace()
@@ -151,9 +149,9 @@ class DialogHiClient(
         val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibratorService.vibrate(120)
 
-        val client = Common.stringToPorterHistruct(result)
+        val client = Common.stringToPorterHistruct(result, context)
         client?.let {
-            saveAndSendData(it.name, it.last_name, it.ci, it.fv)
+            saveAndSendData(it.name, it.last_name, it.ci, it.fv,PreferencesManager(context).getStoreVersion() )
 
             return
         }

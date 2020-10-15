@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/name_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="@string/app_name"
+            android:textColor="@color/blue_drawer"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:openDrawer="start" />
+
+        <TextView
+            android:id="@+id/name_creator_queue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/blue_drawer"
+            android:textSize="14sp"
+            tools:openDrawer="start"
+            tools:text="Elvis Salabarria Aquino" />
+
+        <TextView
+            android:id="@+id/creator_queue_ci"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue_drawer"
+            android:textSize="14sp"
+            android:visibility="visible"
+            tools:openDrawer="start"
+            tools:text="CI:93071111344" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginEnd="64dp"
+        android:background="@android:color/darker_gray" />
+</LinearLayout>
+

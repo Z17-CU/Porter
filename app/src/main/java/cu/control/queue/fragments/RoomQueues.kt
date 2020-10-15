@@ -9,17 +9,21 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Base64
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -28,12 +32,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import cu.control.queue.BuildConfig
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterQueue
-import cu.control.queue.dialogs.DialogCreateQueue
+import cu.control.queue.adapters.AdapterQueueFilterSearch
 import cu.control.queue.interfaces.onClickListener
 import cu.control.queue.repository.dataBase.AppDataBase
 import cu.control.queue.repository.dataBase.Dao
@@ -62,15 +67,21 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.about_as.view.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.android.synthetic.main.quees_open_saved.*
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.search_view.view.*
+import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
-class RoomQueues : SupportFragment(), onClickListener {
+class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickListener {
 
     private lateinit var viewModel: ClientViewModel
 
@@ -86,13 +97,12 @@ class RoomQueues : SupportFragment(), onClickListener {
     private lateinit var adapter: AdapterQueue
 
     private var searchQuery = MutableLiveData<String>().default("")
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = View.inflate(context, R.layout.room_queues, null)
+        val view = View.inflate(context, R.layout.quees_open_saved, null)
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
@@ -108,7 +118,6 @@ class RoomQueues : SupportFragment(), onClickListener {
         viewModel = tempViewModel
 
         sendHi()
-
         return view
     }
 
@@ -117,28 +126,34 @@ class RoomQueues : SupportFragment(), onClickListener {
 
         initToolBar()
 
-        _fabAdd.setOnClickListener {
-            DialogCreateQueue(
-                it.context,
-                compositeDisposable,
-                clientViewModel = viewModel,
-                supportFragment = this
-            ).create()
-                .show()
-        }
+        val toggle = ActionBarDrawerToggle(
+            this.activity, drawer_layout, toolbar, R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
 
+        drawer_layout.addDrawerListener(toggle)
+        nav_view.itemIconTintList = null
+        toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener {
+            processOnMenuItemSelect(it)
+        }
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
+
         adapter = AdapterQueue(this)
+
         _recyclerViewQueues.adapter = adapter
 
         viewModel.allQueues.observe(viewLifecycleOwner, Observer {
             searchView.closeSearch()
-            refreshAdapter(it)
+
+            refreshAdapter()
         })
+
 
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (it.isNullOrEmpty()) {
-                refreshAdapter(viewModel.allQueues.value ?: ArrayList())
+                refreshAdapter()
             } else {
                 Single.create<List<Queue>> { emitter ->
 
@@ -150,21 +165,63 @@ class RoomQueues : SupportFragment(), onClickListener {
                 }.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { list ->
-                        refreshAdapter(list)
+
+                        refreshAdapterFilterSearch(list)
                     }.addTo(compositeDisposable)
             }
         })
+        swipeContainer.setOnRefreshListener {
+            sendHi()                    // refresh your list contents somehow
+            swipeContainer.isRefreshing =
+                false   // reset the SwipeRefreshLayout (stop the loading spinner)
+        }
 
         //viewModel.observePayloads(viewLifecycleOwner)
     }
 
     override fun onBackPressedSupport(): Boolean {
-        return if (searchView.isOpen) {
-            searchView.closeSearch()
-            true
-        } else {
-            super.onBackPressedSupport()
+        return when {
+            searchView.isOpen -> {
+                searchView.closeSearch()
+                refreshAdapter()
+                true
+            }
+            drawer_layout.isDrawerOpen(GravityCompat.START) -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                true
+            }
+            ci != null -> {
+                ci = null
+                searchQuery.postValue("")
+                true
+            }
+            else -> {
+                requireActivity().finish()
+                true
+            }
         }
+    }
+
+    private fun processOnMenuItemSelect(menuItem: MenuItem): Boolean {
+        drawer_layout.closeDrawers()
+        when (menuItem.itemId) {
+            R.id.nav_new_queue -> {
+                start(CreateQueueFragment(viewModel))
+            }
+            R.id.nav_colaborators -> {
+                start(MyCollaboratorsFragment())
+            }
+            R.id.nav_export_queue -> {
+                start(ExportQueueFragment())
+
+            }
+            R.id.nav_settings -> {
+                startActivity(Intent(requireContext(), SettingsActivity::class.java))
+            }
+
+
+        }
+        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -214,15 +271,27 @@ class RoomQueues : SupportFragment(), onClickListener {
         }
     }
 
-    override fun onSaveClick(queue: Queue) {
+    override fun onSaveClick(
+        queue: Queue,
+        delete: Boolean
+    ) {
+
         Completable.create {
             dao.getPayload(queue.uuid!!)?.let {
                 viewModel.sendPayloads(listOf(it))
             }
+
             it.onComplete()
         }.observeOn(Schedulers.computation())
             .subscribeOn(Schedulers.computation())
-            .subscribe().addTo(compositeDisposable)
+            .doOnComplete {
+                if (delete) {
+                    dao.deleteQueue(queue)
+                }
+            }
+
+            .subscribe()
+            .addTo(compositeDisposable)
     }
 
     override fun onDownloadClick(queue: Queue, openQueue: Boolean) {
@@ -253,8 +322,8 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                     it.members?.map { person ->
 
-                        val name = (person.info["name"]
-                            ?: person.ci + " " + person.info["last_name"]) as String
+                        val name = ((person.info["name"]
+                            ?: person.ci) as String + " " + person.info["last_name"])
                         val client = Client(
                             name,
                             person.ci.toLong(),
@@ -273,7 +342,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                         val clientInQueue = ClientInQueue(
                             (person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
-                            it.created_date,
+                            savedQueue.id ?: it.created_date,
                             client.id,
                             (person.info[KEY_MEMBER_UPDATED_DATE] as Double?
                                 ?: person.info[KEY_ADD_DATE] as Double? ?: 0.toDouble()).toLong(),
@@ -297,17 +366,26 @@ class RoomQueues : SupportFragment(), onClickListener {
                         dao.insertCollaborator(it)
                     }
 
-                    savedQueue.business = it.store
+                    savedQueue.store = it.store
                     savedQueue.clientsNumber = it.members?.size ?: 0
                     savedQueue.downloaded = true
                     savedQueue.owner = owner
                     savedQueue.isSaved = false
-
-                    dao.insertQueue(savedQueue)
-
-                    val map = mutableMapOf<String, String>()
+                    savedQueue.id = savedQueue.id ?: it.created_date
+                    savedQueue.info = it.info
+                    val map = mutableMapOf<String, Any>()
                     map[Param.KEY_QUEUE_NAME] = savedQueue.name
                     map[Param.KEY_QUEUE_DESCRIPTION] = savedQueue.description
+                    map[Param.KEY_QUEUE_PRODUCTS] = it.products ?: ArrayList<String>()
+
+                    if (savedQueue.info != null)
+                        (savedQueue.info as MutableMap)[Param.KEY_QUEUE_PRODUCTS] =
+                            it.products ?: ArrayList<String>()
+                    else {
+                        savedQueue.info = map
+                    }
+
+                    dao.insertQueue(savedQueue)
 
                     viewModel.onRegistreAction(
                         savedQueue.uuid!!,
@@ -315,10 +393,9 @@ class RoomQueues : SupportFragment(), onClickListener {
                         Param.TAG_UPDATE_QUEUE,
                         requireContext()
                     )
-
                     requireActivity().runOnUiThread {
 
-                        showReaderOptions(queue)
+                        start(QrReaderFragment(queue, viewModel))
                     }
                 }
 
@@ -337,7 +414,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                         val message =
                             "La cola está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
 
-                        AlertDialog.Builder(requireContext())
+                        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                             .setTitle("Cola en uso")
                             .setMessage(message)
                             .setPositiveButton(android.R.string.ok, null)
@@ -351,14 +428,21 @@ class RoomQueues : SupportFragment(), onClickListener {
                             }
                             .create().show()
                     } else if (errorBody != null) {
-                        if(result.code()==404){
-                            showDialogQueueNoExist(queue)
+                        when (result.code()) {
+                            401 -> {
+                                showDialogQueueNoExist(queue)
+                            }
+                            403 -> {
+                                val dialog = Common.showHiErrorMessage(requireContext(), errorBody)
+                                dialog?.show()
+                            }
+                            404 -> {
+                                showDialogQueueNoExist(queue)
+                            }
+
                         }
-                        showDialogWorkOffline(queue, openQueue)
-                        Toast.makeText(requireContext(), errorBody, Toast.LENGTH_LONG).show()
-                    } else {
-                        showDialogWorkOffline(queue, openQueue)
-                        Toast.makeText(requireContext(), result.message(), Toast.LENGTH_LONG).show()
+
+
                     }
                 }
             }
@@ -378,6 +462,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 true
             }
             .subscribe {
+
                 requireActivity().runOnUiThread {
                     progress.dismiss()
                 }
@@ -410,7 +495,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 } else {
                     queue.startDate
                 }
-                AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle(requireContext().getString(R.string.merge))
                     .setMessage(
                         "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${Conts.formatDateBig.format(
@@ -430,12 +515,15 @@ class RoomQueues : SupportFragment(), onClickListener {
                     .create().show()
             }
         } else {
-            showReaderOptions(queue)
+            start(QrReaderFragment(queue, viewModel))
         }
     }
 
+    override fun onClickExport(list: List<Queue>) {
+    }
+
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setTitle("Descargar cola")
             .setMessage("Debe descargar la cola antes de continuar.")
             .setPositiveButton("Descargar") { _, _ ->
@@ -457,11 +545,11 @@ class RoomQueues : SupportFragment(), onClickListener {
     }
 
     private fun saveDialog(queue: Queue) {
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setTitle("Guardar")
             .setMessage("Debe guardar la cola antes de continuar.")
             .setPositiveButton("Guardar") { _, _ ->
-                onSaveClick(queue)
+                onSaveClick(queue, false)
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create().show()
@@ -476,15 +564,13 @@ class RoomQueues : SupportFragment(), onClickListener {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
-                    AlertDialog.Builder(context)
+                    AlertDialog.Builder(context, R.style.RationaleDialog)
                         .setTitle("Eliminar")
                         .setMessage("¿Desea eliminar " + queue.name + " de la lista?")
                         .setNegativeButton("Cancelar", null)
                         .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                dao.deleteQueue(queue)
-                                dao.deleteAllClientsFromQueue(queue.id!!)
 
+                            Completable.create {
                                 viewModel.onRegistreAction(
                                     queue.uuid ?: "",
                                     ParamDeleteQueue(Calendar.getInstance().timeInMillis),
@@ -494,24 +580,32 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                                 it.onComplete()
                             }
+                                .delay(1, TimeUnit.SECONDS, Schedulers.io())
+
                                 .observeOn(Schedulers.io())
                                 .subscribeOn(Schedulers.io())
+                                .doOnComplete {
+                                    onSaveClick(queue, true)
+                                }
+
                                 .subscribe()
 
+                                .addTo(compositeDisposable)
                         }
                         .create()
                         .show()
                 }
                 R.id.action_edit -> {
-                    DialogCreateQueue(
-                        requireContext(),
-                        CompositeDisposable(),
-                        queue.id!!,
-                        viewModel, this
-                    ).create().show()
+                    start(CreateQueueFragment(viewModel, queue.id!!))
+//                    DialogCreateQueue(
+//                        requireContext(),
+//                        CompositeDisposable(),
+//                        queue.id!!,
+//                        viewModel
+//                    ).create().show()
                 }
                 R.id.action_merge -> {
-                    AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle(requireContext().getString(R.string.merge))
                         .setMessage("Seleccione otra cola para mezclar con ${queue.name}.")
                         .setPositiveButton("Seleccionar") { _, _ ->
@@ -544,23 +638,33 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.action_import -> {
-                        pickQueue()
+
+                    R.id.nav_new_queue -> {
+
                         true
                     }
-                    R.id.action_settings -> {
+                    R.id.nav_colaborators -> {
+                        true
+                    }
+
+//                    R.id.action_import -> {
+//                        pickQueue()
+//                        true
+//                    }
+                    R.id.nav_settings -> {
                         openSettings()
                         true
                     }
-                    R.id.action_black_list -> {
-                        start(BlackListFragment())
-                        true
-                    }
-                    R.id.action_abaut -> {
-                        showAboutAs()
-                        true
-                    }
+//                    R.id.action_black_list -> {
+//                        start(BlackListFragment())
+//                        true
+//                    }
+//                    R.id.action_abaut -> {
+//                        showAboutAs()
+//                        true
+//                    }
                     R.id.action_search -> {
+                        searchView.openSearch()
                         searchView.openSearch()
                         true
                     }
@@ -573,7 +677,13 @@ class RoomQueues : SupportFragment(), onClickListener {
             //setNavigationIcon(R.drawable.ic_arrow_back)
 
             title = requireContext().getString(R.string.app_name)
-
+            val header = nav_view.getHeaderView(0)
+            val namePerson =
+                PreferencesManager(requireContext()).getName() + " " + PreferencesManager(
+                    requireContext()
+                ).getLastName()
+            header.name_creator_queue.text = namePerson
+            header.creator_queue_ci.text = "CI: " + PreferencesManager(requireContext()).getCi()
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
@@ -587,7 +697,7 @@ class RoomQueues : SupportFragment(), onClickListener {
                 override fun onQueryTextChange(newText: String?): Boolean {
                     when (newText?.length) {
                         11 -> searchQuery.postValue(newText)
-                        else -> searchQuery.postValue("")
+                        0 -> searchQuery.postValue("")
                     }
                     return false
                 }
@@ -600,12 +710,67 @@ class RoomQueues : SupportFragment(), onClickListener {
 
                 override fun onSearchViewClosed() {
                     searchQuery.postValue("")
+                    refreshAdapter()
                 }
             })
+
+            if (ci != null) {
+                searchView.openSearch()
+                searchView.setQuery(ci, false)
+            }
         }
     }
 
-    private fun refreshAdapter(list: List<Queue>) {
+    private fun refreshAdapter() {
+        adapter = AdapterQueue(this)
+        _recyclerViewQueues.adapter = adapter
+
+        val listOpen = mutableListOf<Queue>()
+        val listSave = mutableListOf<Queue>()
+        val list = viewModel.allQueues.value ?: ArrayList()
+        list.map { queue ->
+            if (queue.isSaved) {
+                listSave.add(queue)
+            } else {
+                listOpen.add(queue)
+            }
+
+        }
+
+        var separator =
+            Queue(null, "", 0L, 0, "", "", null, null, null, owner = "", textSeparator = "")
+
+        val listToShow = ArrayList<Queue>()
+
+        if (listOpen.isNotEmpty()) {
+            separator.textSeparator = "Abiertas"
+            listToShow.add(separator)
+            listToShow.addAll(listOpen)
+        }
+
+        separator = Queue(null, "", 0L, 0, "", "", null, null, null, owner = "", textSeparator = "")
+
+        if (listSave.isNotEmpty()) {
+            separator.textSeparator = "Guardadas"
+            listToShow.add(separator)
+            listToShow.addAll(listSave)
+        }
+
+        adapter.contentList = listToShow
+
+        adapter.notifyDataSetChanged()
+
+        if (listToShow.isEmpty()) {
+            _imageViewEngranes.visibility = View.VISIBLE
+        } else {
+            _imageViewEngranes.visibility = View.GONE
+        }
+    }
+
+    private fun refreshAdapterFilterSearch(list: List<Queue>) {
+
+        val adapter = AdapterQueueFilterSearch(this, dao)
+        _recyclerViewQueues.adapter = adapter
         adapter.contentList = list
         adapter.notifyDataSetChanged()
         if (list.isNotEmpty()) {
@@ -666,7 +831,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             )
         }
 
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setView(view)
             .create().show()
 
@@ -712,10 +877,6 @@ class RoomQueues : SupportFragment(), onClickListener {
                 ).getFv() + "-" + time,
                 created_date = time,
                 updated_date = time,
-                //Todo update this
-                business = 1,
-                province = "",
-                municipality = "",
                 owner = PreferencesManager(requireContext()).getCi()
             )
 
@@ -755,7 +916,7 @@ class RoomQueues : SupportFragment(), onClickListener {
 
     private fun sendHi() {
 
-        progress.show()
+//        progress.show()
 
         Single.create<Pair<Int, String?>> {
 
@@ -765,7 +926,8 @@ class RoomQueues : SupportFragment(), onClickListener {
                 preferences.getName(),
                 preferences.getLastName(),
                 preferences.getCi(),
-                preferences.getFv()
+                preferences.getFv(),
+                preferences.getStoreVersion()
             )
 
             val data = Common.porterHiToString(struct)
@@ -783,37 +945,58 @@ class RoomQueues : SupportFragment(), onClickListener {
 
             if (result.code() == 200) {
                 result.body()?.let { body ->
-                    val type = object : TypeToken<Map<String, Map<String, Any>>>() {
+                    val type = object : TypeToken<Map<String, Any>>() {
 
                     }.type
+                    val gson: Gson = GsonBuilder().create()
+                    val porterHistruct: PorterHistruct =
+                        gson.fromJson(body, PorterHistruct::class.java)
 
                     Gson().fromJson<Map<String, Map<String, Any>>>(body, type).map { entry ->
 
-                        if (dao.getQueueByUUID(entry.key) == null) {
-                            val name = entry.value["name"] as String
-                            val description = entry.value["description"] as String
-                            val createdDate = (entry.value["created_date"] as Double).toLong()
-                            val tags = entry.value["tags"] as String
+                        when (entry.key) {
+                            "store_version" -> {
+                                if (porterHistruct.store_version != PreferencesManager(this.requireContext()).getStoreVersion()) {
+                                    PreferencesManager(this.requireContext()).setStoreVersion(
+                                        porterHistruct.store_version
+                                    )
+                                    PreferencesManager(this.requireContext()).setStoreVersionInit()
+                                }
+                            }
+                            "stores" -> {
+                                if (PreferencesManager(this.requireContext()).getStoreVersionInit()) {
+                                    JsonWrite(requireContext()).writeToFile(body)
+                                }
 
-                            dao.insertQueue(
-                                Queue(
-                                    createdDate,
-                                    name,
-                                    createdDate,
-                                    0,
-                                    description,
-                                    entry.key,
-                                    null,
-                                    null,
-                                    null,
-                                    createdDate,
-                                    createdDate,
-                                    ArrayList(),
-                                    false,
-                                    isSaved = true,
-                                    owner = ""
-                                )
-                            )
+                            }
+                            else -> {
+                                if (dao.getQueueByUUID(entry.key) == null) {
+                                    val name = entry.value["name"] as String
+                                    val description = entry.value["description"] as String
+                                    val createdDate =
+                                        (entry.value["created_date"] as Double).toLong()
+                                    val affiliation = entry.value["affiliation"] as String
+
+                                    dao.insertQueue(
+                                        Queue(
+                                            id = createdDate,
+                                            name = name,
+                                            startDate = createdDate,
+                                            clientsNumber = 0,
+                                            description = description,
+                                            affiliation = affiliation,
+                                            uuid = entry.key,
+                                            created_date = createdDate,
+                                            updated_date = createdDate,
+                                            collaborators = ArrayList(),
+                                            downloaded = false,
+                                            isSaved = true,
+                                            owner = "",
+                                            info = HashMap()
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -822,6 +1005,7 @@ class RoomQueues : SupportFragment(), onClickListener {
             it.onSuccess(
                 Pair(result.code(), result.errorBody()?.string() ?: result.message())
             )
+
         }
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn {
@@ -830,9 +1014,14 @@ class RoomQueues : SupportFragment(), onClickListener {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.first != 200) {
-                    val message = it.second ?: "Error ${it.first}"
-                    val dialog = Common.showHiErrorMessage(requireContext(), message)
-                    dialog.show()
+                    val message = it.second
+                    if (message != null) {
+                        val dialog = Common.showHiErrorMessage(
+                            requireContext(),
+                            message
+                        )
+                        dialog?.show()
+                    }
                 }
                 progress.dismiss()
             }, {
@@ -843,7 +1032,7 @@ class RoomQueues : SupportFragment(), onClickListener {
     private fun showDialogQueueNoExist(queue: Queue) {
 
         requireActivity().runOnUiThread {
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle(requireContext().getString(R.string.error_conection))
                 .setMessage(requireContext().getString(R.string.queue_not_found))
                 .setPositiveButton(requireContext().getString(R.string.update)) { _, _ ->
@@ -877,7 +1066,7 @@ class RoomQueues : SupportFragment(), onClickListener {
         requireActivity().runOnUiThread {
             val message =
                 "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("Reintentar") { _, _ ->

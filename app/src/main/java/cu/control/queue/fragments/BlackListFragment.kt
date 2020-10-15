@@ -30,6 +30,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.room_queues.*
+import kotlinx.android.synthetic.main.toolbar.*
 import me.yokeyword.fragmentation.SupportFragment
 import java.io.BufferedReader
 import java.io.File
@@ -64,9 +65,9 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
         _recyclerViewQueues.layoutManager = LinearLayoutManager(view.context)
         _recyclerViewQueues.adapter = adapter
 
-        _fabAdd.setOnClickListener {
-            DialogInsertClient(requireContext(), CompositeDisposable(), this).create().show()
-        }
+//        _fabAdd.setOnClickListener {
+//            DialogInsertClient(requireContext(), CompositeDisposable(), this).create().show()
+//        }
 
         initToolBar()
 
@@ -183,6 +184,10 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    override fun onSwipe(direction: Int, client: Client) {
+
     }
 
     @SuppressLint("RestrictedApi")

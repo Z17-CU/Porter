@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
 
     private var retrofit: Retrofit? = null
-    private const val TIME_OUT = 5000L //Time out in milliseconds
+    private const val TIME_OUT = 30000L //Time out in milliseconds
 
     fun get(baseUrl: String): Retrofit? {
         if (retrofit == null) {

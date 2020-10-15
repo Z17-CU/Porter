@@ -5,10 +5,8 @@ import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.ClientInQueue
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.ArrayList
 
 @Singleton
 class ClientRepository @Inject constructor(
@@ -36,4 +34,5 @@ class ClientRepository @Inject constructor(
     fun getAllPayloads() = dao.getAllPayloadLive()
 
     fun deletePayloads(payloads: ArrayList<Payload>) = dao.deletePayload(payloads)
+    fun deleteQueue(queue: Queue)=dao.deleteQueue(queue)
 }

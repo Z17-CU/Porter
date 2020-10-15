@@ -1,9 +1,15 @@
 package cu.control.queue.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.os.StrictMode
 import android.util.Base64
 import android.util.Log
@@ -11,25 +17,34 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
+import com.downloader.PRDownloaderConfig
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
-import com.yuan.library.dmanager.download.DownloadTask
+import cu.control.queue.BuildConfig
+import cu.control.queue.R
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
+import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucItem
+import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
-import com.yuan.library.dmanager.download.DownloadManager as DownloadManager1
+import kotlin.collections.HashMap
 
 
 class Common {
     companion object {
 
         private val gson = Gson()
+        var APK_MIME_TYPE = "application/vnd.android.package-archive"
 
         fun getSex(idString: String?): Int? {
             return if (idString?.length == 11) {
@@ -43,26 +58,38 @@ class Common {
             }
         }
 
-        fun showHiErrorMessage(context: Context, message: String): AlertDialog {
+        fun showHiErrorMessage(
+            context: Context,
+            message: String
+
+        ): AlertDialog? {
 
             val type = object : TypeToken<Hi403Message>() {
 
             }.type
 
-            val hi403Message = Gson().fromJson<Hi403Message>(message, type)
+            val hi403Message = try {
+                Gson().fromJson<Hi403Message>(message, type)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
 
-            val dialog = AlertDialog.Builder(context)
+            val dialog = AlertDialog.Builder(context, R.style.RationaleDialog)
                 .setTitle(hi403Message.title)
+                .setCancelable(false)
                 .setMessage(hi403Message.message)
 
             var count = 0
             hi403Message.url.map {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
 
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.value))
                 when (count) {
                     0 -> {
                         dialog.setPositiveButton(it.key) { _, _ ->
-                            context.startActivity(intent)
+
+                            donloadUpdate(context, it.value)
+
                         }
                     }
                     1 -> {
@@ -83,6 +110,86 @@ class Common {
             }
 
             return dialog.create()
+        }
+
+        private fun donloadUpdate(
+            context: Context,
+            value: String
+
+        ): Int {
+
+            val path: File =
+                Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
+            val config = PRDownloaderConfig.newBuilder()
+                .setReadTimeout(30000)
+                .setConnectTimeout(30000)
+                .build()
+            PRDownloader.initialize(context, config)
+
+            val progress = ProgressDialog.show(
+                context, "Actualizando...",
+                "Descargando actualización", true
+            );
+            return PRDownloader.download(
+                value,
+                path.absolutePath,
+                "/Porter@_v" + BuildConfig.VERSION_NAME + ".apk"
+            )
+                .build()
+                .start(object : OnDownloadListener {
+
+                    override fun onDownloadComplete() {
+
+                        progress.dismiss()
+                        context as Activity
+
+                        installPackage(context, path)
+
+                    }
+
+
+                    override fun onError(error: com.downloader.Error?) {
+                        Timber.e("onError: $error")
+                    }
+
+                    fun onError(error: Error) {
+                        Timber.e("onError: $error")
+                    }
+                })
+
+        }
+
+        private fun installPackage(
+            context: Context,
+            path: File
+        ) {
+
+            val file =
+                context.getFileStreamPath("Porter@_v" + BuildConfig.VERSION_NAME + ".apk")
+            if (file.exists()) {
+                file.deleteOnExit()
+            }
+
+            val toInstall =
+                File(path.absolutePath, "/Porter@_v" + BuildConfig.VERSION_NAME + ".apk")
+            val intent: Intent
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val apkUri = FileProvider.getUriForFile(
+                    context,
+                    BuildConfig.APPLICATION_ID + ".fileprovider",
+                    toInstall
+                )
+                intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                intent.data = apkUri
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            } else {
+                val apkUri = Uri.fromFile(toInstall)
+                intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(intent)
+
         }
 
         fun getAge(idString: String): Int {
@@ -217,19 +324,32 @@ class Common {
         fun isValidCI(ci: String, context: Context): Boolean {
 
             if (ci.length == 11) {
-                val mount = ci.substring(2, 4).toInt()
-                val day = ci.substring(4, 6).toInt()
-                val isValid = mount in 1..12 && day in 1..31
-                if (!isValid) {
-                    Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
-                        .show()
+                if (ci.contains("00000000000")) {
+                    return true
+                } else {
+                    val mount = ci.substring(2, 4).toInt()
+                    val day = ci.substring(4, 6).toInt()
+                    val isValid = mount in 1..12 && day in 1..31
+                    if (!isValid) {
+                        Toast.makeText(context, "Carné de identidad incorrecto", Toast.LENGTH_LONG)
+                            .show()
+                    }
+                    return isValid
                 }
-                return isValid
+
+            } else if (ci.length > 7 && ci.contains("00000000")) {
+                return true
             }
 
             return false
         }
 
+        fun isValidFV(fv: String): Boolean {
+            if (!fv.isBlank()) {
+                return true
+            }
+            return false
+        }
 
         @SuppressLint("LogNotTimber")
         fun stringToClient(rawResult: Result): Client? {
@@ -267,7 +387,10 @@ class Common {
         }
 
         @SuppressLint("LogNotTimber")
-        fun stringToPorterHistruct(rawResult: Result): PorterHistruct? {
+        fun stringToPorterHistruct(
+            rawResult: Result,
+            context: Context
+        ): PorterHistruct? {
 
             var porterHistruct: PorterHistruct? = null
 
@@ -279,7 +402,7 @@ class Common {
                 val lastName = Regex("A:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 val idString = Regex("CI:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 val fv = Regex("FV:(.+?)*").find(it)?.value?.split(':')?.get(1)
-
+//                val stores=Regex("stores:(.+?)*").find(it)?.value?.split(':')?.get(1)
                 if (name != null && lastName != null && idString != null && fv != null) {
 
                     porterHistruct =
@@ -287,12 +410,70 @@ class Common {
                             name,
                             lastName,
                             idString,
-                            fv
+                            fv, PreferencesManager(context).getStoreVersion()
+
                         )
                 }
             }
 
             return porterHistruct
+        }
+
+        fun getCharts(context: Context): List<jsonStrucItem> {
+            val jsonString: String
+
+            val storeVersionInit = PreferencesManager(context).getStoreVersionInit()
+            if (!storeVersionInit) {
+                jsonString = context.assets.open("stores.json").bufferedReader().use {
+                    it.readText()
+                }
+
+                return GsonBuilder().create()
+                    .fromJson(jsonString, object : TypeToken<List<jsonStrucItem>>() {}.type)
+
+            } else {
+                jsonString = JsonWrite(context).readFromFile()!!
+                val gson: Gson = GsonBuilder().create()
+
+                val porterHistruct: PorterHistruct =
+                    gson.fromJson(jsonString, PorterHistruct::class.java)
+
+                val response = porterHistruct.stores
+
+                return response!!
+            }
+        }
+
+        fun drawProductBackground(backgroundColor: Int): GradientDrawable {
+            val shape = GradientDrawable()
+            shape.shape = GradientDrawable.RECTANGLE
+            shape.cornerRadius = 20F
+            shape.setColor(backgroundColor)
+            //shape.setStroke(5, borderColor)
+            return shape
+        }
+
+        fun getStoreName(store: String?, context: Context): String {
+            val name = if (store.isNullOrEmpty()) {
+                context.getText(R.string.sin_definir)
+            } else {
+                val values = store.split(Regex("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)"))
+                if (values.size < 6) {
+                    context.getText(R.string.sin_definir)
+                } else {
+                    val idProvince = values[1].toInt() - 1
+                    val idMunicipie = values[3].toInt() - 1
+                    val idStore = values[5].toInt()
+
+                    val resultReadJson = Common.getCharts(context)
+                    val province = resultReadJson[idProvince].name
+                    val municipality = resultReadJson[idProvince].municipality[idMunicipie].name
+                    val storeName =
+                        resultReadJson[idProvince].municipality[idMunicipie].store[idStore].name
+                    "$province, $municipality, $storeName"
+                }
+            }
+            return name.toString()
         }
     }
 }

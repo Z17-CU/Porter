@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 
 @Keep
 class ParamCreateQueue(
-    val store: Int,
-    val info: Map<String, String>,
+    val store: String,
+    val info: Map<String, Any>,
     val created_date: Long
 ) : Param()

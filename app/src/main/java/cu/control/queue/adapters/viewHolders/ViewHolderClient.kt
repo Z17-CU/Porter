@@ -5,7 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mikhaellopez.circularimageview.CircularImageView
+ import com.mikhaellopez.circularimageview.CircularImageView
 import kotlinx.android.synthetic.main.item_client.view.*
 
 class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -17,9 +17,4 @@ class ViewHolderClient(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val textViewReIntents: TextView = itemView._textViewReIntents
     val clientNumber: TextView = itemView.clientNumber
     val imageViewCheck: ImageView = itemView._imageViewCheck
-    val imageDetails: ImageView = itemView.imageViewDetails
-    val imageDownload: ImageView = itemView.imageViewDownloadQueue
-    val imageSave: ImageView = itemView.imageViewSaveQueue
-    val imageOwner: ImageView = itemView.imageViewOwner
-    val imageOffline: ImageView = itemView.imageViewOffline
 }

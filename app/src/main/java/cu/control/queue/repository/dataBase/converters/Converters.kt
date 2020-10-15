@@ -35,6 +35,13 @@ class Converters {
                     )
                     map.put(it.key, param)
                 }
+                Param.TAG_CLOSE_QUEUE -> {
+                    val param = ParamCloseQueue(
+                        it.value.info!! as Map<String, String>,
+                        it.value.close_date!!
+                    )
+                    map.put(it.key, param)
+                }
                 Param.TAG_DELETE_QUEUE -> {
                     val param = ParamDeleteQueue(
                         it.value.deleted_date!!
@@ -59,6 +66,7 @@ class Converters {
                     )
                     map.put(it.key, param)
                 }
+
                 else -> {
 
                 }

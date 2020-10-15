@@ -5,9 +5,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
+import android.util.Base64
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -21,9 +23,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -31,10 +35,12 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.turingtechnologies.materialscrollbar.CustomIndicator
+import cu.control.queue.BuildConfig
 import cu.control.queue.MainActivity
 import cu.control.queue.R
 import cu.control.queue.SettingsActivity
 import cu.control.queue.adapters.AdapterClient
+import cu.control.queue.adapters.SwipeToDeleteCallback
 import cu.control.queue.dialogs.DialogInsertClient
 import cu.control.queue.interfaces.OnClientClickListener
 import cu.control.queue.interfaces.onSave
@@ -51,24 +57,23 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_MEMBER_UPDATED_DATE
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NAME
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_NUMBER
+import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_PRODUCTS
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_REINTENT_COUNT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.KEY_UNCHECKED
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_ADD_OWNER
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_CHECK
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_INCREMENT_REINTENT
 import cu.control.queue.repository.dataBase.entitys.payload.Person.Companion.MODE_UNCHECK
+import cu.control.queue.repository.dataBase.entitys.payload.params.*
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_ADD_MEMBER
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_DELETE_MEMBER
 import cu.control.queue.repository.dataBase.entitys.payload.params.Param.Companion.TAG_UPDATE_MEMBER
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamAddMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamDeleteMember
-import cu.control.queue.repository.dataBase.entitys.payload.params.ParamUpdateMember
+import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.control.queue.utils.Conts.Companion.QUEUE_CANT
-import cu.control.queue.utils.Conts.Companion.QUEUE_TIME
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -91,7 +96,7 @@ import kotlin.collections.ArrayList
 class QrReaderFragment(
     thisQueue: Queue,
     private val viewModel: ClientViewModel,
-    private val checkList: Boolean
+    private var checkList: Boolean = false
 ) :
     SupportFragment(),
     ZXingScannerView.ResultHandler,
@@ -111,6 +116,8 @@ class QrReaderFragment(
     private lateinit var progress: Progress
     private val compositeDisposable = CompositeDisposable()
     private val adapter = AdapterClient(this)
+
+    private var interestingList = ArrayList<Person>()
 
     private var searchQuery = MutableLiveData<String>().default("")
 
@@ -138,8 +145,6 @@ class QrReaderFragment(
 
         dao = AppDataBase.getInstance(view.context).dao()
 
-        adapter.checkMode = checkList
-
         return view
     }
 
@@ -149,65 +154,7 @@ class QrReaderFragment(
 
         initToolBar()
 
-        _showAddClient.setOnClickListener {
-            showDialogInsertClient()
-        }
-
-        _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
-        _recyclerViewClients.adapter = adapter
-
-        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
-
-        updateObserver(queue.id!!)
-
-        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-
-            try {
-                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
-                    _recyclerViewClients.context, if (it == MODE_LIST) {
-                        pauseScanner()
-                        _qrReader.visibility = View.GONE
-                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
-                        menu.findItem(R.id.action_list).title =
-                            requireContext().getString(R.string.readQR)
-                        R.drawable.ic_qr_reader
-                    } else {
-                        _qrReader.visibility = View.VISIBLE
-                        resumeReader()
-                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
-                        menu.findItem(R.id.action_list).title =
-                            requireContext().getString(R.string.lista)
-                        updateObserver(queue.id!!)
-
-                        R.drawable.ic_filter_list
-                    }
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        })
-
-        searchQuery.observe(viewLifecycleOwner, Observer {
-            if (!it.isNullOrEmpty()) {
-                val id = it.toLong()
-                val index = adapter.contentList.indexOfLast { client -> client.id == id }
-                adapter.contentList.map { client ->
-                    client.searched = false
-                }
-                if (index != -1) {
-                    adapter.contentList[index].searched = true
-                    goTo(index)
-                } else {
-                    showError("El cliente no está en la cola.")
-                }
-                adapter.notifyDataSetChanged()
-            }
-        })
-
-        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
-            queue = it
-            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
-        })
+        initAll(view)
     }
 
     override fun onResume() {
@@ -221,12 +168,24 @@ class QrReaderFragment(
         pauseScanner()
     }
 
+    private fun turnFlash() {
+        _hightLight.setImageDrawable(
+            ContextCompat.getDrawable(
+                _zXingScannerView.context,
+                if (checkList)
+                    if (_zXingScannerView.flash) R.drawable.ic_flash_on_red else R.drawable.ic_flash_off_red
+                else
+                    if (_zXingScannerView.flash) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+            )
+        )
+    }
+
     override fun onBackPressedSupport(): Boolean {
         return if (searchView.isOpen) {
             searchView.closeSearch()
             true
         } else if (!queue.isSaved) {
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle("Cambios sin guardar")
                 .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
                 .setPositiveButton("Guardar") { _, _ ->
@@ -238,6 +197,7 @@ class QrReaderFragment(
                         false
                     )
                     pop()
+                    restoreNotificationBarColor()
                 }.create().show()
             true
         } else {
@@ -246,7 +206,16 @@ class QrReaderFragment(
                 false
             )
             pop()
+            restoreNotificationBarColor()
             true
+        }
+    }
+
+    private fun restoreNotificationBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            requireActivity().window.statusBarColor = ContextCompat.getColor(
+                requireContext(), R.color.colorPrimaryDark
+            )
         }
     }
 
@@ -277,6 +246,122 @@ class QrReaderFragment(
             }))
     }
 
+    private fun initAll(view: View) {
+        adapter.checkMode = checkList
+
+        toolbar.background = ContextCompat.getDrawable(
+            requireContext(), if (checkList) {
+                R.drawable.bg_action_bar_red
+            } else {
+                R.drawable.bg_action_bar_accent
+            }
+        )
+
+        _showAddClient.background = ContextCompat.getDrawable(
+            requireContext(),
+            if (checkList) R.drawable.item_save_count_queue else R.drawable.round_accent_bg
+        )
+
+        dragScrollBar.setHandleOffColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red else R.color.colorAccent
+            )
+        )
+
+        dragScrollBar.setHandleColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red else R.color.colorAccent
+            )
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val scale = requireContext().resources.displayMetrics.density;
+            val padd = (8 * scale + 0.5f).toInt()
+            requireActivity().window.statusBarColor = ContextCompat.getColor(
+                requireContext(),
+                if (checkList) R.color.google_red_dark else R.color.colorPrimaryDark
+            )
+            _showAddClient.setPadding(padd, padd, padd, padd)
+        }
+
+        toolbar.menu.findItem(R.id.action_check).title = if (checkList)
+            view.context.getText(R.string.modo_de_registro)
+        else
+            view.context.getText(R.string.modo_de_chequeo)
+
+        _showAddClient.setOnClickListener {
+            showDialogInsertClient()
+        }
+
+        _hightLight.setOnClickListener {
+            _zXingScannerView.flash = !_zXingScannerView.flash
+            turnFlash()
+        }
+
+        _recyclerViewClients.layoutManager = LinearLayoutManager(view.context)
+        _recyclerViewClients.adapter = adapter
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback(adapter, requireContext()))
+        itemTouchHelper.attachToRecyclerView(_recyclerViewClients)
+        dragScrollBar.setIndicator(CustomIndicator(requireContext()), true)
+
+        updateObserver(queue.id!!)
+
+        currentMode.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+
+            try {
+                menu.findItem(R.id.action_list).icon = ContextCompat.getDrawable(
+                    _recyclerViewClients.context, if (it == MODE_LIST) {
+                        pauseScanner()
+                        _qrReader.visibility = View.GONE
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = true
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.readQR)
+                        R.drawable.ic_qr_reader
+                    } else {
+                        _qrReader.visibility = View.VISIBLE
+                        resumeReader()
+                        menu.findItem(R.id.action_show_filter_menu).isVisible = false
+                        menu.findItem(R.id.action_list).title =
+                            requireContext().getString(R.string.lista)
+                        updateObserver(queue.id!!)
+
+                        R.drawable.ic_list
+                    }
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        })
+
+        searchQuery.observe(viewLifecycleOwner, Observer {
+            if (!it.isNullOrEmpty()) {
+                val id = it.toLong()
+                val index = adapter.contentList.indexOfLast { client -> client.id == id }
+                adapter.contentList.map { client ->
+                    client.searched = false
+                }
+                if (index != -1) {
+                    adapter.contentList[index].searched = true
+                    goTo(index)
+                } else {
+                    showError("El cliente no está en la cola.")
+                }
+                adapter.notifyDataSetChanged()
+            }
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            queue = it
+            menu.findItem(R.id.action_save_online).isVisible = !it.isSaved
+        })
+
+        dao.getQueueLive(queue.id!!).observe(viewLifecycleOwner, Observer {
+            toolbar.title = it.name
+        })
+    }
+
     @SuppressLint("RestrictedApi")
     private fun initToolBar() {
         with(toolbar as androidx.appcompat.widget.Toolbar) {
@@ -285,8 +370,9 @@ class QrReaderFragment(
 
             val item = this.menu.findItem(R.id.action_search)
 
-            if (this.menu is MenuBuilder)
+            if (this.menu is MenuBuilder) {
                 (this.menu as MenuBuilder).setOptionalIconsVisible(true)
+            }
 
             setOnMenuItemClickListener {
                 when (it.itemId) {
@@ -302,6 +388,10 @@ class QrReaderFragment(
                         selectRangeToExport()
                         true
                     }
+                    R.id.action_settings -> {
+                        start(CreateQueueFragment(viewModel, queue.id!!))
+                        true
+                    }
                     R.id.action_save_online -> {
                         sendPayloads()
                         true
@@ -310,13 +400,23 @@ class QrReaderFragment(
                         searchView.openSearch()
                         true
                     }
+                    R.id.action_validate -> {
+                        validateQueue()
+                        true
+                    }
+                    R.id.action_check -> {
+                        checkList = !checkList
+                        pauseScanner()
+                        initAll(requireView())
+                        true
+                    }
                     else -> {
                         false
                     }
                 }
             }
 
-            setNavigationIcon(R.drawable.ic_arrow_back)
+            setNavigationIcon(R.drawable.ic_back_custom_white)
 
             title = queue.name
 
@@ -364,6 +464,7 @@ class QrReaderFragment(
             .subscribeOn(Schedulers.computation())
             .subscribe {
                 progress.dismiss()
+                restoreNotificationBarColor()
                 pop()
             }.addTo(compositeDisposable)
     }
@@ -503,7 +604,7 @@ class QrReaderFragment(
             MediaPlayer.create(context, R.raw.error_buzz).start()
 
             requireActivity().runOnUiThread {
-                AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle("Lista negra")
                     .setMessage("${client.name} está en lista negra.")
                     .setPositiveButton(requireContext().getString(android.R.string.ok), null)
@@ -513,7 +614,7 @@ class QrReaderFragment(
         }
 
         if (PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(ALERTS, false) && !checkList
+                .getBoolean(ALERTS, false) && !checkList && queue.alert != false
         ) {
 
             val queueCant = PreferenceManager.getDefaultSharedPreferences(context)
@@ -536,12 +637,12 @@ class QrReaderFragment(
 
                 requireActivity().runOnUiThread {
 
-                    AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle("Alerta")
                         .setMessage(
                             client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
                                 startDate
-                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count colas."
+                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count de las colas locales."
                         )
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {
@@ -551,6 +652,9 @@ class QrReaderFragment(
                                 .observeOn(Schedulers.io())
                                 .subscribe()
                                 .addTo(compositeDisposable)
+                        }
+                        .setNeutralButton("Ver Detalles") { _, _ ->
+                            start(RoomQueues(client.ci))
                         }
                         .setNegativeButton("Cancelar", null)
                         .create().show()
@@ -611,15 +715,10 @@ class QrReaderFragment(
                     )
                 payloadAddMember(clientInQueue, client)
             } else {
-                if ((Calendar.getInstance().timeInMillis - clientInQueue.lastRegistry) < (PreferenceManager.getDefaultSharedPreferences(
-                        context
-                    ).getInt(QUEUE_TIME, DEFAULT_QUEUE_TIME_HOURS)) * 60 * 60 * 1000
-                ) {
-                    clientInQueue.reIntent++
-                    queue.clientsNumber--
-                    done = false
-                    payloadUpdateMember(clientInQueue, client, MODE_INCREMENT_REINTENT)
-                }
+                clientInQueue.reIntent++
+                done = false
+                payloadUpdateMember(clientInQueue, client, MODE_INCREMENT_REINTENT)
+                queue.clientsNumber--
                 clientInQueue.lastRegistry = Calendar.getInstance().timeInMillis
             }
             dao.insertClientInQueue(clientInQueue)
@@ -632,19 +731,15 @@ class QrReaderFragment(
 
     private fun payloadAddMember(clientInQueue: ClientInQueue, client: Client) {
 
-//        if (client.ci in queue.collaborators) {
-//            payloadUpdateMember(clientInQueue, client, MODE_ADD_OWNER)
-//            return
-//        }
-
         Completable.create {
 
             val payload = dao.getPayload(queue.uuid!!)
             var param: ParamAddMember? = payload?.methods?.get(TAG_ADD_MEMBER) as ParamAddMember?
 
-            val nameArray = client.name.split(' ')
+            val nameArray = client.name!!.split(' ')
             val name: String
             var lastName = ""
+            val products = ""
             if (nameArray.size > 1) {
                 name = nameArray[0]
                 var pos = 0
@@ -655,7 +750,7 @@ class QrReaderFragment(
                     pos++
                 }
             } else {
-                name = client.name
+                name = client.name!!
                 lastName = ""
             }
 
@@ -665,6 +760,19 @@ class QrReaderFragment(
             map[KEY_NUMBER] = clientInQueue.number.toLong()
             map[KEY_NAME] = name.trim()
             map[KEY_LAST_NAME] = lastName.trim()
+            map[KEY_PRODUCTS] = if (queue.info != null) {
+                if ((queue.info!![KEY_PRODUCTS] as ArrayList<*>?).isNullOrEmpty()) {
+                    ArrayList<String>()
+                } else {
+                    queue.info!![KEY_PRODUCTS] as ArrayList<*>
+                }
+            } else {
+                ArrayList<String>()
+            }
+
+            val type = object : TypeToken<Map<String, ParamGeneral>>() {
+
+            }.type
 
             val person = Person(client.ci, client.fv ?: "", map)
 
@@ -673,6 +781,7 @@ class QrReaderFragment(
             } else {
                 param = ParamAddMember(arrayListOf(person))
             }
+
 
             viewModel.onRegistreAction(queue.uuid!!, param, TAG_ADD_MEMBER, requireContext())
 
@@ -691,10 +800,12 @@ class QrReaderFragment(
                 payload?.methods?.get(TAG_UPDATE_MEMBER) as ParamUpdateMember?
 
             val map = mutableMapOf<String, Long>()
-            map[KEY_MEMBER_UPDATED_DATE] = clientInQueue.lastRegistry
+
+            val time = Calendar.getInstance().timeInMillis
+            map[KEY_MEMBER_UPDATED_DATE] = time
             when (mode) {
-                MODE_CHECK -> map[KEY_CHECKED] = clientInQueue.lastRegistry
-                MODE_UNCHECK -> map[KEY_UNCHECKED] = clientInQueue.lastRegistry
+                MODE_CHECK -> map[KEY_CHECKED] = time
+                MODE_UNCHECK -> map[KEY_UNCHECKED] = time
                 MODE_INCREMENT_REINTENT -> map[KEY_REINTENT_COUNT] =
                     clientInQueue.reIntent.toLong()
                 MODE_ADD_OWNER -> map[KEY_NUMBER] = clientInQueue.number.toLong()
@@ -750,6 +861,7 @@ class QrReaderFragment(
             _zXingScannerView.startCamera()
         }
         progress.dismiss()
+        turnFlash()
     }
 
     private fun showDone(done: Boolean?) {
@@ -959,7 +1071,34 @@ class QrReaderFragment(
     }
 
     override fun onClick(client: Client) {
+        if (client.isInteresting == true) {
+            interestingList.find { it.ci == client.ci }?.let {
+                start(InterestingFragment(it, client))
+            }
+        }
+    }
 
+    private fun deleteItem(client: Client) {
+        requireActivity().runOnUiThread {
+            android.app.AlertDialog.Builder(context)
+                .setTitle("Eliminar")
+                .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Eliminar") { _, _ ->
+                    Completable.create {
+                        payloadDeleteMember(client)
+                        val size = adapter.contentList.size - 1
+                        dao.deleteClientFromQueue(client.id, adapter.queueId)
+                        dao.updateQueueSize(adapter.queueId, size)
+                        it.onComplete()
+                    }
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe().addTo(CompositeDisposable())
+                }
+                .create()
+                .show()
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -971,24 +1110,7 @@ class QrReaderFragment(
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete -> {
-                    android.app.AlertDialog.Builder(context)
-                        .setTitle("Eliminar")
-                        .setMessage("¿Desea eliminar a " + client.name + " de la lista?")
-                        .setNegativeButton("Cancelar", null)
-                        .setPositiveButton("Eliminar") { _, _ ->
-                            Completable.create {
-                                payloadDeleteMember(client)
-                                val size = adapter.contentList.size - 1
-                                dao.deleteClientFromQueue(client.id, adapter.queueId)
-                                dao.updateQueueSize(adapter.queueId, size)
-                                it.onComplete()
-                            }
-                                .observeOn(Schedulers.io())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe().addTo(CompositeDisposable())
-                        }
-                        .create()
-                        .show()
+                    deleteItem(client)
                 }
                 R.id.action_black_list -> {
                     Completable.create {
@@ -1036,6 +1158,35 @@ class QrReaderFragment(
             MenuPopupHelper(wrapper, popupMenu.menu as MenuBuilder, view)
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.show()
+    }
+
+    override fun onSwipe(direction: Int, client: Client) {
+
+        //vibrate
+        val vibratorService =
+            requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibratorService.vibrate(120)
+
+        Completable.create { emitter ->
+            val clientInQueue =
+                dao.getClientFromQueue(client.id, adapter.queueId)
+
+            if (direction == ItemTouchHelper.RIGHT) {
+                deleteItem(client)
+            } else if (direction == ItemTouchHelper.LEFT) {
+                if (clientInQueue!!.isChecked) {
+                    clientInQueue.isChecked = false
+                    payloadUpdateMember(clientInQueue, client, MODE_UNCHECK)
+                } else {
+                    clientInQueue.isChecked = true
+                    payloadUpdateMember(clientInQueue, client, MODE_CHECK)
+                }
+            }
+            dao.insertClientInQueue(clientInQueue!!)
+            emitter.onComplete()
+        }.observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .subscribe().addTo(compositeDisposable)
     }
 
     private fun selectRangeToExport() {
@@ -1099,7 +1250,7 @@ class QrReaderFragment(
             }
         }
 
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setView(view)
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -1108,6 +1259,60 @@ class QrReaderFragment(
 
             }
             .create().show()
+    }
+
+    private fun validateQueue() {
+        val headerMap = mutableMapOf<String, String>().apply {
+            this["Content-Type"] = "application/json"
+            this["operator"] = PreferencesManager(requireContext()).getId()
+            this["queue"] = queue.uuid!!
+            this["Authorization"] = Base64.encodeToString(
+                BuildConfig.PORTER_SERIAL_KEY.toByteArray(), Base64.NO_WRAP
+            ) ?: ""
+        }
+
+        progress.show()
+
+        Single.create<Int> {
+
+            dao.getPayload(queue.uuid!!)?.let {
+                if (viewModel.sendSuspend(listOf(it))?.code() == 200) {
+                    viewModel.onRegistreAction(
+                        queue.uuid!!,
+                        ParamUpdateQueue(queue.info!!, Calendar.getInstance().timeInMillis),
+                        Param.TAG_UPDATE_QUEUE,
+                        requireContext()
+                    )
+                } else {
+                    showError("Error de Red")
+                }
+            }
+
+            val interesting =
+                APIService.apiService.validate(headers = headerMap).execute().body()
+
+            interesting?.let { persons ->
+                interestingList = persons
+                persons.map { person ->
+                    val pos = adapter.contentList.indexOfLast { it.ci == person.ci }
+                    if (pos != -1)
+                        adapter.contentList[pos].isInteresting = true
+                }
+            }
+
+            it.onSuccess(adapter.contentList.indexOfFirst { it.isInteresting ?: false })
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorReturn {
+                showError("Error de Red")
+                return@onErrorReturn null
+            }
+            .subscribe { pos, _ ->
+                adapter.notifyDataSetChanged()
+                if (pos != -1 && pos != null)
+                    goTo(pos)
+                progress.dismiss()
+            }.addTo(compositeDisposable)
     }
 
     private fun findPositionOfNumber(number: Int): Int {

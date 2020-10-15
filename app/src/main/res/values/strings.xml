@@ -38,7 +38,6 @@
     <string name="app_intro_done_button">
          Hecho
     </string>
-    <string name="nombre_de_la_cola">Nombre de la cola</string>
     <string name="guardar_como_pdf">Guardar como PDF</string>
     <string name="guardar_como_csv">Guardar como CSV</string>
     <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
@@ -47,7 +46,6 @@
     <string name="modo_de_registro">Modo de registro.</string>
     <string name="modo_de_chequeo">Modo de chequeo.</string>
     <string name="acerca_de">Acerca de</string>
-    <string name="ajustes">Ajustes</string>
     <string name="uci_2020">UCI 2020</string>
     <string name="c_digo_fuente">Código fuente</string>
     <string name="https_github_com_richardanca_porter_by_richard">https://github.com/richardanca/Porter_By_Richard</string>
@@ -96,12 +94,65 @@
     <string name="Permissions_permission_required">Se requiere permiso</string>
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
     <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
-    <string name="info">Informacion</string>
-    <string name="dialogInfo">Debe escanear su carné  para continnuar</string>
+    <string name="deschequiar">NO CHEQUEAR</string>
+    <string name="chequiar">CHEQUEAR</string>
+    <string name="delete">DELETE</string>
+    <string name="fv">Fv</string>
     <string name="dialog_ok_button">Ok</string>
-    <string name="colaboradores">Colaboradores</string>
-    <string name="readWrong">Lectura incorrecta</string>
-    <string name="update">Actualizar</string>
-    <string name="queue_not_found">Ha ocurrido un error al sincronizar la cola.</string>
+    <string name="dialogInfo">Debe escanear su carné para continuar.</string>
+    <string name="info">Informacion</string>
+    <string name="readWrong">Error al leer</string>
     <string name="error_conection">Error de red</string>
+    <string name="update">Actualizar</string>
+    <string name="queue_not_found">La cola no existe.</string>
+    <string name="next">Continuar</string>
+    <string name="province">Seleccione la provincia</string>
+    <string name="municipie">Seleccione un municipio</string>
+    <string name="store">Seleccione una tienda</string>
+    <string name="select_municipe">Seleccione un municipio</string>
+    <string name="select_store">Seleccione una tienda</string>
+    <string name="products">Pollo, aceite, picadillo</string>
+
+
+    <string name="title_activity_main2">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="opened">Abiertas</string>
+    <string name="saved">Guardadas</string>
+    <string name="new_queue">Nueva cola</string>
+    <string name="colaborators">Mis colaboradores</string>
+    <string name="export_queue">Exportar cola</string>
+    <string name="export_queues">Exportar colas</string>
+    <string name="settings">Ajustes</string>
+    <string name="export_list">Debe tener al menos una cola para exportar.</string>
+    <string name="nombre_de_la_cola">Nombre de la cola</string>
+    <string name="sin_definir">Sin definir</string>
+    <string name="descripci_n">Descripción</string>
+    <string name="emitir_alertas">Emitir alertas</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="establecimiento">Establecimiento</string>
+    <string name="provincia">Provincia</string>
+    <string name="municipio">Municipio</string>
+    <string name="colaboradores">Colaboradores</string>
+    <string name="productos">Productos</string>
+    <string name="time_rotation">Tiempo de rotación</string>
+    <string name="multiple_queue">Alertas de  colas múltiples</string>
+    <string name="count_alert_queue">Cantidad de colas a alertar</string>
+    <string name="date_init">Fecha de inicio</string>
+    <string name="date_end">Fecha de fin</string>
+    <string name="modo_chequeo">Modo chequeo</string>
+    <string name="producto">Producto</string>
+    <string name="nombre_del_producto">Nombre del producto</string>
+    <string name="optional">Opcional</string>
+    <string name="error_colaborator">No se pudo agragar el colaborador.</string>
+    <string name="verificar_cola">Verificar cola</string>
+    <string name="cerrar">Cerrar</string>
 </resources>

@@ -3,11 +3,14 @@ package cu.control.queue
 import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import cu.control.queue.utils.Conts
+import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.control.queue.utils.IntEditTextPreference
+import kotlinx.android.synthetic.main.settings_activity.*
 import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
@@ -23,6 +26,24 @@ class SettingsActivity : AppCompatActivity() {
             )
             .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        initToolBar()
+    }
+
+    private fun initToolBar() {
+        with(toolbar as androidx.appcompat.widget.Toolbar) {
+            setNavigationIcon(R.drawable.ic_back_custom)
+
+            title = "Ajustes "
+            setTitleTextColor(ContextCompat.getColor(context, R.color.blue_drawer))
+
+            setNavigationOnClickListener {
+                this@SettingsActivity.title = this@SettingsActivity.getString(R.string.app_name)
+                (this@SettingsActivity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(
+                    false
+                )
+                onBackPressed()
+            }
+        }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
@@ -53,6 +74,11 @@ class SettingsActivity : AppCompatActivity() {
                         Calendar.getInstance().timeInMillis
                     )
                 )
+
+            if (preferenceManager.sharedPreferences.getInt(Conts.QUEUE_CANT, -1) == -1) {
+                preferenceManager.sharedPreferences.edit()
+                    .putInt(Conts.QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS).apply()
+            }
 
 
             preferenceManager.findPreference<SwitchPreferenceCompat>("alerts")
