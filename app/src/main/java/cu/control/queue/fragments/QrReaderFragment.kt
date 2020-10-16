@@ -1306,7 +1306,10 @@ class QrReaderFragment(
             }
 
             val interesting =
-                APIService.apiService.validate(headers = headerMap).execute().body()
+                APIService.apiService.validate(
+                    headers = headerMap,
+                    body = body
+                ).execute().body()
 
             interesting?.let { persons ->
                 interestingList = persons
