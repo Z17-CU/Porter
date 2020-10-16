@@ -568,6 +568,15 @@ class QrReaderFragment(
                 R.id.action_filter_3raEdad -> {
                     updateObserver(queue.id!!, true, 56, 200)
                 }
+                R.id.action_interesting -> {
+                    val list: ArrayList<Client> = ArrayList()
+                    adapter.contentList.map {
+                        if (it.isInteresting == true)
+                            list.add(it)
+                    }
+                    adapter.contentList = list
+                    adapter.notifyDataSetChanged()
+                }
             }
             false
         }
@@ -1262,6 +1271,7 @@ class QrReaderFragment(
     }
 
     private fun validateQueue() {
+        updateObserver(queueId = queue.id!!)
         val headerMap = mutableMapOf<String, String>().apply {
             this["Content-Type"] = "application/json"
             this["operator"] = PreferencesManager(requireContext()).getId()
@@ -1311,6 +1321,7 @@ class QrReaderFragment(
                 adapter.notifyDataSetChanged()
                 if (pos != -1 && pos != null)
                     goTo(pos)
+                currentMode.postValue(MODE_LIST)
                 progress.dismiss()
             }.addTo(compositeDisposable)
     }

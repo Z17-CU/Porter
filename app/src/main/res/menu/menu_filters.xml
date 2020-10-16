@@ -46,4 +46,10 @@
         android:orderInCategory="100"
         android:title="@string/_3ra_edad" />
 
+    <item
+        android:id="@+id/action_interesting"
+        android:icon="@drawable/ic_baseline_warning_24"
+        android:orderInCategory="100"
+        android:title="@string/interesantes" />
+
 </menu>
