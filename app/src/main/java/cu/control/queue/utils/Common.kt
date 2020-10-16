@@ -22,7 +22,6 @@ import com.downloader.PRDownloader
 import com.downloader.PRDownloaderConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.Result
 import cu.control.queue.BuildConfig
@@ -30,6 +29,7 @@ import cu.control.queue.R
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.repository.dataBase.entitys.PorterHistruct
 import cu.control.queue.repository.dataBase.entitys.Queue
+import cu.control.queue.repository.dataBase.entitys.payload.CountDays
 import cu.control.queue.repository.dataBase.entitys.payload.Hi403Message
 import cu.control.queue.repository.dataBase.entitys.payload.Payload
 import cu.control.queue.repository.dataBase.entitys.payload.jsonStruc.jsonStrucItem
@@ -37,7 +37,6 @@ import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class Common {
@@ -249,6 +248,10 @@ class Common {
         }
 
         fun payloadToString(someObjects: Payload): String {
+            return gson.toJson(someObjects)
+        }
+
+        fun stringCountDay(someObjects: CountDays): String {
             return gson.toJson(someObjects)
         }
 
