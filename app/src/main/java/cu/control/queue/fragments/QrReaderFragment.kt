@@ -72,8 +72,10 @@ import cu.control.queue.repository.retrofit.APIService
 import cu.control.queue.utils.*
 import cu.control.queue.utils.Conts.Companion.ALERTS
 import cu.control.queue.utils.Conts.Companion.APP_DIRECTORY
+import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_COUNT_VERIFY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
 import cu.control.queue.utils.Conts.Companion.QUEUE_CANT
+import cu.control.queue.utils.Conts.Companion.QUEUE_CANT_DAY
 import cu.control.queue.viewModels.ClientViewModel
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -401,6 +403,7 @@ class QrReaderFragment(
                         true
                     }
                     R.id.action_validate -> {
+
                         validateQueue()
                         true
                     }
@@ -1262,6 +1265,11 @@ class QrReaderFragment(
     }
 
     private fun validateQueue() {
+        val queueCantDay = PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt(QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY)
+        val body = mutableMapOf<String, Int>().apply {
+            this["days_ago"] = queueCantDay
+        }
         val headerMap = mutableMapOf<String, String>().apply {
             this["Content-Type"] = "application/json"
             this["operator"] = PreferencesManager(requireContext()).getId()
@@ -1289,7 +1297,11 @@ class QrReaderFragment(
             }
 
             val interesting =
-                APIService.apiService.validate(headers = headerMap).execute().body()
+                APIService.apiService.validate(
+                    headers = headerMap,
+                    body = body
+
+                ).execute().body()
 
             interesting?.let { persons ->
                 interestingList = persons

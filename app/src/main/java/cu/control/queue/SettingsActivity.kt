@@ -8,7 +8,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import cu.control.queue.utils.Conts
+import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_COUNT_VERIFY
 import cu.control.queue.utils.Conts.Companion.DEFAULT_QUEUE_TIME_HOURS
+import cu.control.queue.utils.IntCountEditTextPreference
 import cu.control.queue.utils.IntEditTextPreference
 import kotlinx.android.synthetic.main.settings_activity.*
 import java.util.*
@@ -52,6 +54,8 @@ class SettingsActivity : AppCompatActivity() {
 
             val isEnable =
                 preferenceManager.findPreference<SwitchPreferenceCompat>("alerts")?.isChecked!!
+            val isEnableCountDay =
+                preferenceManager.findPreference<SwitchPreferenceCompat>("alerts_cant_day")?.isChecked!!
 
             preferenceManager.findPreference<IntEditTextPreference>("QUEUE_CANT")?.isEnabled =
                 isEnable
@@ -59,7 +63,8 @@ class SettingsActivity : AppCompatActivity() {
                 isEnable
             preferenceManager.findPreference<Preference>(QUERY_END_DATE)?.isEnabled =
                 isEnable
-
+            preferenceManager.findPreference<IntCountEditTextPreference>("QUEUE_CANT_DAY")?.isEnabled =
+                isEnableCountDay
             preferenceManager.findPreference<Preference>(QUERY_START_DATE)?.summary =
                 Conts.formatDateBig.format(
                     preferenceManager.sharedPreferences.getLong(
@@ -80,7 +85,6 @@ class SettingsActivity : AppCompatActivity() {
                     .putInt(Conts.QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS).apply()
             }
 
-
             preferenceManager.findPreference<SwitchPreferenceCompat>("alerts")
                 ?.setOnPreferenceChangeListener { _, newValue ->
 
@@ -94,6 +98,20 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
 
+            preferenceManager.findPreference<SwitchPreferenceCompat>("alerts_cant_day")
+                ?.setOnPreferenceChangeListener { _, newValue ->
+
+                    preferenceManager.findPreference<IntCountEditTextPreference>("QUEUE_CANT_DAY")?.isEnabled =
+                        newValue as Boolean
+                    true
+                }
+
+            if (preferenceManager.sharedPreferences.getInt(Conts.QUEUE_CANT_DAY, -1) == -1) {
+                preferenceManager.sharedPreferences.edit()
+                    .putInt(Conts.QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY).apply()
+            }
+
+
             preferenceManager.findPreference<Preference>(QUERY_START_DATE)
                 ?.setOnPreferenceClickListener {
                     showDatePicker(QUERY_START_DATE)
@@ -104,7 +122,6 @@ class SettingsActivity : AppCompatActivity() {
                     showDatePicker(QUERY_END_DATE)
                     true
                 }
-
         }
 
         private fun showDatePicker(preferenceKey: String) {

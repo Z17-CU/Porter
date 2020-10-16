@@ -51,7 +51,7 @@ interface APIService {
     @POST
     fun validate(
         @Url url: String = VALIDATE_PORTER_URL,
-        @Body body: String = "{\"days_ago\": 400}",
+        @Body body: Map<String, Int>,
         @HeaderMap headers: Map<String, String>
     ): Call<ArrayList<Person>?>
 
