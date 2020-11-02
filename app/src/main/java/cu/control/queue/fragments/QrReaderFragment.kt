@@ -1108,8 +1108,12 @@ class QrReaderFragment(
 
     override fun onClick(client: Client) {
         if (client.isInteresting == true) {
-            interestingList.find { it.ci == client.ci }?.let {
-                start(InterestingFragment(it, client))
+            val person = interestingList.find { it.ci == client.ci }
+
+            if (person != null) {
+                start(InterestingFragment(person, client))
+            } else {
+                validateQueue(true, client)
             }
         }
     }
@@ -1297,7 +1301,7 @@ class QrReaderFragment(
             .create().show()
     }
 
-    private fun validateQueue() {
+    private fun validateQueue(showDetails: Boolean = false, client: Client? = null) {
         updateObserver(queueId = queue.id!!)
         val queueCantDay = PreferenceManager.getDefaultSharedPreferences(context)
             .getInt(QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY)
@@ -1356,9 +1360,19 @@ class QrReaderFragment(
             }
             .subscribe { pos, _ ->
                 adapter.notifyDataSetChanged()
-                if (pos != -1 && pos != null)
-                    goTo(pos)
-                currentMode.postValue(MODE_LIST)
+                if(showDetails){
+                    val person = interestingList.find { it.ci == client?.ci }
+
+                    if (person != null) {
+                        start(InterestingFragment(person, client!!))
+                    } else {
+                        showError("No se detectó éste cliente como interesante.")
+                    }
+                } else {
+                    if (pos != -1 && pos != null)
+                        goTo(pos)
+                    currentMode.postValue(MODE_LIST)
+                }
                 progress.dismiss()
             }.addTo(compositeDisposable)
     }
