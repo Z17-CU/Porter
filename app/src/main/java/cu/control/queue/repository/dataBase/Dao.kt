@@ -151,6 +151,9 @@ interface Dao {
     @Query("SELECT * FROM ${Person.TABLE_NAME}")
     fun getAllCollaboratorsList(): List<Person>
 
+    @Query("UPDATE ClientInQueue SET isInteresting = 1 WHERE clientId = :id")
+    fun updateInteresting(id: Long)
+
     fun getCollaborators(idList: List<String>): List<Person> {
         var clientList: List<Person> = ArrayList()
 

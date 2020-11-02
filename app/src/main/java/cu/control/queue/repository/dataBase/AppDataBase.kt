@@ -15,7 +15,7 @@ import cu.control.queue.repository.dataBase.entitys.payload.Person
 
 @Database(
     entities = [(Client::class), (Queue::class), (ClientInQueue::class), (Payload::class), (Person::class)],
-    version = 7
+    version = 8
 )
 @TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {

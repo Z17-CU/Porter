@@ -14,7 +14,8 @@ class ClientInQueue(
     var number: Int = 0,
     var isChecked: Boolean = false,
     var repeatedClient: Boolean? = false,
-    var status:Boolean?=false
+    var status:Boolean?=false,
+    var isInteresting: Boolean? = false
 ){
     companion object{
         const val TABLE_NAME = "ClientInQueue"

@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -412,6 +414,23 @@ class QrReaderFragment(
                         initAll(requireView())
                         true
                     }
+                    R.id.action_send_mail -> {
+
+                        exportQueueCSV(false)?.let { file ->
+                            val emailIntent = Intent(Intent.ACTION_SENDTO)
+                            emailIntent.data =
+                                Uri.parse("mailto:tiendas@rem.cu?cc=pedregallisa@rem.cu")
+                            emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+
+                            if (emailIntent.resolveActivity(requireActivity().packageManager) != null) {
+                                requireContext().startActivity(emailIntent)
+                            } else {
+                                showError("No hay aplicaciones de correo disponibles.")
+                            }
+                        }
+
+                        true
+                    }
                     else -> {
                         false
                     }
@@ -524,6 +543,7 @@ class QrReaderFragment(
                         client.number = thisClientInQueue.number
                         client.isChecked = thisClientInQueue.isChecked
                         client.repeatedClient = thisClientInQueue.repeatedClient
+                        client.isInteresting = thisClientInQueue.isInteresting
                     }
 
                     clientList = clientList.sortedBy { it.number }
@@ -985,7 +1005,7 @@ class QrReaderFragment(
         dialog.show()
     }
 
-    private fun exportQueueCSV() {
+    private fun exportQueueCSV(shareQueue: Boolean = true): File? {
         if (adapter.contentList.isNotEmpty()) {
             val list = adapter.contentList.subList(exportFrom, exportTo)
             val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
@@ -1011,21 +1031,26 @@ class QrReaderFragment(
                             "$index",
                             client.name,
                             client.ci,
-                            dateFormat.format(client.lastRegistry),
-                            timeFormat.format(client.lastRegistry)
+                            dateFormat.format(client.id),
+                            timeFormat.format(client.id)
                         )
                     )
                 }
                 csvWriter.close()
-                Common.shareQueue(requireContext(), file, "csv")
+                if (shareQueue)
+                    Common.shareQueue(requireContext(), file, "csv")
                 Toast.makeText(
                     requireContext(),
                     R.string.export_OK,
                     Toast.LENGTH_LONG
                 ).show()
+                return file
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                return null
             }
+        } else {
+            return null
         }
     }
 
@@ -1315,8 +1340,10 @@ class QrReaderFragment(
                 interestingList = persons
                 persons.map { person ->
                     val pos = adapter.contentList.indexOfLast { it.ci == person.ci }
-                    if (pos != -1)
+                    if (pos != -1) {
                         adapter.contentList[pos].isInteresting = true
+                        dao.updateInteresting(adapter.contentList[pos].id)
+                    }
                 }
             }
 
