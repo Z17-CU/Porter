@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
+import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import cu.control.queue.utils.Conts
@@ -103,6 +104,21 @@ class SettingsActivity : AppCompatActivity() {
 
                     preferenceManager.findPreference<IntCountEditTextPreference>("QUEUE_CANT_DAY")?.isEnabled =
                         newValue as Boolean
+                    true
+                }
+
+            val isEnableEmail =
+                preferenceManager.findPreference<SwitchPreferenceCompat>("email")?.isChecked!!
+
+            preferenceManager.findPreference<EditTextPreference>("emailAddress")?.isEnabled =
+                isEnableEmail
+
+            preferenceManager.findPreference<SwitchPreferenceCompat>("email")
+                ?.setOnPreferenceChangeListener { _, newValue ->
+
+                    preferenceManager.findPreference<EditTextPreference>("emailAddress")?.isEnabled =
+                        newValue as Boolean
+
                     true
                 }
 

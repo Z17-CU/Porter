@@ -63,7 +63,11 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
 
         holder.clientNumber.background = ContextCompat.getDrawable(
             context,
-            if (checkMode) R.drawable.item_save_count_queue else R.drawable.round_accent_bg
+            when {
+                client.isChecked -> R.drawable.round_green_bg
+                checkMode -> R.drawable.item_save_count_queue
+                else -> R.drawable.round_accent_bg
+            }
         )
 
         holder.layoutBackground.setOnLongClickListener {
@@ -73,17 +77,17 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
 
         when {
             !client.isChecked -> {
-                holder.clientNumber.visibility = View.VISIBLE
                 holder.imageViewCheck.visibility = View.GONE
                 holder.imageView.visibility = View.GONE
-                holder.clientNumber.text = client.number.toString()
             }
             client.isChecked -> {
-                holder.clientNumber.visibility = View.GONE
                 holder.imageView.visibility = View.GONE
                 holder.imageViewCheck.visibility = View.VISIBLE
             }
         }
+
+        holder.clientNumber.visibility = View.VISIBLE
+        holder.clientNumber.text = client.number.toString()
 
         holder.textViewName.text = client.name
         holder.textViewID.text = "CI: ${client.ci}"

@@ -34,4 +34,17 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Alertas">
+
+        <SwitchPreferenceCompat
+            app:key="email"
+            app:title="Enviar correo" />
+
+        <EditTextPreference
+            app:key="emailAddress"
+            app:title="Dirección de correo."
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

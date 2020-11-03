@@ -373,6 +373,9 @@ class QrReaderFragment(
             inflateMenu(R.menu.main)
 
             val item = this.menu.findItem(R.id.action_search)
+            this.menu.findItem(R.id.action_send_mail).isVisible =
+                PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean("email", false)
 
             if (this.menu is MenuBuilder) {
                 (this.menu as MenuBuilder).setOptionalIconsVisible(true)
@@ -418,15 +421,26 @@ class QrReaderFragment(
 
                         exportQueueCSV(false)?.let { file ->
                             val emailIntent = Intent(Intent.ACTION_SENDTO)
-                            emailIntent.data =
-                                Uri.parse("mailto:tiendas@rem.cu?cc=pedregallisa@rem.cu")
-                            emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
 
-                            if (emailIntent.resolveActivity(requireActivity().packageManager) != null) {
-                                requireContext().startActivity(emailIntent)
-                            } else {
-                                showError("No hay aplicaciones de correo disponibles.")
-                            }
+                            PreferenceManager.getDefaultSharedPreferences(context)
+                                .getString("emailAddress", "")?.let { emailAddress ->
+                                    if (emailAddress.isNotBlank()) {
+                                        emailIntent.data = Uri.parse("mailto:$emailAddress")
+
+                                        emailIntent.putExtra(
+                                            Intent.EXTRA_STREAM,
+                                            Uri.fromFile(file)
+                                        )
+
+                                        if (emailIntent.resolveActivity(requireActivity().packageManager) != null) {
+                                            requireContext().startActivity(emailIntent)
+                                        } else {
+                                            showError("No hay aplicaciones de correo disponibles.")
+                                        }
+                                    } else {
+                                        showError("Configure una dirección de correo válida.")
+                                    }
+                                }
                         }
 
                         true
@@ -671,9 +685,11 @@ class QrReaderFragment(
                     AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle("Alerta")
                         .setMessage(
-                            client.name + " ha lanzado una alerta porque del día ${Conts.formatDateMid.format(
-                                startDate
-                            )} al ${Conts.formatDateMid.format(endDate)} ha estado en $count de las colas locales."
+                            client.name + " ha lanzado una alerta porque del día ${
+                                Conts.formatDateMid.format(
+                                    startDate
+                                )
+                            } al ${Conts.formatDateMid.format(endDate)} ha estado en $count de las colas locales."
                         )
                         .setPositiveButton("Continuar") { _, _ ->
                             Completable.create {
@@ -1360,7 +1376,7 @@ class QrReaderFragment(
             }
             .subscribe { pos, _ ->
                 adapter.notifyDataSetChanged()
-                if(showDetails){
+                if (showDetails) {
                     val person = interestingList.find { it.ci == client?.ci }
 
                     if (person != null) {
