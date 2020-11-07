@@ -497,9 +497,11 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
                 AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle(requireContext().getString(R.string.merge))
                     .setMessage(
-                        "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${Conts.formatDateBig.format(
-                            startDate
-                        )} y los usuarios comunes solo aparecerán una vez. \nÉsta acción no se puede deshacer."
+                        "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${
+                            Conts.formatDateBig.format(
+                                startDate
+                            )
+                        } y los usuarios comunes solo aparecerán una vez. \nÉsta acción no se puede deshacer."
                     )
                     .setPositiveButton(requireContext().getText(R.string.merge)) { _, _ ->
                         mergeQueues(queueToMerge!!, queue, startDate)
@@ -1014,12 +1016,18 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
             .subscribe({
                 if (it.first != 200) {
                     val message = it.second
-                    if (message != null) {
+                    if (message != null && it.first == 403) {
                         val dialog = Common.showHiErrorMessage(
                             requireContext(),
                             message
                         )
                         dialog?.show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error ${it.first}, ${it.second}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
                 progress.dismiss()
