@@ -101,7 +101,7 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
                             val client: Client? = dao.getClient(clientInQueue.clientId)
                             client?.let {
                                 client.isChecked = clientInQueue.isChecked
-                                client.lastRegistry = clientInQueue.lastRegistry
+                                client.lastRegistry = clientInQueue.id
                                 client.number = clientInQueue.number
                                 client.reIntent = clientInQueue.reIntent
                                 list.add(client)
@@ -146,10 +146,10 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
                 file.createNewFile()
                 val csvWriter = CSVWriter(FileWriter(file))
                 csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
-                list.forEachIndexed { index, client ->
+                list.map { client ->
                     csvWriter.writeNext(
                         arrayOf(
-                            "$index",
+                            client.number.toString(),
                             client.name,
                             client.ci,
                             dateFormat.format(client.lastRegistry),

@@ -30,7 +30,7 @@ class PreferencesManager(context: Context) {
 
     fun getId() = getCi() + "." + getFv()
 
-    fun getStoreVersion() = preferences.getInt(STORE_VERSION, 1)
+    fun getStoreVersion() = preferences.getInt(STORE_VERSION, 0)
     fun getStoreVersionInit() = preferences.getBoolean(STORE_VERSION_INIT, false)
     fun getLastInfoCreateQueue() = preferences.getString(LAST_INFO_CREATE_QUEUE, "")
     fun setLastName(lastName: String) = editor.putString(LATS_NAME, lastName).commit()

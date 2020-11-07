@@ -150,7 +150,6 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
             refreshAdapter()
         })
 
-
         searchQuery.observe(viewLifecycleOwner, Observer {
             if (it.isNullOrEmpty()) {
                 refreshAdapter()

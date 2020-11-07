@@ -468,12 +468,12 @@ class Common {
                     val idMunicipie = values[3].toInt() - 1
                     val idStore = values[5].toInt()
 
-                    val resultReadJson = Common.getCharts(context)
+                    val resultReadJson = getCharts(context)
                     val province = resultReadJson[idProvince].name
                     val municipality = resultReadJson[idProvince].municipality[idMunicipie].name
                     val storeName =
                         resultReadJson[idProvince].municipality[idMunicipie].store[idStore].name
-                    "$province, $municipality, $storeName"
+                    "$storeName, $municipality, $province"
                 }
             }
             return name.toString()

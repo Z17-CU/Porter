@@ -419,29 +419,7 @@ class QrReaderFragment(
                     }
                     R.id.action_send_mail -> {
 
-                        exportQueueCSV(false)?.let { file ->
-                            val emailIntent = Intent(Intent.ACTION_SENDTO)
-
-                            PreferenceManager.getDefaultSharedPreferences(context)
-                                .getString("emailAddress", "")?.let { emailAddress ->
-                                    if (emailAddress.isNotBlank()) {
-                                        emailIntent.data = Uri.parse("mailto:$emailAddress")
-
-                                        emailIntent.putExtra(
-                                            Intent.EXTRA_STREAM,
-                                            Uri.fromFile(file)
-                                        )
-
-                                        if (emailIntent.resolveActivity(requireActivity().packageManager) != null) {
-                                            requireContext().startActivity(emailIntent)
-                                        } else {
-                                            showError("No hay aplicaciones de correo disponibles.")
-                                        }
-                                    } else {
-                                        showError("Configure una dirección de correo válida.")
-                                    }
-                                }
-                        }
+                        exportQueueCSV(false)
 
                         true
                     }
@@ -1021,9 +999,12 @@ class QrReaderFragment(
         dialog.show()
     }
 
-    private fun exportQueueCSV(shareQueue: Boolean = true): File? {
+    private fun exportQueueCSV(shareQueue: Boolean = true) {
         if (adapter.contentList.isNotEmpty()) {
-            val list = adapter.contentList.subList(exportFrom, exportTo)
+            val list = if (shareQueue) adapter.contentList.subList(
+                exportFrom,
+                exportTo
+            ) else adapter.contentList
             val timeFormat = SimpleDateFormat("h:mm a", Locale("es", "CU"))
             val dateFormat = SimpleDateFormat("d 'de' MMM 'del' yyyy", Locale("es", "CU"))
 
@@ -1037,36 +1018,72 @@ class QrReaderFragment(
 
             val file = File(exportDir, name)
 
-            try {
-                file.createNewFile()
-                val csvWriter = CSVWriter(FileWriter(file))
-                csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
-                list.forEachIndexed { index, client ->
-                    csvWriter.writeNext(
-                        arrayOf(
-                            "$index",
-                            client.name,
-                            client.ci,
-                            dateFormat.format(client.id),
-                            timeFormat.format(client.id)
+            Completable.create {
+
+                try {
+                    file.createNewFile()
+                    val csvWriter = CSVWriter(FileWriter(file))
+                    csvWriter.writeNext(arrayOf("Orden", "Nombre", "CI", "Fecha", "Hora"))
+                    list.map { client ->
+                        val registryDate = dao.getClientFromQueue(client.id, queue.id!!)?.id ?: 0
+                        csvWriter.writeNext(
+                            arrayOf(
+                                client.number.toString(),
+                                client.name,
+                                client.ci,
+                                dateFormat.format(registryDate),
+                                timeFormat.format(registryDate)
+                            )
                         )
-                    )
+                    }
+                    csvWriter.close()
+                    requireActivity().runOnUiThread {
+                        if (shareQueue) {
+                            Common.shareQueue(requireContext(), file, "csv")
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.export_OK,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else
+                            sendMail(file)
+                    }
+                } catch (e: Exception) {
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                    }
                 }
-                csvWriter.close()
-                if (shareQueue)
-                    Common.shareQueue(requireContext(), file, "csv")
-                Toast.makeText(
-                    requireContext(),
-                    R.string.export_OK,
-                    Toast.LENGTH_LONG
-                ).show()
-                return file
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                return null
-            }
-        } else {
-            return null
+
+                it.onComplete()
+            }.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe().addTo(compositeDisposable)
+        }
+    }
+
+    private fun sendMail(file: File?) {
+        file?.let {
+            val emailIntent = Intent(Intent.ACTION_SENDTO)
+
+            PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("emailAddress", "")?.let { emailAddress ->
+                    if (emailAddress.isNotBlank()) {
+                        emailIntent.data = Uri.parse("mailto:$emailAddress")
+
+                        emailIntent.putExtra(
+                            Intent.EXTRA_STREAM,
+                            Uri.fromFile(file)
+                        )
+
+                        if (emailIntent.resolveActivity(requireActivity().packageManager) != null) {
+                            requireContext().startActivity(emailIntent)
+                        } else {
+                            showError("No hay aplicaciones de correo disponibles.")
+                        }
+                    } else {
+                        showError("Configure una dirección de correo válida.")
+                    }
+                }
         }
     }
 
