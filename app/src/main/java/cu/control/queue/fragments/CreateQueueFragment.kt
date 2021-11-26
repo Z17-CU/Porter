@@ -132,23 +132,24 @@ class CreateQueueFragment(
             val time = Calendar.getInstance().timeInMillis
 
             when {
-                thisqueue.store == null -> {
-                    Toast.makeText(
-                        it.context,
-                        "Debe seleccionar un establecimiento.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+//                thisqueue.store == null -> {
+//                    Toast.makeText(
+//                        it.context,
+//                        "Debe seleccionar un establecimiento.",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                }
                 view._editTextName.text?.trim()?.isEmpty() ?: false -> {
                     Toast.makeText(
                         it.context,
-                        "Es necesario el nombre de la cola.",
+                        "Es necesario el nombre de la Visita.",
                         Toast.LENGTH_LONG
                     ).show()
                 }
                 else -> {
                     Completable.create {
 
+                        thisqueue.store = "p3m9s9"
                         dao.insertQueue(thisqueue)
 
                         val map = mutableMapOf<String, Any>()
@@ -252,7 +253,7 @@ class CreateQueueFragment(
 
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-            title = if (id == -1) "Nueva Cola" else "Editar Cola"
+            title = if (id == -1) "Nueva Visita" else "Editar Visita"
 
             setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 

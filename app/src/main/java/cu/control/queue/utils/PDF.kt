@@ -74,7 +74,7 @@ class PDF(val context: Context) {
             var cell1: PdfPCell? = PdfPCell(Phrase("Nombre"))
             var cell3: PdfPCell? = PdfPCell(Phrase("CI"))
             var cell4: PdfPCell? = PdfPCell(Phrase("Reintentos"))
-            var cell5: PdfPCell? = PdfPCell(Phrase("Última ves en cola"))
+            var cell5: PdfPCell? = PdfPCell(Phrase("Última ves en visita"))
             table.addCell(cell1)
             table.addCell(cell3)
             table.addCell(cell4)

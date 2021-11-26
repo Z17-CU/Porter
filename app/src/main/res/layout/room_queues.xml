@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:padding="100dp"
                 android:visibility="gone"
-                app:srcCompat="@drawable/ic_recurso_1" />
+                app:srcCompat="@mipmap/ic_launcher" />
 
         </RelativeLayout>
 

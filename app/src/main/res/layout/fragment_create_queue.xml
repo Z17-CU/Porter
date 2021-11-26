@@ -84,9 +84,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_recurso_1" />
+                app:srcCompat="@drawable/ic_logo_cf" />
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
@@ -94,6 +95,7 @@
                 android:background="@color/darkGray" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -103,6 +105,7 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:visibility="gone"
                 android:id="@+id/alertSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,6 +115,7 @@
                 android:textColor="@color/darkGray" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -122,6 +126,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:visibility="gone"
                 android:id="@+id/selectStore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

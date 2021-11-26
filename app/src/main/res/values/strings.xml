@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Porter@</string>
+    <string name="app_name">Porter@ CFC</string>
     <string name="permissions">Hay permisos obligatorios sin conceder</string>
     <string name="lantern">lantern</string>
     <string name="readError">Lectura incorrecta, inténtalo otra vez.</string>
@@ -41,10 +41,10 @@
     <string name="guardar_como_pdf">Guardar como PDF</string>
     <string name="guardar_como_csv">Guardar como CSV</string>
     <string name="guardar_como_archivo_de_porter">Guardar como archivo de Porter@</string>
-    <string name="export_OK">La cola ha sido exportada al almacenamiento del dispositivo</string>
+    <string name="export_OK">La visita ha sido exportada al almacenamiento del dispositivo</string>
     <string name="export_OK_black_list">La lista negra ha sido exportada al almacenamiento del dispositivo</string>
-    <string name="modo_de_registro">Modo de registro.</string>
-    <string name="modo_de_chequeo">Modo de chequeo.</string>
+    <string name="modo_de_registro">Registrar visita general.</string>
+    <string name="modo_de_chequeo">Registrar visita a la biblioteca.</string>
     <string name="acerca_de">Acerca de</string>
     <string name="uci_2020">UCI 2020</string>
     <string name="c_digo_fuente">Código fuente</string>
@@ -64,9 +64,9 @@
     <string name="buscar">Buscar por CI</string>
     <string name="editar">Editar</string>
     <string name="merge">Mezclar</string>
-    <string name="descripci_n_de_la_cola">Descripción de la cola.</string>
+    <string name="descripci_n_de_la_cola">Descripción de la visita.</string>
     <string name="details">Details</string>
-    <string name="notDescroption">La cola no tiene descripción.</string>
+    <string name="notDescroption">La visita no tiene descripción.</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -93,7 +93,7 @@
     <string name="Permissions_not_now">Ahora no</string>
     <string name="Permissions_permission_required">Se requiere permiso</string>
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
-    <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
+    <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la visita a exportar.</string>
     <string name="deschequiar">NO CHEQUEAR</string>
     <string name="chequiar">CHEQUEAR</string>
     <string name="delete">DELETE</string>
@@ -104,7 +104,7 @@
     <string name="readWrong">Error al leer</string>
     <string name="error_conection">Error de red</string>
     <string name="update">Actualizar</string>
-    <string name="queue_not_found">La cola no existe.</string>
+    <string name="queue_not_found">La visita no existe.</string>
     <string name="next">Continuar</string>
     <string name="province">Seleccione la provincia</string>
     <string name="municipie">Seleccione un municipio</string>
@@ -127,13 +127,13 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="opened">Abiertas</string>
     <string name="saved">Guardadas</string>
-    <string name="new_queue">Nueva cola</string>
+    <string name="new_queue">Nueva visita</string>
     <string name="colaborators">Mis colaboradores</string>
-    <string name="export_queue">Exportar cola</string>
-    <string name="export_queues">Exportar colas</string>
+    <string name="export_queue">Exportar visita</string>
+    <string name="export_queues">Exportar visitas</string>
     <string name="settings">Ajustes</string>
-    <string name="export_list">Debe tener al menos una cola para exportar.</string>
-    <string name="nombre_de_la_cola">Nombre de la cola</string>
+    <string name="export_list">Debe tener al menos una visita para exportar.</string>
+    <string name="nombre_de_la_cola">Nombre de la visita</string>
     <string name="sin_definir">Sin definir</string>
     <string name="descripci_n">Descripción</string>
     <string name="emitir_alertas">Emitir alertas</string>
@@ -142,18 +142,18 @@
     <string name="provincia">Provincia</string>
     <string name="municipio">Municipio</string>
     <string name="colaboradores">Colaboradores</string>
-    <string name="productos">Productos</string>
+    <string name="productos">Categorías</string>
     <string name="time_rotation">Tiempo de rotación</string>
-    <string name="multiple_queue">Alertas de  colas múltiples</string>
-    <string name="count_alert_queue">Cantidad de colas a alertar</string>
+    <string name="multiple_queue">Alertas de  visitas múltiples</string>
+    <string name="count_alert_queue">Cantidad de visitas a alertar</string>
     <string name="date_init">Fecha de inicio</string>
     <string name="date_end">Fecha de fin</string>
     <string name="modo_chequeo">Modo chequeo</string>
-    <string name="producto">Producto</string>
-    <string name="nombre_del_producto">Nombre del producto</string>
+    <string name="producto">Categoría</string>
+    <string name="nombre_del_producto">Nombre de la categoría</string>
     <string name="optional">Opcional</string>
     <string name="error_colaborator">No se pudo agragar el colaborador.</string>
-    <string name="verificar_cola">Verificar cola</string>
+    <string name="verificar_cola">Verificar visita</string>
     <string name="cerrar">Cerrar</string>
     <string name="interesantes">Interesantes</string>
     <string name="enviar_correo">Enviar correo</string>

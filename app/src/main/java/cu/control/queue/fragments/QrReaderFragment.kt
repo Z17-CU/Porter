@@ -191,7 +191,7 @@ class QrReaderFragment(
         } else if (!queue.isSaved) {
             AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle("Cambios sin guardar")
-                .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
+                .setMessage("Hay cambios sin guardar en la visita actual. ¿Desea guardarlos?")
                 .setPositiveButton("Guardar") { _, _ ->
                     sendPayloads()
                 }
@@ -350,7 +350,7 @@ class QrReaderFragment(
                     adapter.contentList[index].searched = true
                     goTo(index)
                 } else {
-                    showError("El cliente no está en la cola.")
+                    showError("El cliente no está en la Visita.")
                 }
                 adapter.notifyDataSetChanged()
             }

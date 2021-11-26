@@ -1,17 +1,22 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    val kotlinVersion = "1.3.71"
+    val kotlinVersion = "1.4.32"
     repositories {
+
+        google()  // Google's Maven repository
+        mavenCentral()
+        jcenter()
+        maven { url = uri("https://jitpack.io") }
 
 //        mavenCentral()
 //        google()
 //        jcenter()
 
-        maven { url = uri("https://maven.aliyun.com/repository/central") }
-        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
-        maven { url = uri("https://jitpack.io") }
+//        maven { url = uri("https://maven.aliyun.com/repository/central") }
+//        maven { url = uri("https://maven.aliyun.com/repository/google") }
+//        maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
+//        maven { url = uri("https://jitpack.io") }
 
         //firebase
 //        maven {
@@ -20,7 +25,7 @@ buildscript {
         //maven { url = uri("https://maven.fabric.io/public") }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.0")
+        classpath("com.android.tools.build:gradle:7.0.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
         //firebase
@@ -33,14 +38,19 @@ buildscript {
 
 allprojects {
     repositories {
+
+        google()  // Google's Maven repository
+        mavenCentral()
+        jcenter()
+        maven { url = uri("https://jitpack.io") }
 //        mavenCentral()
 //        google()
-//        jcenter()
-
-        maven { url = uri("https://maven.aliyun.com/repository/central") }
-        maven { url = uri("https://maven.aliyun.com/repository/google") }
-        maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
-        maven { url = uri("https://jitpack.io") }
+////        jcenter()
+//
+//        maven { url = uri("https://maven.aliyun.com/repository/central") }
+//        maven { url = uri("https://maven.aliyun.com/repository/google") }
+//        maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
+//        maven { url = uri("https://jitpack.io") }
 
     }
 }

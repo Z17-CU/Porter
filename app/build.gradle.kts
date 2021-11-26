@@ -1,19 +1,18 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.kotlin.konan.properties.Properties
 
-plugins {
+    plugins {
 
     id("com.android.application")
-//    id("io.fabric")
-//    id("com.google.gms.google-services")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
-    id("kotlin-android")
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdk = 31
+
+    buildToolsVersion = "31.0.0"
 
     val versionPropsFile = file("version.properties")
 
@@ -28,7 +27,7 @@ android {
         defaultConfig {
             applicationId = "cu.control.queue"
             minSdkVersion(19)
-            targetSdkVersion(28)
+            targetSdkVersion(29 )
             versionCode = code
             versionName = "$name.$build"
             testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
@@ -120,17 +119,17 @@ kapt {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72")
-    implementation("androidx.appcompat:appcompat:1.1.0")
-    implementation("androidx.core:core-ktx:1.3.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.21")
+    implementation("androidx.appcompat:appcompat:1.4.0")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
     implementation("androidx.preference:preference:1.1.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
-    testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test.ext:junit:1.1.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
-    implementation("com.google.android.material:material:1.3.0-alpha01")
+    implementation("com.google.android.material:material:1.5.0-beta01")
 
     implementation("com.karumi:dexter:6.0.2")
 

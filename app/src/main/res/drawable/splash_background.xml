@@ -4,6 +4,6 @@
     <item android:drawable="@color/colorPrimary" />
 
     <item
-        android:drawable="@drawable/ic_splash"
+        android:drawable="@drawable/ic_logo_cf"
         android:gravity="center" />
 </layer-list>

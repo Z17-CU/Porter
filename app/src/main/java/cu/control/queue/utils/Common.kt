@@ -289,7 +289,7 @@ class Common {
         fun shareQueue(context: Context, file: File, extension: String) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Compartir")
-            builder.setMessage("¿Desea compartir el archivo de la cola?")
+            builder.setMessage("¿Desea compartir el archivo de la visita?")
             builder.setNegativeButton("Cancelar", null)
             builder.setPositiveButton(
                 "Compartir"

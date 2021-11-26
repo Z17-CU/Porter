@@ -5,12 +5,12 @@
 
         <SwitchPreferenceCompat
             app:key="alerts"
-            app:title="Alertas de colas multiples" />
+            app:title="Alertas de visitas multiples" />
 
         <cu.control.queue.utils.IntEditTextPreference
             android:inputType="number"
             app:key="QUEUE_CANT"
-            app:title="Cantidad de colas a alertar."
+            app:title="Cantidad de visitas a alertar."
             app:useSimpleSummaryProvider="true" />
 
 

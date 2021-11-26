@@ -89,7 +89,7 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
             if (exportList.size > 0) {
                 Toast.makeText(
                     context,
-                    "Exportando ${exportList.size} cola(s), por favor espere...",
+                    "Exportando ${exportList.size} visita(s), por favor espere...",
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -113,7 +113,7 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
                 }.subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        Toast.makeText(requireContext(), "Colas exportadas", Toast.LENGTH_LONG)
+                        Toast.makeText(requireContext(), "Visitas exportadas", Toast.LENGTH_LONG)
                             .show()
                     }.addTo(compositeDisposable)
 
@@ -223,7 +223,7 @@ class ExportQueueFragment : SupportFragment(), onClickListener {
 
             setNavigationIcon(R.drawable.ic_back_custom)
 
-            title = "Exportar Colas"
+            title = "Exportar Visitas"
             setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 
             setNavigationOnClickListener {

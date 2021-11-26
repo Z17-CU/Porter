@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:text="@string/app_name"
-            android:textColor="@color/blue_drawer"
+            android:textColor="@color/colorAccent"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:openDrawer="start" />
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:textColor="@color/blue_drawer"
+            android:textColor="@color/colorAccent"
             android:textSize="14sp"
             tools:openDrawer="start"
             tools:text="Elvis Salabarria Aquino" />
@@ -38,7 +38,7 @@
             android:id="@+id/creator_queue_ci"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/blue_drawer"
+            android:textColor="@color/colorAccent"
             android:textSize="14sp"
             android:visibility="visible"
             tools:openDrawer="start"

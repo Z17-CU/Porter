@@ -251,7 +251,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
                                 e.printStackTrace()
                                 Toast.makeText(
                                     requireContext(),
-                                    "Archivo incorrecto o cola corrupta.",
+                                    "Archivo incorrecto o visita corrupta.",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -411,18 +411,18 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
                         val person: Person = Gson().fromJson(errorBody, type)
 
                         val message =
-                            "La cola está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
+                            "La visita está siendo operada por ${person.info[Person.KEY_NAME]} ${person.info[Person.KEY_LAST_NAME]}."
 
                         AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
-                            .setTitle("Cola en uso")
+                            .setTitle("Visita en uso")
                             .setMessage(message)
                             .setPositiveButton(android.R.string.ok, null)
                             .setNeutralButton("Abrir") { _, _ ->
                                 showDialogWorkOffline(
                                     queue,
                                     openQueue,
-                                    "Cola en uso",
-                                    "La cola está siendo usada"
+                                    "Visita en uso",
+                                    "La visita está siendo usada"
                                 )
                             }
                             .create().show()
@@ -483,7 +483,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
             if (queue.id == queueToMerge!!.id) {
                 Toast.makeText(
                     requireContext(),
-                    "No puede mezclar una cola con ella misma.",
+                    "No puede mezclar una visita con ella misma.",
                     Toast.LENGTH_LONG
                 ).show()
                 queueToMerge = null
@@ -497,7 +497,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
                 AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                     .setTitle(requireContext().getString(R.string.merge))
                     .setMessage(
-                        "¿Está segur@ que desea mezclar la cola ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la cola ${
+                        "¿Está segur@ que desea mezclar la visita ${queueToMerge!!.name} con ${queue.name}? Se establecerá como fecha de la visita ${
                             Conts.formatDateBig.format(
                                 startDate
                             )
@@ -525,8 +525,8 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
 
     private fun downloadQueueDialog(queue: Queue, openMode: Boolean = false) {
         AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
-            .setTitle("Descargar cola")
-            .setMessage("Debe descargar la cola antes de continuar.")
+            .setTitle("Descargar visita")
+            .setMessage("Debe descargar la visita antes de continuar.")
             .setPositiveButton("Descargar") { _, _ ->
                 onDownloadClick(queue, openMode)
             }.setNegativeButton(android.R.string.cancel, null)
@@ -548,7 +548,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
     private fun saveDialog(queue: Queue) {
         AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
             .setTitle("Guardar")
-            .setMessage("Debe guardar la cola antes de continuar.")
+            .setMessage("Debe guardar la visita antes de continuar.")
             .setPositiveButton("Guardar") { _, _ ->
                 onSaveClick(queue, false)
             }
@@ -608,7 +608,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
                 R.id.action_merge -> {
                     AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                         .setTitle(requireContext().getString(R.string.merge))
-                        .setMessage("Seleccione otra cola para mezclar con ${queue.name}.")
+                        .setMessage("Seleccione otra visita para mezclar con ${queue.name}.")
                         .setPositiveButton("Seleccionar") { _, _ ->
                             queueToMerge = queue
                             toMerge = true
@@ -1072,7 +1072,7 @@ class RoomQueues(private var ci: String? = null) : SupportFragment(), onClickLis
 
         requireActivity().runOnUiThread {
             val message =
-                "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la cola que no prodrá ser guardada en el servidor."
+                "$messageInit. En caso de seleccionar la opción LOCAL la aplicación creará una copia local de la visita que no prodrá ser guardada en el servidor."
             AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle(title)
                 .setMessage(message)

@@ -97,7 +97,7 @@ class SelectProductsFragment(
 
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-            title = "Productos"
+            title = "Categorías"
 
             setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 

@@ -37,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
             setNavigationIcon(R.drawable.ic_back_custom)
 
             title = "Ajustes "
-            setTitleTextColor(ContextCompat.getColor(context, R.color.blue_drawer))
+            setTitleTextColor(ContextCompat.getColor(context, R.color.colorAccent))
 
             setNavigationOnClickListener {
                 this@SettingsActivity.title = this@SettingsActivity.getString(R.string.app_name)
