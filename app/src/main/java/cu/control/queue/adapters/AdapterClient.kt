@@ -90,7 +90,7 @@ class AdapterClient(private val onClientClickListener: OnClientClickListener) :
         holder.clientNumber.text = client.number.toString()
 
         holder.textViewName.text = client.name
-        holder.textViewID.text = "CI: ${client.ci}"
+        holder.textViewID.text = client.ci
         holder.textViewDate.text = formatDateOnlyTime.format(client.lastRegistry)
         holder.textViewReIntents.visibility = if (client.reIntent > 0) {
             holder.textViewReIntents.text = if (client.reIntent > 9) {

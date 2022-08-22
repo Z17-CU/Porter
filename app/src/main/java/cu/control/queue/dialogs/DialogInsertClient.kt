@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import cu.control.queue.repository.dataBase.Dao
 import cu.control.queue.repository.dataBase.entitys.Client
 import cu.control.queue.utils.Common
 import cu.control.queue.utils.Common.Companion.isValidCI
+import cu.control.queue.utils.Common.Companion.isValidCar
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,7 +25,8 @@ import kotlinx.android.synthetic.main.layout_dialog_insert_client.view.*
 class DialogInsertClient(
     private val context: Context,
     private val compositeDisposable: CompositeDisposable,
-    private val onSave: onSave
+    private val onSave: onSave,
+    private val isCar: Boolean = false
 ) {
 
     private lateinit var dao: Dao
@@ -31,7 +34,7 @@ class DialogInsertClient(
 
     fun create(): AlertDialog {
         dao = AppDataBase.getInstance(context).dao()
-        dialog = AlertDialog.Builder(context,R.style.RationaleDialog)
+        dialog = AlertDialog.Builder(context, R.style.RationaleDialog)
             .setView(getView())
             .setCancelable(false)
             .create()
@@ -43,6 +46,13 @@ class DialogInsertClient(
 
         val view = View.inflate(context, R.layout.layout_dialog_insert_client, null)
 
+        if (isCar) {
+            view._editTextCILayout.hint = "Chapa/Circulación"
+            view._editTextFVLayout.visibility = View.GONE
+            view._editTextFVLayoutTag.visibility = View.GONE
+            view._editTextCI.inputType = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+        }
+
         view._cancelButton.setOnClickListener {
             dialog.dismiss()
         }
@@ -53,14 +63,14 @@ class DialogInsertClient(
 
                 val client = Client(
                     view._editTextCI.text.toString().trim(),
-                    view._editTextCI.text.trim().toString().toLong(),
+                    view._editTextCI.text.trim().toString().hashCode().toLong(),
                     view._editTextCI.text.toString().trim(),
                     null,
-                    Common.getSex(view._editTextCI.text.toString().trim()),
-                    Common.getAge(view._editTextCI.text.toString().trim())
+                    if (isCar) null else Common.getSex(view._editTextCI.text.toString().trim()),
+                    if (isCar) 0 else Common.getAge(view._editTextCI.text.toString().trim())
                 )
 
-                onSave.save(client)
+                onSave.save(client, isCar)
 
                 it.onComplete()
             }
@@ -83,7 +93,12 @@ class DialogInsertClient(
 
             override fun afterTextChanged(s: Editable) {
 
-                view._okButton.isEnabled = isValidCI(view._editTextCI.text.toString().trim(), context)
+                view._okButton.isEnabled = if (isCar)
+                    isValidCar(
+                        view._editTextCI.text.toString().trim()
+                    )
+                else
+                    isValidCI(view._editTextCI.text.toString().trim(), context)
             }
         })
 

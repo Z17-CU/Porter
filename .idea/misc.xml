@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Work/Porter/app/src/main/res/drawable/ic_car_svgrepo_com.xml" value="0.2985" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/item_client.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/layout_dialog_insert_client.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/qr_reader.xml" value="0.17046605876393112" />
         <entry key="..\:/WorkArea/Porter/app/src/main/res/drawable/ic_baby.xml" value="0.36666666666666664" />
         <entry key="..\:/WorkArea/Porter/app/src/main/res/drawable/ic_back_custom.xml" value="0.36666666666666664" />
         <entry key="..\:/WorkArea/Porter/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.36666666666666664" />

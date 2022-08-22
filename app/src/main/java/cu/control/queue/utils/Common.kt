@@ -37,6 +37,7 @@ import timber.log.Timber
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.regex.Pattern
 
 
 class Common {
@@ -289,7 +290,7 @@ class Common {
         fun shareQueue(context: Context, file: File, extension: String) {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Compartir")
-            builder.setMessage("¿Desea compartir el archivo de la visita?")
+            builder.setMessage("¿Desea compartir el archivo de la cola?")
             builder.setNegativeButton("Cancelar", null)
             builder.setPositiveButton(
                 "Compartir"
@@ -322,6 +323,12 @@ class Common {
                 ).show()
                 e.printStackTrace()
             }
+        }
+
+        fun isValidCar(ci: String): Boolean {
+            val regex = Pattern.compile("[A-Za-z][0-9]{5}")
+            val regex2 = Pattern.compile("[A-Za-z][0-9]{6}")
+            return regex.matcher(ci).matches() || regex2.matcher(ci).matches()
         }
 
         fun isValidCI(ci: String, context: Context): Boolean {

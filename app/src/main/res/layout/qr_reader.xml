@@ -83,6 +83,18 @@
                         app:srcCompat="@drawable/ic_keyboard"
                         tools:ignore="UnusedAttribute" />
 
+                    <ImageView
+                        android:id="@+id/_showAddCar"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/round_accent_bg"
+                        android:contentDescription="Auto"
+                        android:foreground="?selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        app:srcCompat="@drawable/ic_car_svgrepo_com"
+                        tools:ignore="UnusedAttribute" />
+
 
                 </LinearLayout>
 

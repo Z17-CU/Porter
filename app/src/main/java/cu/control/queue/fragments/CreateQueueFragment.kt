@@ -142,7 +142,7 @@ class CreateQueueFragment(
                 view._editTextName.text?.trim()?.isEmpty() ?: false -> {
                     Toast.makeText(
                         it.context,
-                        "Es necesario el nombre de la Visita.",
+                        "Es necesario el nombre de la Cola.",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -253,7 +253,7 @@ class CreateQueueFragment(
 
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-            title = if (id == -1) "Nueva Visita" else "Editar Visita"
+            title = if (id == -1) "Nueva Cola" else "Editar Cola"
 
             setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 

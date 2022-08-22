@@ -191,7 +191,7 @@ class QrReaderFragment(
         } else if (!queue.isSaved) {
             AlertDialog.Builder(requireContext(), R.style.RationaleDialog)
                 .setTitle("Cambios sin guardar")
-                .setMessage("Hay cambios sin guardar en la visita actual. ¿Desea guardarlos?")
+                .setMessage("Hay cambios sin guardar en la cola actual. ¿Desea guardarlos?")
                 .setPositiveButton("Guardar") { _, _ ->
                     sendPayloads()
                 }
@@ -299,6 +299,10 @@ class QrReaderFragment(
             showDialogInsertClient()
         }
 
+        _showAddCar.setOnClickListener {
+            showDialogInsertClient(true)
+        }
+
         _hightLight.setOnClickListener {
             _zXingScannerView.flash = !_zXingScannerView.flash
             turnFlash()
@@ -350,7 +354,7 @@ class QrReaderFragment(
                     adapter.contentList[index].searched = true
                     goTo(index)
                 } else {
-                    showError("El cliente no está en la Visita.")
+                    showError("El cliente no está en la cola.")
                 }
                 adapter.notifyDataSetChanged()
             }
@@ -614,7 +618,7 @@ class QrReaderFragment(
         progress.dismiss()
     }
 
-    private fun saveClient(client: Client?) {
+    private fun saveClient(client: Client?, isCar: Boolean = false) {
         this.client = client
         isAddClient = true
         if (client == null) {
@@ -636,17 +640,17 @@ class QrReaderFragment(
             return
         }
 
-        if (PreferenceManager.getDefaultSharedPreferences(context)
+        if (PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean(ALERTS, false) && !checkList && queue.alert != false
         ) {
 
-            val queueCant = PreferenceManager.getDefaultSharedPreferences(context)
+            val queueCant = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getInt(QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS)
 
             val currentTime = Calendar.getInstance().timeInMillis
-            val startDate = PreferenceManager.getDefaultSharedPreferences(context)
+            val startDate = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getLong(SettingsActivity.QUERY_START_DATE, currentTime)
-            val endDate = PreferenceManager.getDefaultSharedPreferences(context)
+            val endDate = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getLong(SettingsActivity.QUERY_END_DATE, currentTime)
 
             val count = dao.countToAlert(
@@ -986,12 +990,13 @@ class QrReaderFragment(
         }
     }
 
-    private fun showDialogInsertClient() {
+    private fun showDialogInsertClient(isCar: Boolean = false) {
         pauseScanner()
         val dialog = DialogInsertClient(
             progress.context,
             compositeDisposable,
-            this@QrReaderFragment
+            this@QrReaderFragment,
+            isCar
         ).create()
         dialog.setOnDismissListener {
             resumeReader()
@@ -1065,7 +1070,7 @@ class QrReaderFragment(
         file?.let {
             val emailIntent = Intent(Intent.ACTION_SENDTO)
 
-            PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getString("emailAddress", "")?.let { emailAddress ->
                     if (emailAddress.isNotBlank()) {
                         emailIntent.data = Uri.parse("mailto:$emailAddress")
@@ -1130,9 +1135,9 @@ class QrReaderFragment(
     private fun <T : Any?> MutableLiveData<T>.default(initialValue: T?) =
         apply { setValue(initialValue) }
 
-    override fun save(client: Client) {
+    override fun save(client: Client, isCar: Boolean) {
         Completable.create {
-            saveClient(client)
+            saveClient(client, isCar)
             it.onComplete()
         }.observeOn(Schedulers.io())
             .subscribeOn(Schedulers.io())
@@ -1336,7 +1341,7 @@ class QrReaderFragment(
 
     private fun validateQueue(showDetails: Boolean = false, client: Client? = null) {
         updateObserver(queueId = queue.id!!)
-        val queueCantDay = PreferenceManager.getDefaultSharedPreferences(context)
+        val queueCantDay = PreferenceManager.getDefaultSharedPreferences(requireContext())
             .getInt(QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY)
         val body = mutableMapOf<String, Int>().apply {
             this["days_ago"] = queueCantDay

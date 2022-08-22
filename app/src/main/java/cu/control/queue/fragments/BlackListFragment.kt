@@ -138,7 +138,7 @@ class BlackListFragment : SupportFragment(), onSave, OnClientClickListener {
         })
     }
 
-    override fun save(client: Client) {
+    override fun save(client: Client, isCar: Boolean) {
         Completable.create {
             client.onBlackList = true
             dao.insertClient(client)

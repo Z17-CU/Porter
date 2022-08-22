@@ -4,5 +4,5 @@ import cu.control.queue.repository.dataBase.entitys.Client
 
 
 interface onSave {
-    fun save(client: Client)
+    fun save(client: Client, isCar: Boolean)
 }

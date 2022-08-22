@@ -68,22 +68,22 @@ class SettingsActivity : AppCompatActivity() {
                 isEnableCountDay
             preferenceManager.findPreference<Preference>(QUERY_START_DATE)?.summary =
                 Conts.formatDateBig.format(
-                    preferenceManager.sharedPreferences.getLong(
+                    preferenceManager.sharedPreferences?.getLong(
                         QUERY_START_DATE,
                         Calendar.getInstance().timeInMillis
                     )
                 )
             preferenceManager.findPreference<Preference>(QUERY_END_DATE)?.summary =
                 Conts.formatDateBig.format(
-                    preferenceManager.sharedPreferences.getLong(
+                    preferenceManager.sharedPreferences?.getLong(
                         QUERY_END_DATE,
                         Calendar.getInstance().timeInMillis
                     )
                 )
 
-            if (preferenceManager.sharedPreferences.getInt(Conts.QUEUE_CANT, -1) == -1) {
-                preferenceManager.sharedPreferences.edit()
-                    .putInt(Conts.QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS).apply()
+            if (preferenceManager.sharedPreferences?.getInt(Conts.QUEUE_CANT, -1) == -1) {
+                preferenceManager.sharedPreferences?.edit()
+                    ?.putInt(Conts.QUEUE_CANT, DEFAULT_QUEUE_TIME_HOURS)?.apply()
             }
 
             preferenceManager.findPreference<SwitchPreferenceCompat>("alerts")
@@ -122,9 +122,9 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
 
-            if (preferenceManager.sharedPreferences.getInt(Conts.QUEUE_CANT_DAY, -1) == -1) {
-                preferenceManager.sharedPreferences.edit()
-                    .putInt(Conts.QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY).apply()
+            if (preferenceManager.sharedPreferences?.getInt(Conts.QUEUE_CANT_DAY, -1) == -1) {
+                preferenceManager.sharedPreferences?.edit()
+                    ?.putInt(Conts.QUEUE_CANT_DAY, DEFAULT_QUEUE_COUNT_VERIFY)?.apply()
             }
 
 
@@ -142,7 +142,7 @@ class SettingsActivity : AppCompatActivity() {
 
         private fun showDatePicker(preferenceKey: String) {
             var calendar = Calendar.getInstance()
-            calendar.timeInMillis = preferenceManager.sharedPreferences.getLong(
+            calendar.timeInMillis = preferenceManager.sharedPreferences!!.getLong(
                 preferenceKey,
                 Calendar.getInstance().timeInMillis
             )
@@ -161,8 +161,8 @@ class SettingsActivity : AppCompatActivity() {
                         endDay(calendar)
                     }
 
-                    preferenceManager.sharedPreferences.edit()
-                        .putLong(preferenceKey, calendar.timeInMillis).apply()
+                    preferenceManager.sharedPreferences?.edit()
+                        ?.putLong(preferenceKey, calendar.timeInMillis)?.apply()
                     preferenceManager.findPreference<Preference>(preferenceKey)?.summary =
                         Conts.formatDateBig.format(calendar.timeInMillis)
 

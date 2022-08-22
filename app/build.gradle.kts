@@ -10,9 +10,9 @@ import org.jetbrains.kotlin.konan.properties.Properties
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
-    buildToolsVersion = "31.0.0"
+    //buildToolsVersion = "33.0.2"
 
     val versionPropsFile = file("version.properties")
 
