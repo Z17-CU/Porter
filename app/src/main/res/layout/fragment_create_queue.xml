@@ -84,7 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/ic_logo_cf" />
+                app:srcCompat="@drawable/ic_recurso_1" />
 
             <LinearLayout
                 android:visibility="gone"

@@ -149,6 +149,11 @@ class CreateQueueFragment(
                 else -> {
                     Completable.create {
 
+                        //OFFLINE QUEQUES
+                        thisqueue.isOffline = true
+                        thisqueue.isSaved = true
+                        thisqueue.downloaded = true
+
                         thisqueue.store = "p3m9s9"
                         dao.insertQueue(thisqueue)
 

@@ -27,7 +27,7 @@ android {
         defaultConfig {
             applicationId = "cu.control.queue"
             minSdkVersion(19)
-            targetSdkVersion(29 )
+            targetSdkVersion(30 )
             versionCode = code
             versionName = "$name.$build"
             testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
