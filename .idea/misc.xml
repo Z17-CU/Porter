@@ -15,9 +15,15 @@
         <entry key="..\:/Work/Porter/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/app_bar_main.xml" value="0.35052083333333334" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/content_main.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/dialog_comment_validate.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/dialog_products.xml" value="0.35052083333333334" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/fragment_create_queue.xml" value="0.35052083333333334" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/item_client.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/layout_add_product_dialog.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/layout_buttom_sheet_dialog.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/layout_dialog_hi_client.xml" value="0.35052083333333334" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/layout_dialog_insert_client.xml" value="0.35052083333333334" />
+        <entry key="..\:/Work/Porter/app/src/main/res/layout/permissions_rationale_dialog.xml" value="0.35052083333333334" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/qr_reader.xml" value="0.17046605876393112" />
         <entry key="..\:/Work/Porter/app/src/main/res/layout/quees_open_saved.xml" value="0.35052083333333334" />
         <entry key="..\:/WorkArea/Porter/app/src/main/res/drawable/ic_baby.xml" value="0.36666666666666664" />

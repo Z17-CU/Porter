@@ -89,8 +89,8 @@
     <string name="su_nombre">Su nombre</string>
     <string name="guardar">Guardar</string>
 
-    <string name="Permissions_continue">Continuar</string>
-    <string name="Permissions_not_now">Ahora no</string>
+        <string name="Permissions_continue">Continuar</string>
+        <string name="Permissions_not_now">Ahora no</string>
     <string name="Permissions_permission_required">Se requiere permiso</string>
     <string name="qr_fragment_permanent_denial_camera">Es nesesario acceder a la cámara para escanear los QR.</string>
     <string name="seleccione_el_rango_de_la_cola_a_exportar">Seleccione el rango de la cola a exportar.</string>
